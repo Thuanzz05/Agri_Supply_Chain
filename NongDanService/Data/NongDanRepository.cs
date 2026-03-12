@@ -89,43 +89,40 @@ namespace NongDanService.Data
 
         public int Create(NongDanCreateDTO dto)
         {
-            using var conn = new SqlConnection(_connectionString);
-            conn.Open();
-            using var transaction = conn.BeginTransaction();
-            
             try
             {
+                using var conn = new SqlConnection(_connectionString);
+                conn.Open();
+                
                 // Tạo tài khoản trước
-                var taiKhoanCmd = new SqlCommand(@"
+                using var cmd1 = new SqlCommand(@"
                     INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan) 
                     OUTPUT INSERTED.MaTaiKhoan 
-                    VALUES (@TenDangNhap, @MatKhau, 'nongdan')", conn, transaction);
+                    VALUES (@TenDangNhap, @MatKhau, 'nongdan')", conn);
                 
-                taiKhoanCmd.Parameters.Add("@TenDangNhap", SqlDbType.NVarChar, 50).Value = dto.TenDangNhap;
-                taiKhoanCmd.Parameters.Add("@MatKhau", SqlDbType.NVarChar, 255).Value = dto.MatKhau;
-
-                var maTaiKhoan = (int)taiKhoanCmd.ExecuteScalar();
-
+                cmd1.Parameters.AddWithValue("@TenDangNhap", dto.TenDangNhap);
+                cmd1.Parameters.AddWithValue("@MatKhau", dto.MatKhau);
+                
+                var maTaiKhoan = (int)cmd1.ExecuteScalar();
+                
                 // Tạo nông dân
-                var nongDanCmd = new SqlCommand(@"
+                using var cmd2 = new SqlCommand(@"
                     INSERT INTO NongDan (MaTaiKhoan, HoTen, SoDienThoai, DiaChi) 
                     OUTPUT INSERTED.MaNongDan 
-                    VALUES (@MaTaiKhoan, @HoTen, @SoDienThoai, @DiaChi)", conn, transaction);
-
-                nongDanCmd.Parameters.Add("@MaTaiKhoan", SqlDbType.Int).Value = maTaiKhoan;
-                nongDanCmd.Parameters.Add("@HoTen", SqlDbType.NVarChar, 100).Value = (object?)dto.HoTen ?? DBNull.Value;
-                nongDanCmd.Parameters.Add("@SoDienThoai", SqlDbType.NVarChar, 20).Value = (object?)dto.SoDienThoai ?? DBNull.Value;
-                nongDanCmd.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
-
-                var maNongDan = (int)nongDanCmd.ExecuteScalar();
+                    VALUES (@MaTaiKhoan, @HoTen, @SoDienThoai, @DiaChi)", conn);
                 
-                transaction.Commit();
+                cmd2.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
+                cmd2.Parameters.AddWithValue("@HoTen", (object?)dto.HoTen ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
+                
+                var maNongDan = (int)cmd2.ExecuteScalar();
+                
                 _logger.LogInformation("Created new farmer with ID {FarmerId}", maNongDan);
                 return maNongDan;
             }
             catch (SqlException ex)
             {
-                transaction.Rollback();
                 _logger.LogError(ex, "SQL error occurred while creating farmer");
                 if (ex.Number == 2627 || ex.Number == 2601)
                     throw new Exception("Tên đăng nhập đã tồn tại trong hệ thống", ex);
@@ -133,7 +130,6 @@ namespace NongDanService.Data
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
                 _logger.LogError(ex, "Error occurred while creating farmer");
                 throw new Exception("Lỗi tạo nông dân: " + ex.Message, ex);
             }
