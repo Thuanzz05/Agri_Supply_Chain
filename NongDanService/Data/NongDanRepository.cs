@@ -90,6 +90,7 @@ namespace NongDanService.Data
         public int Create(NongDanCreateDTO dto)
         {
             using var conn = new SqlConnection(_connectionString);
+            conn.Open();
             using var transaction = conn.BeginTransaction();
             
             try
@@ -103,7 +104,6 @@ namespace NongDanService.Data
                 taiKhoanCmd.Parameters.Add("@TenDangNhap", SqlDbType.NVarChar, 50).Value = dto.TenDangNhap;
                 taiKhoanCmd.Parameters.Add("@MatKhau", SqlDbType.NVarChar, 255).Value = dto.MatKhau;
 
-                conn.Open();
                 var maTaiKhoan = (int)taiKhoanCmd.ExecuteScalar();
 
                 // Tạo nông dân
@@ -130,6 +130,12 @@ namespace NongDanService.Data
                 if (ex.Number == 2627 || ex.Number == 2601)
                     throw new Exception("Tên đăng nhập đã tồn tại trong hệ thống", ex);
                 throw new Exception("Lỗi tạo nông dân trong cơ sở dữ liệu: " + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogError(ex, "Error occurred while creating farmer");
+                throw new Exception("Lỗi tạo nông dân: " + ex.Message, ex);
             }
         }
 
