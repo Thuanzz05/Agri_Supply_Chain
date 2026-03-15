@@ -9,6 +9,8 @@ builder.Services.AddControllers();
 // Add dependency injection
 builder.Services.AddScoped<IDaiLyRepository, DaiLyRepository>();
 builder.Services.AddScoped<IDaiLyService, DaiLyService.Services.DaiLyService>();
+builder.Services.AddScoped<IKhoRepository, KhoRepository>();
+builder.Services.AddScoped<IKhoService, KhoService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
