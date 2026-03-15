@@ -1,7 +1,15 @@
+using DaiLyService.Models.DTOs;
+
 namespace DaiLyService.Data
 {
     public interface IKhoRepository
     {
-        // TODO: Define Kho repository methods
+        List<KhoDTO> GetAll();
+        List<KhoDTO> GetByDaiLy(int maDaiLy);
+        KhoDTO? GetById(int id);
+        List<KhoDTO> GetByTrangThai(string trangThai);
+        int Create(KhoCreateDTO dto);
+        bool Update(int id, KhoUpdateDTO dto);
+        bool Delete(int id);
     }
 }
