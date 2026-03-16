@@ -2,7 +2,10 @@
 
 ## Mô tả bài toán
 
-Xây dựng hệ thống quản lý toàn diện chuỗi cung ứng nông sản từ trang trại đến siêu thị, đảm bảo truy xuất nguồn gốc và kiểm soát chất lượng.
+Xây dựng hệ thống quản lý toàn diện chuỗi cung ứng nông sản từ trang trại đến siêu thị, đảm bảo truy xuất nguồn gốc và kiểm soát chất lượng trong toàn bộ quy trình. Hệ thống giải quyết bài toán minh bạch thông tin, theo dõi chất lượng sản phẩm nông nghiệp và tạo niềm tin cho người tiêu dùng thông qua việc cung cấp thông tin chi tiết về nguồn gốc, quy trình sản xuất, vận chuyển và bảo quản của từng lô nông sản.
+
+Với sự phát triển của công nghệ và nhu cầu ngày càng cao về an toàn thực phẩm, hệ thống này sẽ kết nối tất cả các bên tham gia trong chuỗi cung ứng - từ nông dân sản xuất, đại lý phân phối, đến siêu thị bán lẻ - tạo thành một mạng lưới thông tin minh bạch và đáng tin cậy. Hệ thống cung cấp giao diện web thân thiện cho phép các bên dễ dàng quản lý và theo dõi toàn bộ quy trình từ sản xuất đến tiêu thụ.
+
 
 ## Các vai trò
 
