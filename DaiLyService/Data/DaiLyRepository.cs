@@ -23,10 +23,10 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           dl.Email, dl.MoTa, dl.NgayTao, tk.TenDangNhap, tk.HoTen
+                           tk.TenDangNhap, tk.HoTen
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
-                    ORDER BY dl.NgayTao DESC", conn);
+                    ORDER BY dl.MaDaiLy DESC", conn);
 
                 conn.Open();
                 using var reader = cmd.ExecuteReader();
@@ -51,7 +51,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           dl.Email, dl.MoTa, dl.NgayTao, tk.TenDangNhap, tk.HoTen
+                           tk.TenDangNhap, tk.HoTen
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE dl.MaDaiLy = @MaDaiLy", conn);
@@ -81,7 +81,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           dl.Email, dl.MoTa, dl.NgayTao, tk.TenDangNhap, tk.HoTen
+                           tk.TenDangNhap, tk.HoTen
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE dl.MaTaiKhoan = @MaTaiKhoan", conn);
@@ -110,17 +110,14 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, DiaChi, SoDienThoai, Email, MoTa, NgayTao) 
+                    INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, DiaChi, SoDienThoai) 
                     OUTPUT INSERTED.MaDaiLy 
-                    VALUES (@MaTaiKhoan, @TenDaiLy, @DiaChi, @SoDienThoai, @Email, @MoTa, @NgayTao)", conn);
+                    VALUES (@MaTaiKhoan, @TenDaiLy, @DiaChi, @SoDienThoai)", conn);
 
                 cmd.Parameters.AddWithValue("@MaTaiKhoan", dto.MaTaiKhoan);
                 cmd.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
-                cmd.Parameters.AddWithValue("@DiaChi", dto.DiaChi);
-                cmd.Parameters.AddWithValue("@SoDienThoai", dto.SoDienThoai);
-                cmd.Parameters.AddWithValue("@Email", dto.Email);
-                cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@NgayTao", DateTime.Now);
+                cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
 
                 conn.Open();
                 var maDaiLy = (int)cmd.ExecuteScalar();
@@ -134,7 +131,7 @@ namespace DaiLyService.Data
                 if (ex.Number == 547) // Foreign key constraint
                     throw new Exception("Tài khoản không tồn tại trong hệ thống", ex);
                 if (ex.Number == 2627 || ex.Number == 2601) // Unique constraint
-                    throw new Exception("Email hoặc số điện thoại đã tồn tại", ex);
+                    throw new Exception("Tài khoản đã được sử dụng", ex);
                 throw new Exception("Lỗi tạo đại lý trong cơ sở dữ liệu: " + ex.Message, ex);
             }
         }
@@ -146,16 +143,13 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     UPDATE DaiLy 
-                    SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai, 
-                        Email = @Email, MoTa = @MoTa 
+                    SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai 
                     WHERE MaDaiLy = @MaDaiLy", conn);
 
                 cmd.Parameters.AddWithValue("@MaDaiLy", id);
                 cmd.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
-                cmd.Parameters.AddWithValue("@DiaChi", dto.DiaChi);
-                cmd.Parameters.AddWithValue("@SoDienThoai", dto.SoDienThoai);
-                cmd.Parameters.AddWithValue("@Email", dto.Email);
-                cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
 
                 conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
@@ -212,11 +206,8 @@ namespace DaiLyService.Data
                 MaDaiLy = reader.GetInt32("MaDaiLy"),
                 MaTaiKhoan = reader.GetInt32("MaTaiKhoan"),
                 TenDaiLy = reader.GetString("TenDaiLy"),
-                DiaChi = reader.GetString("DiaChi"),
-                SoDienThoai = reader.GetString("SoDienThoai"),
-                Email = reader.GetString("Email"),
-                MoTa = reader.IsDBNull("MoTa") ? null : reader.GetString("MoTa"),
-                NgayTao = reader.GetDateTime("NgayTao"),
+                DiaChi = reader.IsDBNull("DiaChi") ? string.Empty : reader.GetString("DiaChi"),
+                SoDienThoai = reader.IsDBNull("SoDienThoai") ? string.Empty : reader.GetString("SoDienThoai"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 HoTen = reader.IsDBNull("HoTen") ? null : reader.GetString("HoTen")
             };

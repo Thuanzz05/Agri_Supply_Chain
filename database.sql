@@ -1,4 +1,4 @@
-﻿Create database CNWEB_Agri_Supply_Chain
+Create database CNWEB_Agri_Supply_Chain
 Go
 
 USE CNWEB_Agri_Supply_Chain;
