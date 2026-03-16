@@ -121,6 +121,35 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                conn.Open();
+                
+                // Kiểm tra tính hợp lệ của LoaiChuSoHuu
+                if (dto.LoaiChuSoHuu != "daily" && dto.LoaiChuSoHuu != "sieuthi")
+                {
+                    throw new Exception("Loại chủ sở hữu chỉ được phép là 'daily' hoặc 'sieuthi'");
+                }
+                
+                // Kiểm tra tính hợp lệ của MaChuSoHuu
+                bool isValidOwner = false;
+                if (dto.LoaiChuSoHuu == "daily")
+                {
+                    using var checkCmd = new SqlCommand("SELECT COUNT(*) FROM DaiLy WHERE MaDaiLy = @MaChuSoHuu", conn);
+                    checkCmd.Parameters.AddWithValue("@MaChuSoHuu", dto.MaChuSoHuu);
+                    isValidOwner = (int)checkCmd.ExecuteScalar() > 0;
+                }
+                else if (dto.LoaiChuSoHuu == "sieuthi")
+                {
+                    using var checkCmd = new SqlCommand("SELECT COUNT(*) FROM SieuThi WHERE MaSieuThi = @MaChuSoHuu", conn);
+                    checkCmd.Parameters.AddWithValue("@MaChuSoHuu", dto.MaChuSoHuu);
+                    isValidOwner = (int)checkCmd.ExecuteScalar() > 0;
+                }
+                
+                if (!isValidOwner)
+                {
+                    throw new Exception($"Chủ sở hữu với mã {dto.MaChuSoHuu} không tồn tại trong hệ thống");
+                }
+                
+                // Tạo kho
                 using var cmd = new SqlCommand(@"
                     INSERT INTO Kho (TenKho, LoaiKho, MaChuSoHuu, LoaiChuSoHuu, DiaChi) 
                     OUTPUT INSERTED.MaKho 
@@ -132,7 +161,6 @@ namespace DaiLyService.Data
                 cmd.Parameters.AddWithValue("@LoaiChuSoHuu", dto.LoaiChuSoHuu);
                 cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
 
-                conn.Open();
                 var maKho = (int)cmd.ExecuteScalar();
                 
                 _logger.LogInformation("Created new warehouse with ID {WarehouseId}", maKho);
@@ -141,9 +169,12 @@ namespace DaiLyService.Data
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "SQL error occurred while creating warehouse");
-                if (ex.Number == 547) // Foreign key constraint
-                    throw new Exception("Chủ sở hữu không tồn tại trong hệ thống", ex);
                 throw new Exception("Lỗi tạo kho trong cơ sở dữ liệu: " + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while creating warehouse");
+                throw;
             }
         }
 

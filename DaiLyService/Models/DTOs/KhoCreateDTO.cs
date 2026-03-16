@@ -12,6 +12,11 @@ namespace DaiLyService.Models.DTOs
         [StringLength(20, ErrorMessage = "Loại kho không được vượt quá 20 ký tự")]
         public string LoaiKho { get; set; } = string.Empty; // 'daily', 'sieuthi', 'trung_gian'
 
+        /// <summary>
+        /// Mã chủ sở hữu kho
+        /// - Nếu LoaiChuSoHuu = 'daily' thì MaChuSoHuu = MaDaiLy (từ bảng DaiLy)
+        /// - Nếu LoaiChuSoHuu = 'sieuthi' thì MaChuSoHuu = MaSieuThi (từ bảng SieuThi)
+        /// </summary>
         [Required(ErrorMessage = "Mã chủ sở hữu là bắt buộc")]
         public int MaChuSoHuu { get; set; }
 
