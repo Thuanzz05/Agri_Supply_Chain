@@ -109,18 +109,31 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(@"
+                conn.Open();
+                
+                // Tạo tài khoản trước
+                using var cmd1 = new SqlCommand(@"
+                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan) 
+                    OUTPUT INSERTED.MaTaiKhoan 
+                    VALUES (@TenDangNhap, @MatKhau, 'daily')", conn);
+                
+                cmd1.Parameters.AddWithValue("@TenDangNhap", dto.TenDangNhap);
+                cmd1.Parameters.AddWithValue("@MatKhau", dto.MatKhau);
+                
+                var maTaiKhoan = (int)cmd1.ExecuteScalar();
+                
+                // Tạo đại lý
+                using var cmd2 = new SqlCommand(@"
                     INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, DiaChi, SoDienThoai) 
                     OUTPUT INSERTED.MaDaiLy 
                     VALUES (@MaTaiKhoan, @TenDaiLy, @DiaChi, @SoDienThoai)", conn);
 
-                cmd.Parameters.AddWithValue("@MaTaiKhoan", dto.MaTaiKhoan);
-                cmd.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
-                cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
+                cmd2.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
+                cmd2.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
 
-                conn.Open();
-                var maDaiLy = (int)cmd.ExecuteScalar();
+                var maDaiLy = (int)cmd2.ExecuteScalar();
                 
                 _logger.LogInformation("Created new distributor with ID {DistributorId}", maDaiLy);
                 return maDaiLy;
@@ -128,11 +141,14 @@ namespace DaiLyService.Data
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "SQL error occurred while creating distributor");
-                if (ex.Number == 547) // Foreign key constraint
-                    throw new Exception("Tài khoản không tồn tại trong hệ thống", ex);
                 if (ex.Number == 2627 || ex.Number == 2601) // Unique constraint
-                    throw new Exception("Tài khoản đã được sử dụng", ex);
+                    throw new Exception("Tên đăng nhập đã tồn tại trong hệ thống", ex);
                 throw new Exception("Lỗi tạo đại lý trong cơ sở dữ liệu: " + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while creating distributor");
+                throw new Exception("Lỗi tạo đại lý: " + ex.Message, ex);
             }
         }
 
