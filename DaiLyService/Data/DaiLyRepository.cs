@@ -23,7 +23,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           tk.TenDangNhap, tk.HoTen
+                           tk.TenDangNhap
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     ORDER BY dl.MaDaiLy DESC", conn);
@@ -51,7 +51,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           tk.TenDangNhap, tk.HoTen
+                           tk.TenDangNhap
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE dl.MaDaiLy = @MaDaiLy", conn);
@@ -81,7 +81,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           tk.TenDangNhap, tk.HoTen
+                           tk.TenDangNhap
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE dl.MaTaiKhoan = @MaTaiKhoan", conn);
@@ -209,7 +209,7 @@ namespace DaiLyService.Data
                 DiaChi = reader.IsDBNull("DiaChi") ? string.Empty : reader.GetString("DiaChi"),
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? string.Empty : reader.GetString("SoDienThoai"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
-                HoTen = reader.IsDBNull("HoTen") ? null : reader.GetString("HoTen")
+                HoTen = null // TaiKhoan table doesn't have HoTen field
             };
         }
     }
