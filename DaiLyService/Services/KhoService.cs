@@ -18,8 +18,6 @@ namespace DaiLyService.Services
 
         public KhoDTO? GetById(int id) => _repo.GetById(id);
 
-        public List<KhoDTO> GetByTrangThai(string trangThai) => _repo.GetByTrangThai(trangThai);
-
         public int Create(KhoCreateDTO dto) => _repo.Create(dto);
 
         public bool Update(int id, KhoUpdateDTO dto) => _repo.Update(id, dto);

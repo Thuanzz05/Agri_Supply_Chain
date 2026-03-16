@@ -3,16 +3,13 @@ namespace DaiLyService.Models.DTOs
     public class KhoDTO
     {
         public int MaKho { get; set; }
-        public int MaDaiLy { get; set; }
         public string TenKho { get; set; } = string.Empty;
-        public string DiaChi { get; set; } = string.Empty;
-        public decimal DienTich { get; set; }
-        public decimal SucChua { get; set; }
-        public string TrangThai { get; set; } = string.Empty;
-        public string? MoTa { get; set; }
-        public DateTime NgayTao { get; set; }
+        public string LoaiKho { get; set; } = string.Empty; // 'daily', 'sieuthi', 'trung_gian'
+        public int MaChuSoHuu { get; set; }
+        public string LoaiChuSoHuu { get; set; } = string.Empty; // 'daily', 'sieuthi'
+        public string? DiaChi { get; set; }
         
         // Thông tin liên quan
-        public string? TenDaiLy { get; set; }
+        public string? TenChuSoHuu { get; set; } // Tên đại lý hoặc siêu thị
     }
 }

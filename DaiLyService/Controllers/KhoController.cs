@@ -128,44 +128,6 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
-        /// Lấy kho theo trạng thái
-        /// </summary>
-        /// <param name="trangThai">Trạng thái (hoat_dong, tam_ngung, bao_tri)</param>
-        /// <returns>Danh sách kho theo trạng thái</returns>
-        [HttpGet("get-by-trang-thai")]
-        public IActionResult GetByTrangThai([FromQuery] string trangThai)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(trangThai))
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Trạng thái không được để trống"
-                    });
-                }
-
-                var data = _khoService.GetByTrangThai(trangThai);
-                return Ok(new
-                {
-                    success = true,
-                    message = $"Lấy danh sách kho trạng thái '{trangThai}' thành công",
-                    data = data,
-                    count = data.Count
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Lỗi server: " + ex.Message
-                });
-            }
-        }
-
-        /// <summary>
         /// Tạo kho mới
         /// </summary>
         /// <param name="dto">Thông tin kho</param>

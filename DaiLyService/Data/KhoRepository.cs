@@ -22,11 +22,16 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT k.MaKho, k.MaDaiLy, k.TenKho, k.DiaChi, k.DienTich, k.SucChua, 
-                           k.TrangThai, k.MoTa, k.NgayTao, dl.TenDaiLy
+                    SELECT k.MaKho, k.TenKho, k.LoaiKho, k.MaChuSoHuu, k.LoaiChuSoHuu, k.DiaChi,
+                           CASE 
+                               WHEN k.LoaiChuSoHuu = 'daily' THEN dl.TenDaiLy
+                               WHEN k.LoaiChuSoHuu = 'sieuthi' THEN st.TenSieuThi
+                               ELSE NULL
+                           END AS TenChuSoHuu
                     FROM Kho k
-                    LEFT JOIN DaiLy dl ON k.MaDaiLy = dl.MaDaiLy
-                    ORDER BY k.NgayTao DESC", conn);
+                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                    LEFT JOIN SieuThi st ON k.MaChuSoHuu = st.MaSieuThi AND k.LoaiChuSoHuu = 'sieuthi'
+                    ORDER BY k.MaKho DESC", conn);
 
                 conn.Open();
                 using var reader = cmd.ExecuteReader();
@@ -51,12 +56,12 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT k.MaKho, k.MaDaiLy, k.TenKho, k.DiaChi, k.DienTich, k.SucChua, 
-                           k.TrangThai, k.MoTa, k.NgayTao, dl.TenDaiLy
+                    SELECT k.MaKho, k.TenKho, k.LoaiKho, k.MaChuSoHuu, k.LoaiChuSoHuu, k.DiaChi,
+                           dl.TenDaiLy AS TenChuSoHuu
                     FROM Kho k
-                    LEFT JOIN DaiLy dl ON k.MaDaiLy = dl.MaDaiLy
-                    WHERE k.MaDaiLy = @MaDaiLy
-                    ORDER BY k.NgayTao DESC", conn);
+                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy
+                    WHERE k.MaChuSoHuu = @MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                    ORDER BY k.MaKho DESC", conn);
                 
                 cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
 
@@ -82,10 +87,15 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT k.MaKho, k.MaDaiLy, k.TenKho, k.DiaChi, k.DienTich, k.SucChua, 
-                           k.TrangThai, k.MoTa, k.NgayTao, dl.TenDaiLy
+                    SELECT k.MaKho, k.TenKho, k.LoaiKho, k.MaChuSoHuu, k.LoaiChuSoHuu, k.DiaChi,
+                           CASE 
+                               WHEN k.LoaiChuSoHuu = 'daily' THEN dl.TenDaiLy
+                               WHEN k.LoaiChuSoHuu = 'sieuthi' THEN st.TenSieuThi
+                               ELSE NULL
+                           END AS TenChuSoHuu
                     FROM Kho k
-                    LEFT JOIN DaiLy dl ON k.MaDaiLy = dl.MaDaiLy
+                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                    LEFT JOIN SieuThi st ON k.MaChuSoHuu = st.MaSieuThi AND k.LoaiChuSoHuu = 'sieuthi'
                     WHERE k.MaKho = @MaKho", conn);
                 
                 cmd.Parameters.AddWithValue("@MaKho", id);
@@ -106,56 +116,21 @@ namespace DaiLyService.Data
             }
         }
 
-        public List<KhoDTO> GetByTrangThai(string trangThai)
-        {
-            var list = new List<KhoDTO>();
-            try
-            {
-                using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(@"
-                    SELECT k.MaKho, k.MaDaiLy, k.TenKho, k.DiaChi, k.DienTich, k.SucChua, 
-                           k.TrangThai, k.MoTa, k.NgayTao, dl.TenDaiLy
-                    FROM Kho k
-                    LEFT JOIN DaiLy dl ON k.MaDaiLy = dl.MaDaiLy
-                    WHERE k.TrangThai = @TrangThai
-                    ORDER BY k.NgayTao DESC", conn);
-                
-                cmd.Parameters.AddWithValue("@TrangThai", trangThai);
-
-                conn.Open();
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    list.Add(MapToDTO(reader));
-                }
-                _logger.LogInformation("Retrieved {Count} warehouses with status {Status}", list.Count, trangThai);
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "SQL error occurred while getting warehouses with status {Status}", trangThai);
-                throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
-            }
-            return list;
-        }
-
         public int Create(KhoCreateDTO dto)
         {
             try
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    INSERT INTO Kho (MaDaiLy, TenKho, DiaChi, DienTich, SucChua, TrangThai, MoTa, NgayTao) 
+                    INSERT INTO Kho (TenKho, LoaiKho, MaChuSoHuu, LoaiChuSoHuu, DiaChi) 
                     OUTPUT INSERTED.MaKho 
-                    VALUES (@MaDaiLy, @TenKho, @DiaChi, @DienTich, @SucChua, @TrangThai, @MoTa, @NgayTao)", conn);
+                    VALUES (@TenKho, @LoaiKho, @MaChuSoHuu, @LoaiChuSoHuu, @DiaChi)", conn);
 
-                cmd.Parameters.AddWithValue("@MaDaiLy", dto.MaDaiLy);
                 cmd.Parameters.AddWithValue("@TenKho", dto.TenKho);
-                cmd.Parameters.AddWithValue("@DiaChi", dto.DiaChi);
-                cmd.Parameters.AddWithValue("@DienTich", dto.DienTich);
-                cmd.Parameters.AddWithValue("@SucChua", dto.SucChua);
-                cmd.Parameters.AddWithValue("@TrangThai", "hoat_dong");
-                cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@NgayTao", DateTime.Now);
+                cmd.Parameters.AddWithValue("@LoaiKho", dto.LoaiKho);
+                cmd.Parameters.AddWithValue("@MaChuSoHuu", dto.MaChuSoHuu);
+                cmd.Parameters.AddWithValue("@LoaiChuSoHuu", dto.LoaiChuSoHuu);
+                cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
 
                 conn.Open();
                 var maKho = (int)cmd.ExecuteScalar();
@@ -167,7 +142,7 @@ namespace DaiLyService.Data
             {
                 _logger.LogError(ex, "SQL error occurred while creating warehouse");
                 if (ex.Number == 547) // Foreign key constraint
-                    throw new Exception("Đại lý không tồn tại trong hệ thống", ex);
+                    throw new Exception("Chủ sở hữu không tồn tại trong hệ thống", ex);
                 throw new Exception("Lỗi tạo kho trong cơ sở dữ liệu: " + ex.Message, ex);
             }
         }
@@ -179,17 +154,13 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     UPDATE Kho 
-                    SET TenKho = @TenKho, DiaChi = @DiaChi, DienTich = @DienTich, 
-                        SucChua = @SucChua, TrangThai = @TrangThai, MoTa = @MoTa 
+                    SET TenKho = @TenKho, LoaiKho = @LoaiKho, DiaChi = @DiaChi
                     WHERE MaKho = @MaKho", conn);
 
                 cmd.Parameters.AddWithValue("@MaKho", id);
                 cmd.Parameters.AddWithValue("@TenKho", dto.TenKho);
-                cmd.Parameters.AddWithValue("@DiaChi", dto.DiaChi);
-                cmd.Parameters.AddWithValue("@DienTich", dto.DienTich);
-                cmd.Parameters.AddWithValue("@SucChua", dto.SucChua);
-                cmd.Parameters.AddWithValue("@TrangThai", dto.TrangThai);
-                cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@LoaiKho", dto.LoaiKho);
+                cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
 
                 conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
@@ -244,15 +215,12 @@ namespace DaiLyService.Data
             return new KhoDTO
             {
                 MaKho = reader.GetInt32("MaKho"),
-                MaDaiLy = reader.GetInt32("MaDaiLy"),
                 TenKho = reader.GetString("TenKho"),
-                DiaChi = reader.GetString("DiaChi"),
-                DienTich = reader.GetDecimal("DienTich"),
-                SucChua = reader.GetDecimal("SucChua"),
-                TrangThai = reader.GetString("TrangThai"),
-                MoTa = reader.IsDBNull("MoTa") ? null : reader.GetString("MoTa"),
-                NgayTao = reader.GetDateTime("NgayTao"),
-                TenDaiLy = reader.IsDBNull("TenDaiLy") ? null : reader.GetString("TenDaiLy")
+                LoaiKho = reader.GetString("LoaiKho"),
+                MaChuSoHuu = reader.GetInt32("MaChuSoHuu"),
+                LoaiChuSoHuu = reader.GetString("LoaiChuSoHuu"),
+                DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
+                TenChuSoHuu = reader.IsDBNull("TenChuSoHuu") ? null : reader.GetString("TenChuSoHuu")
             };
         }
     }

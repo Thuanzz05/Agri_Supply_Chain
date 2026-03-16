@@ -7,7 +7,6 @@ namespace DaiLyService.Services
         List<KhoDTO> GetAll();
         List<KhoDTO> GetByDaiLy(int maDaiLy);
         KhoDTO? GetById(int id);
-        List<KhoDTO> GetByTrangThai(string trangThai);
         int Create(KhoCreateDTO dto);
         bool Update(int id, KhoUpdateDTO dto);
         bool Delete(int id);
