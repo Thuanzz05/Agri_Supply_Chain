@@ -7,7 +7,6 @@ Hệ thống quản lý toàn diện chuỗi cung ứng nông sản từ trang t
 - **Đại lý**: Quản lý kho trung gian và số lượng tồn kho, theo dõi quá trình vận chuyển và lưu trữ của từng lô hàng, thực hiện kiểm định chất lượng nông sản và lưu biên bản kiểm tra.
 - **Siêu thị**: Xem thông tin lô hàng từ đại lý trước khi nhập hàng, bán hàng cho khách hàng, cung cấp thông tin truy xuất nguồn gốc.
 - **Admin**: Quản trị hệ thống, tạo báo cáo sản lượng và tồn kho, cảnh báo lô nông sản sắp hết hạn hoặc quá hạn.
-- **Khách hàng**: Tra cứu nguồn gốc sản phẩm qua mã định danh.
 
 **Quy trình chuỗi cung ứng**: Trang trại Nông dân → Kho trung gian → Đại lý → Siêu thị → Khách hàng
 
