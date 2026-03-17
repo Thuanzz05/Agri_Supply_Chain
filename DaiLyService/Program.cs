@@ -11,7 +11,7 @@ builder.Services.AddScoped<IDaiLyRepository, DaiLyRepository>();
 builder.Services.AddScoped<IDaiLyService, DaiLyService.Services.DaiLyService>();
 builder.Services.AddScoped<IKhoRepository, KhoRepository>();
 builder.Services.AddScoped<IKhoService, KhoService>();
-builder.Services.AddScoped<ITonKhoRepository, TonKhoRepository>();
+builder.Services.AddScoped<ITonKhoRepository, InventoryRepository>();
 builder.Services.AddScoped<ITonKhoService, TonKhoService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

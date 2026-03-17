@@ -6,14 +6,9 @@ namespace DaiLyService.Data
     {
         List<TonKhoDTO> GetAll();
         List<TonKhoDTO> GetByKho(int maKho);
-        List<TonKhoDTO> GetByDaiLy(int maDaiLy);
-        TonKhoDTO? GetById(int id);
-        TonKhoDTO? GetByLoNongSan(int maLoNongSan);
-        List<TonKhoDTO> GetByTrangThai(string trangThai);
-        List<TonKhoDTO> GetSapHetHang(int maDaiLy);
-        int Create(TonKhoCreateDTO dto);
-        bool Update(int id, TonKhoUpdateDTO dto);
-        bool UpdateSoLuong(int id, decimal soLuongMoi);
-        bool Delete(int id);
+        TonKhoDTO? GetByKhoAndLo(int maKho, int maLo);
+        bool Create(int maKho, int maLo, decimal soLuong);
+        bool UpdateSoLuong(int maKho, int maLo, decimal soLuongMoi);
+        bool Delete(int maKho, int maLo);
     }
 }

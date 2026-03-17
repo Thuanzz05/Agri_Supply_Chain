@@ -4,12 +4,12 @@ using System.Data;
 
 namespace DaiLyService.Data
 {
-    public class TonKhoRepositoryImpl : ITonKhoRepository
+    public class InventoryRepository : ITonKhoRepository
     {
         private readonly string _connectionString;
-        private readonly ILogger<TonKhoRepositoryImpl> _logger;
+        private readonly ILogger<InventoryRepository> _logger;
 
-        public TonKhoRepositoryImpl(IConfiguration config, ILogger<TonKhoRepositoryImpl> logger)
+        public InventoryRepository(IConfiguration config, ILogger<InventoryRepository> logger)
         {
             _connectionString = config.GetConnectionString("DefaultConnection")!;
             _logger = logger;
