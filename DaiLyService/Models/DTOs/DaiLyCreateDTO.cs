@@ -12,6 +12,10 @@ namespace DaiLyService.Models.DTOs
         [StringLength(255, ErrorMessage = "Mật khẩu không được vượt quá 255 ký tự")]
         public string MatKhau { get; set; } = string.Empty;
 
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        [StringLength(100, ErrorMessage = "Email không được vượt quá 100 ký tự")]
+        public string? Email { get; set; }
+
         [Required(ErrorMessage = "Tên đại lý là bắt buộc")]
         [StringLength(100, ErrorMessage = "Tên đại lý không được vượt quá 100 ký tự")]
         public string TenDaiLy { get; set; } = string.Empty;

@@ -23,7 +23,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           tk.TenDangNhap
+                           tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     ORDER BY dl.MaDaiLy DESC", conn);
@@ -51,7 +51,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           tk.TenDangNhap
+                           tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE dl.MaDaiLy = @MaDaiLy", conn);
@@ -81,7 +81,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
-                           tk.TenDangNhap
+                           tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE dl.MaTaiKhoan = @MaTaiKhoan", conn);
@@ -113,12 +113,14 @@ namespace DaiLyService.Data
                 
                 // Tạo tài khoản trước
                 using var cmd1 = new SqlCommand(@"
-                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan) 
+                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan, NgayTao) 
                     OUTPUT INSERTED.MaTaiKhoan 
-                    VALUES (@TenDangNhap, @MatKhau, 'daily')", conn);
+                    VALUES (@TenDangNhap, @MatKhau, @Email, 'daily', @NgayTao)", conn);
                 
                 cmd1.Parameters.AddWithValue("@TenDangNhap", dto.TenDangNhap);
                 cmd1.Parameters.AddWithValue("@MatKhau", dto.MatKhau);
+                cmd1.Parameters.AddWithValue("@Email", (object?)dto.Email ?? DBNull.Value);
+                cmd1.Parameters.AddWithValue("@NgayTao", DateTime.Now);
                 
                 var maTaiKhoan = (int)cmd1.ExecuteScalar();
                 
@@ -225,7 +227,8 @@ namespace DaiLyService.Data
                 DiaChi = reader.IsDBNull("DiaChi") ? string.Empty : reader.GetString("DiaChi"),
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? string.Empty : reader.GetString("SoDienThoai"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
-                HoTen = null // TaiKhoan table doesn't have HoTen field
+                Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
+                NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")
             };
         }
     }

@@ -8,8 +8,9 @@ namespace DaiLyService.Models.DTOs
         public string DiaChi { get; set; } = string.Empty;
         public string SoDienThoai { get; set; } = string.Empty;
         
-        // Thông tin liên quan
+        // Thông tin từ bảng TaiKhoan
         public string? TenDangNhap { get; set; }
-        public string? HoTen { get; set; }
+        public string? Email { get; set; }
+        public DateTime? NgayTao { get; set; }
     }
 }
