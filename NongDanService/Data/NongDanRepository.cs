@@ -21,7 +21,12 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("SELECT MaNongDan, MaTaiKhoan, HoTen, SoDienThoai, DiaChi FROM NongDan", conn);
+                using var cmd = new SqlCommand(@"
+                    SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
+                           tk.TenDangNhap, tk.Email, tk.NgayTao
+                    FROM NongDan nd
+                    LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
+                    ORDER BY nd.MaNongDan DESC", conn);
 
                 conn.Open();
                 using var reader = cmd.ExecuteReader();
@@ -44,7 +49,12 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("SELECT MaNongDan, MaTaiKhoan, HoTen, SoDienThoai, DiaChi FROM NongDan WHERE MaNongDan = @MaNongDan", conn);
+                using var cmd = new SqlCommand(@"
+                    SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
+                           tk.TenDangNhap, tk.Email, tk.NgayTao
+                    FROM NongDan nd
+                    LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
+                    WHERE nd.MaNongDan = @MaNongDan", conn);
                 cmd.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = id;
 
                 conn.Open();
@@ -68,7 +78,12 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("SELECT MaNongDan, MaTaiKhoan, HoTen, SoDienThoai, DiaChi FROM NongDan WHERE MaTaiKhoan = @MaTaiKhoan", conn);
+                using var cmd = new SqlCommand(@"
+                    SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
+                           tk.TenDangNhap, tk.Email, tk.NgayTao
+                    FROM NongDan nd
+                    LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
+                    WHERE nd.MaTaiKhoan = @MaTaiKhoan", conn);
                 cmd.Parameters.Add("@MaTaiKhoan", SqlDbType.Int).Value = maTaiKhoan;
 
                 conn.Open();
@@ -96,12 +111,14 @@ namespace NongDanService.Data
                 
                 // Tạo tài khoản trước
                 using var cmd1 = new SqlCommand(@"
-                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan) 
+                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan, NgayTao) 
                     OUTPUT INSERTED.MaTaiKhoan 
-                    VALUES (@TenDangNhap, @MatKhau, 'nongdan')", conn);
+                    VALUES (@TenDangNhap, @MatKhau, @Email, 'nongdan', @NgayTao)", conn);
                 
                 cmd1.Parameters.AddWithValue("@TenDangNhap", dto.TenDangNhap);
                 cmd1.Parameters.AddWithValue("@MatKhau", dto.MatKhau);
+                cmd1.Parameters.AddWithValue("@Email", (object?)dto.Email ?? DBNull.Value);
+                cmd1.Parameters.AddWithValue("@NgayTao", DateTime.Now);
                 
                 var maTaiKhoan = (int)cmd1.ExecuteScalar();
                 
@@ -206,7 +223,10 @@ namespace NongDanService.Data
                 MaTaiKhoan = reader.GetInt32("MaTaiKhoan"),
                 HoTen = reader.IsDBNull("HoTen") ? null : reader.GetString("HoTen"),
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? null : reader.GetString("SoDienThoai"),
-                DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi")
+                DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
+                TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
+                Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
+                NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")
             };
         }
     }

@@ -7,5 +7,10 @@ namespace NongDanService.Models.DTOs
         public string? HoTen { get; set; }
         public string? SoDienThoai { get; set; }
         public string? DiaChi { get; set; }
+        
+        // Thông tin từ bảng TaiKhoan
+        public string? TenDangNhap { get; set; }
+        public string? Email { get; set; }
+        public DateTime? NgayTao { get; set; }
     }
 }

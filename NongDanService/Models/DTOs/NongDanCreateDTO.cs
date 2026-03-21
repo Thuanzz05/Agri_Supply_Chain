@@ -12,6 +12,10 @@ namespace NongDanService.Models.DTOs
         [StringLength(255, MinimumLength = 6, ErrorMessage = "Mật khẩu phải từ 6-255 ký tự")]
         public string MatKhau { get; set; } = string.Empty;
 
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        [StringLength(100, ErrorMessage = "Email không được vượt quá 100 ký tự")]
+        public string? Email { get; set; }
+
         [StringLength(100, ErrorMessage = "Họ tên không được vượt quá 100 ký tự")]
         public string? HoTen { get; set; }
 
