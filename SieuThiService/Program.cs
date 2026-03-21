@@ -1,8 +1,15 @@
+using SieuThiService.Data;
+using SieuThiService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
+// Register dependencies
+builder.Services.AddScoped<ISieuThiRepository, SieuThiRepository>();
+builder.Services.AddScoped<ISieuThiService, SieuThiBusinessService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
