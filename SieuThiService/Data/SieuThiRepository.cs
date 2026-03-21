@@ -20,15 +20,18 @@ namespace SieuThiService.Data
             var list = new List<SieuThiDTO>();
             try
             {
+                _logger.LogInformation("Starting to retrieve all supermarket records");
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
-                           tk.TenDangNhap, tk.Email, tk.NgayTao
+                           tk.TenDangNhap, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
                     ORDER BY st.MaSieuThi", conn);
 
                 conn.Open();
+                _logger.LogInformation("Database connection opened successfully");
+                
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -38,8 +41,13 @@ namespace SieuThiService.Data
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting all supermarket records");
+                _logger.LogError(ex, "SQL error occurred while getting all supermarket records. Error: {ErrorMessage}, Number: {ErrorNumber}", ex.Message, ex.Number);
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "General error occurred while getting all supermarket records: {ErrorMessage}", ex.Message);
+                throw;
             }
             return list;
         }
@@ -51,7 +59,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
-                           tk.TenDangNhap, tk.Email, tk.NgayTao
+                           tk.TenDangNhap, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE st.MaSieuThi = @MaSieuThi", conn);
@@ -80,7 +88,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
-                           tk.TenDangNhap, tk.Email, tk.NgayTao
+                           tk.TenDangNhap, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
                     WHERE st.MaTaiKhoan = @MaTaiKhoan", conn);
@@ -104,22 +112,20 @@ namespace SieuThiService.Data
         public bool Create(SieuThiCreateDTO sieuThiDto)
         {
             using var conn = new SqlConnection(_connectionString);
+            conn.Open();
             using var transaction = conn.BeginTransaction();
             
             try
             {
-                conn.Open();
-
                 // Tạo tài khoản trước
                 using var cmdAccount = new SqlCommand(@"
-                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan, NgayTao) 
+                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan, NgayTao) 
                     OUTPUT INSERTED.MaTaiKhoan
-                    VALUES (@TenDangNhap, @MatKhau, @Email, @LoaiTaiKhoan, @NgayTao)", conn, transaction);
+                    VALUES (@TenDangNhap, @MatKhau, @LoaiTaiKhoan, @NgayTao)", conn, transaction);
 
                 cmdAccount.Parameters.AddWithValue("@TenDangNhap", sieuThiDto.TenDangNhap);
                 cmdAccount.Parameters.AddWithValue("@MatKhau", BCrypt.Net.BCrypt.HashPassword(sieuThiDto.MatKhau));
-                cmdAccount.Parameters.AddWithValue("@Email", (object?)sieuThiDto.Email ?? DBNull.Value);
-                cmdAccount.Parameters.AddWithValue("@LoaiTaiKhoan", "SieuThi");
+                cmdAccount.Parameters.AddWithValue("@LoaiTaiKhoan", "sieuthi");
                 cmdAccount.Parameters.AddWithValue("@NgayTao", DateTime.Now);
 
                 var maTaiKhoan = (int)cmdAccount.ExecuteScalar();
@@ -259,7 +265,7 @@ namespace SieuThiService.Data
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? null : reader.GetString("SoDienThoai"),
                 DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
-                Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
+                Email = null, // Bảng TaiKhoan không có cột Email
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")
             };
         }
