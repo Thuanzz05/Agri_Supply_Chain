@@ -16,6 +16,10 @@ namespace DaiLyService.Services
 
         public List<KhoDTO> GetByDaiLy(int maDaiLy) => _repo.GetByDaiLy(maDaiLy);
 
+        public List<KhoDTO> GetBySieuThi() => _repo.GetBySieuThi();
+
+        public List<KhoDTO> GetBySieuThi(int maSieuThi) => _repo.GetBySieuThi(maSieuThi);
+
         public KhoDTO? GetById(int id) => _repo.GetById(id);
 
         public int Create(KhoCreateDTO dto) => _repo.Create(dto);
