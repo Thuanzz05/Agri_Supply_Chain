@@ -15,6 +15,8 @@ builder.Services.AddScoped<ITonKhoRepository, InventoryRepository>();
 builder.Services.AddScoped<ITonKhoService, TonKhoService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
+builder.Services.AddScoped<IVanChuyenRepository, VanChuyenRepository>();
+builder.Services.AddScoped<IVanChuyenService, VanChuyenService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
