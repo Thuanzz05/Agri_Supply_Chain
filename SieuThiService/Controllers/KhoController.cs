@@ -114,7 +114,11 @@ namespace SieuThiService.Controllers
                 // Kiểm tra xem kho có thuộc siêu thị không
                 if (data.LoaiChuSoHuu != "sieuthi")
                 {
-                    return Forbid("Kho này không thuộc quyền quản lý của siêu thị");
+                    return StatusCode(403, new
+                    {
+                        success = false,
+                        message = "Kho này không thuộc quyền quản lý của siêu thị"
+                    });
                 }
 
                 return Ok(new
