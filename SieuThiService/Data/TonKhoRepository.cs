@@ -155,14 +155,33 @@ namespace SieuThiService.Data
                 conn.Open();
                 
                 // Kiểm tra kho có thuộc siêu thị không
-                using var checkCmd = new SqlCommand(@"
-                    SELECT COUNT(*) FROM Kho 
+                using var checkKhoCmd = new SqlCommand(@"
+                    SELECT MaChuSoHuu FROM Kho 
                     WHERE MaKho = @MaKho AND LoaiChuSoHuu = 'sieuthi'", conn);
-                checkCmd.Parameters.AddWithValue("@MaKho", maKho);
+                checkKhoCmd.Parameters.AddWithValue("@MaKho", maKho);
                 
-                if ((int)checkCmd.ExecuteScalar() == 0)
+                var result = checkKhoCmd.ExecuteScalar();
+                if (result == null)
                 {
                     throw new Exception("Kho không thuộc quyền quản lý của siêu thị");
+                }
+                
+                int maSieuThi = (int)result;
+                
+                // Kiểm tra siêu thị có đơn hàng đã hoàn thành cho lô này không
+                using var checkDonHangCmd = new SqlCommand(@"
+                    SELECT COUNT(*) FROM DonHang dh
+                    INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
+                    WHERE dh.MaNguoiMua = @MaSieuThi 
+                    AND dh.LoaiNguoiMua = 'sieuthi'
+                    AND dh.TrangThai = 'hoan_thanh'
+                    AND ct.MaLo = @MaLo", conn);
+                checkDonHangCmd.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
+                checkDonHangCmd.Parameters.AddWithValue("@MaLo", maLo);
+                
+                if ((int)checkDonHangCmd.ExecuteScalar() == 0)
+                {
+                    throw new Exception("Siêu thị chỉ có thể tạo tồn kho cho những lô đã mua thông qua đơn hàng hoàn thành");
                 }
                 
                 // Tạo tồn kho
