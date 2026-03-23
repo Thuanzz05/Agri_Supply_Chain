@@ -167,52 +167,6 @@ namespace SieuThiService.Controllers
         }
 
         /// <summary>
-        /// Tạo tồn kho mới
-        /// </summary>
-        /// <param name="dto">Thông tin tồn kho</param>
-        /// <returns>Kết quả tạo tồn kho</returns>
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] TonKhoCreateDTO dto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Dữ liệu không hợp lệ",
-                        errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
-                    });
-                }
-
-                var result = _tonKhoService.Create(dto.MaKho, dto.MaLo, dto.SoLuong);
-                if (result)
-                {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Tạo tồn kho thành công"
-                    });
-                }
-
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Không thể tạo tồn kho"
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Lỗi server: " + ex.Message
-                });
-            }
-        }
-
-        /// <summary>
         /// Cập nhật số lượng tồn kho
         /// </summary>
         /// <param name="maKho">Mã kho</param>

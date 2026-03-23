@@ -147,69 +147,6 @@ namespace SieuThiService.Data
             }
         }
 
-        public bool Create(int maKho, int maLo, decimal soLuong)
-        {
-            try
-            {
-                using var conn = new SqlConnection(_connectionString);
-                conn.Open();
-                
-                // Kiểm tra kho có thuộc siêu thị không
-                using var checkKhoCmd = new SqlCommand(@"
-                    SELECT MaChuSoHuu FROM Kho 
-                    WHERE MaKho = @MaKho AND LoaiChuSoHuu = 'sieuthi'", conn);
-                checkKhoCmd.Parameters.AddWithValue("@MaKho", maKho);
-                
-                var result = checkKhoCmd.ExecuteScalar();
-                if (result == null)
-                {
-                    throw new Exception("Kho không thuộc quyền quản lý của siêu thị");
-                }
-                
-                int maSieuThi = (int)result;
-                
-                // Kiểm tra siêu thị có đơn hàng đã hoàn thành cho lô này không
-                using var checkDonHangCmd = new SqlCommand(@"
-                    SELECT COUNT(*) FROM DonHang dh
-                    INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
-                    WHERE dh.MaNguoiMua = @MaSieuThi 
-                    AND dh.LoaiNguoiMua = 'sieuthi'
-                    AND dh.TrangThai = 'hoan_thanh'
-                    AND ct.MaLo = @MaLo", conn);
-                checkDonHangCmd.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
-                checkDonHangCmd.Parameters.AddWithValue("@MaLo", maLo);
-                
-                if ((int)checkDonHangCmd.ExecuteScalar() == 0)
-                {
-                    throw new Exception("Siêu thị chỉ có thể tạo tồn kho cho những lô đã mua thông qua đơn hàng hoàn thành");
-                }
-                
-                // Tạo tồn kho
-                using var cmd = new SqlCommand(@"
-                    INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat) 
-                    VALUES (@MaKho, @MaLo, @SoLuong, @NgayCapNhat)", conn);
-
-                cmd.Parameters.AddWithValue("@MaKho", maKho);
-                cmd.Parameters.AddWithValue("@MaLo", maLo);
-                cmd.Parameters.AddWithValue("@SoLuong", soLuong);
-                cmd.Parameters.AddWithValue("@NgayCapNhat", DateTime.Now);
-
-                var rowsAffected = cmd.ExecuteNonQuery();
-                
-                _logger.LogInformation("Created inventory record for warehouse {WarehouseId}, lot {LotId}", maKho, maLo);
-                return rowsAffected > 0;
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "SQL error occurred while creating inventory record");
-                if (ex.Number == 547) // Foreign key constraint
-                    throw new Exception("Kho hoặc lô nông sản không tồn tại trong hệ thống", ex);
-                if (ex.Number == 2627 || ex.Number == 2601) // Unique constraint
-                    throw new Exception("Lô nông sản đã tồn tại trong kho này", ex);
-                throw new Exception("Lỗi tạo tồn kho trong cơ sở dữ liệu: " + ex.Message, ex);
-            }
-        }
-
         public bool UpdateSoLuong(int maKho, int maLo, decimal soLuongMoi)
         {
             try

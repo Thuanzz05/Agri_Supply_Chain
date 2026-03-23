@@ -20,8 +20,6 @@ namespace SieuThiService.Services
 
         public TonKhoDTO? GetByKhoAndLo(int maKho, int maLo) => _repo.GetByKhoAndLo(maKho, maLo);
 
-        public bool Create(int maKho, int maLo, decimal soLuong) => _repo.Create(maKho, maLo, soLuong);
-
         public bool UpdateSoLuong(int maKho, int maLo, decimal soLuongMoi) => _repo.UpdateSoLuong(maKho, maLo, soLuongMoi);
 
         public bool Delete(int maKho, int maLo) => _repo.Delete(maKho, maLo);
