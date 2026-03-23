@@ -238,11 +238,11 @@ namespace DaiLyService.Data
         public int Create(DonHangCreateDTO dto)
         {
             using var conn = new SqlConnection(_connectionString);
+            conn.Open();
             using var transaction = conn.BeginTransaction();
             
             try
             {
-                conn.Open();
                 
                 // Tạo đơn hàng
                 using var cmd = new SqlCommand(@"
@@ -327,11 +327,11 @@ namespace DaiLyService.Data
         public bool Delete(int maDonHang)
         {
             using var conn = new SqlConnection(_connectionString);
+            conn.Open();
             using var transaction = conn.BeginTransaction();
             
             try
             {
-                conn.Open();
                 
                 // Xóa chi tiết đơn hàng trước
                 using var detailCmd = new SqlCommand(@"
