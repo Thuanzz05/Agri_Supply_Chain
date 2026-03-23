@@ -28,6 +28,7 @@ namespace DaiLyService.Data
                     LEFT JOIN Kho k ON tk.MaKho = k.MaKho
                     LEFT JOIN LoNongSan ln ON tk.MaLo = ln.MaLo
                     LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
+                    WHERE k.LoaiChuSoHuu = 'daily'
                     ORDER BY tk.NgayCapNhat DESC", conn);
 
                 conn.Open();
@@ -36,11 +37,11 @@ namespace DaiLyService.Data
                 {
                     list.Add(MapToDTO(reader));
                 }
-                _logger.LogInformation("Retrieved {Count} inventory records from database", list.Count);
+                _logger.LogInformation("Retrieved {Count} distributor inventory records from database", list.Count);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting all inventory records");
+                _logger.LogError(ex, "SQL error occurred while getting distributor inventory records");
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
             }
             return list;
@@ -59,7 +60,7 @@ namespace DaiLyService.Data
                     LEFT JOIN Kho k ON tk.MaKho = k.MaKho
                     LEFT JOIN LoNongSan ln ON tk.MaLo = ln.MaLo
                     LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
-                    WHERE tk.MaKho = @MaKho
+                    WHERE tk.MaKho = @MaKho AND k.LoaiChuSoHuu = 'daily'
                     ORDER BY tk.NgayCapNhat DESC", conn);
                 
                 cmd.Parameters.AddWithValue("@MaKho", maKho);
@@ -70,11 +71,11 @@ namespace DaiLyService.Data
                 {
                     list.Add(MapToDTO(reader));
                 }
-                _logger.LogInformation("Retrieved {Count} inventory records for warehouse {WarehouseId}", list.Count, maKho);
+                _logger.LogInformation("Retrieved {Count} inventory records for distributor warehouse {WarehouseId}", list.Count, maKho);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting inventory records for warehouse {WarehouseId}", maKho);
+                _logger.LogError(ex, "SQL error occurred while getting inventory records for distributor warehouse {WarehouseId}", maKho);
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
             }
             return list;
@@ -92,7 +93,7 @@ namespace DaiLyService.Data
                     LEFT JOIN Kho k ON tk.MaKho = k.MaKho
                     LEFT JOIN LoNongSan ln ON tk.MaLo = ln.MaLo
                     LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
-                    WHERE tk.MaKho = @MaKho AND tk.MaLo = @MaLo", conn);
+                    WHERE tk.MaKho = @MaKho AND tk.MaLo = @MaLo AND k.LoaiChuSoHuu = 'daily'", conn);
                 
                 cmd.Parameters.AddWithValue("@MaKho", maKho);
                 cmd.Parameters.AddWithValue("@MaLo", maLo);
@@ -107,7 +108,7 @@ namespace DaiLyService.Data
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting inventory record");
+                _logger.LogError(ex, "SQL error occurred while getting distributor inventory record");
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
             }
         }
@@ -117,6 +118,20 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                conn.Open();
+                
+                // Kiểm tra kho có thuộc đại lý không
+                using var checkCmd = new SqlCommand(@"
+                    SELECT COUNT(*) FROM Kho 
+                    WHERE MaKho = @MaKho AND LoaiChuSoHuu = 'daily'", conn);
+                checkCmd.Parameters.AddWithValue("@MaKho", maKho);
+                
+                if ((int)checkCmd.ExecuteScalar() == 0)
+                {
+                    throw new Exception("Kho không thuộc quyền quản lý của đại lý");
+                }
+                
+                // Tạo tồn kho
                 using var cmd = new SqlCommand(@"
                     INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat) 
                     VALUES (@MaKho, @MaLo, @SoLuong, @NgayCapNhat)", conn);
@@ -126,10 +141,9 @@ namespace DaiLyService.Data
                 cmd.Parameters.AddWithValue("@SoLuong", soLuong);
                 cmd.Parameters.AddWithValue("@NgayCapNhat", DateTime.Now);
 
-                conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
                 
-                _logger.LogInformation("Created inventory record for warehouse {WarehouseId}, lot {LotId}", maKho, maLo);
+                _logger.LogInformation("Created inventory record for distributor warehouse {WarehouseId}, lot {LotId}", maKho, maLo);
                 return rowsAffected > 0;
             }
             catch (SqlException ex)
@@ -151,7 +165,9 @@ namespace DaiLyService.Data
                 using var cmd = new SqlCommand(@"
                     UPDATE TonKho 
                     SET SoLuong = @SoLuongMoi, NgayCapNhat = @NgayCapNhat
-                    WHERE MaKho = @MaKho AND MaLo = @MaLo", conn);
+                    FROM TonKho tk
+                    INNER JOIN Kho k ON tk.MaKho = k.MaKho
+                    WHERE tk.MaKho = @MaKho AND tk.MaLo = @MaLo AND k.LoaiChuSoHuu = 'daily'", conn);
 
                 cmd.Parameters.AddWithValue("@MaKho", maKho);
                 cmd.Parameters.AddWithValue("@MaLo", maLo);
@@ -163,7 +179,7 @@ namespace DaiLyService.Data
                 
                 if (rowsAffected > 0)
                 {
-                    _logger.LogInformation("Updated quantity for warehouse {WarehouseId}, lot {LotId} to {NewQuantity}", maKho, maLo, soLuongMoi);
+                    _logger.LogInformation("Updated quantity for distributor warehouse {WarehouseId}, lot {LotId} to {NewQuantity}", maKho, maLo, soLuongMoi);
                     return true;
                 }
                 
@@ -171,7 +187,7 @@ namespace DaiLyService.Data
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while updating inventory quantity");
+                _logger.LogError(ex, "SQL error occurred while updating distributor inventory quantity");
                 throw new Exception("Lỗi cập nhật số lượng tồn kho", ex);
             }
         }
@@ -181,7 +197,11 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("DELETE FROM TonKho WHERE MaKho = @MaKho AND MaLo = @MaLo", conn);
+                using var cmd = new SqlCommand(@"
+                    DELETE tk FROM TonKho tk
+                    INNER JOIN Kho k ON tk.MaKho = k.MaKho
+                    WHERE tk.MaKho = @MaKho AND tk.MaLo = @MaLo AND k.LoaiChuSoHuu = 'daily'", conn);
+                
                 cmd.Parameters.AddWithValue("@MaKho", maKho);
                 cmd.Parameters.AddWithValue("@MaLo", maLo);
 
@@ -190,7 +210,7 @@ namespace DaiLyService.Data
                 
                 if (rowsAffected > 0)
                 {
-                    _logger.LogInformation("Deleted inventory record for warehouse {WarehouseId}, lot {LotId}", maKho, maLo);
+                    _logger.LogInformation("Deleted distributor inventory record for warehouse {WarehouseId}, lot {LotId}", maKho, maLo);
                     return true;
                 }
                 
@@ -198,7 +218,7 @@ namespace DaiLyService.Data
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while deleting inventory record");
+                _logger.LogError(ex, "SQL error occurred while deleting distributor inventory record");
                 throw new Exception("Lỗi xóa tồn kho trong cơ sở dữ liệu", ex);
             }
         }

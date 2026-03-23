@@ -23,14 +23,10 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT k.MaKho, k.TenKho, k.LoaiKho, k.MaChuSoHuu, k.LoaiChuSoHuu, k.DiaChi,
-                           CASE 
-                               WHEN k.LoaiChuSoHuu = 'daily' THEN dl.TenDaiLy
-                               WHEN k.LoaiChuSoHuu = 'sieuthi' THEN st.TenSieuThi
-                               ELSE NULL
-                           END AS TenChuSoHuu
+                           dl.TenDaiLy AS TenChuSoHuu
                     FROM Kho k
-                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
-                    LEFT JOIN SieuThi st ON k.MaChuSoHuu = st.MaSieuThi AND k.LoaiChuSoHuu = 'sieuthi'
+                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy
+                    WHERE k.LoaiChuSoHuu = 'daily'
                     ORDER BY k.MaKho DESC", conn);
 
                 conn.Open();
@@ -39,11 +35,11 @@ namespace DaiLyService.Data
                 {
                     list.Add(MapToDTO(reader));
                 }
-                _logger.LogInformation("Retrieved {Count} warehouses from database", list.Count);
+                _logger.LogInformation("Retrieved {Count} distributor warehouses from database", list.Count);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting all warehouses");
+                _logger.LogError(ex, "SQL error occurred while getting distributor warehouses");
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
             }
             return list;
@@ -88,15 +84,10 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT k.MaKho, k.TenKho, k.LoaiKho, k.MaChuSoHuu, k.LoaiChuSoHuu, k.DiaChi,
-                           CASE 
-                               WHEN k.LoaiChuSoHuu = 'daily' THEN dl.TenDaiLy
-                               WHEN k.LoaiChuSoHuu = 'sieuthi' THEN st.TenSieuThi
-                               ELSE NULL
-                           END AS TenChuSoHuu
+                           dl.TenDaiLy AS TenChuSoHuu
                     FROM Kho k
-                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
-                    LEFT JOIN SieuThi st ON k.MaChuSoHuu = st.MaSieuThi AND k.LoaiChuSoHuu = 'sieuthi'
-                    WHERE k.MaKho = @MaKho", conn);
+                    LEFT JOIN DaiLy dl ON k.MaChuSoHuu = dl.MaDaiLy
+                    WHERE k.MaKho = @MaKho AND k.LoaiChuSoHuu = 'daily'", conn);
                 
                 cmd.Parameters.AddWithValue("@MaKho", id);
 
@@ -104,14 +95,14 @@ namespace DaiLyService.Data
                 using var reader = cmd.ExecuteReader();
                 if (!reader.Read())
                 {
-                    _logger.LogWarning("Warehouse with ID {WarehouseId} not found", id);
+                    _logger.LogWarning("Distributor warehouse with ID {WarehouseId} not found", id);
                     return null;
                 }
                 return MapToDTO(reader);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting warehouse with ID {WarehouseId}", id);
+                _logger.LogError(ex, "SQL error occurred while getting distributor warehouse with ID {WarehouseId}", id);
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
             }
         }
