@@ -1,4 +1,4 @@
-Create database CNWEB_Agri_Supply_Chain
+﻿Create database CNWEB_Agri_Supply_Chain
 Go
 
 USE CNWEB_Agri_Supply_Chain;
@@ -12,6 +12,7 @@ CREATE TABLE TaiKhoan (
     MaTaiKhoan INT IDENTITY(1,1) PRIMARY KEY,
     TenDangNhap NVARCHAR(50) UNIQUE NOT NULL,
     MatKhau NVARCHAR(255) NOT NULL,
+    Email NVARCHAR(100) UNIQUE NOT NULL,
     LoaiTaiKhoan NVARCHAR(20) NOT NULL, -- 'admin', 'nongdan', 'daily', 'sieuthi'
     TrangThai NVARCHAR(20) DEFAULT N'hoat_dong',
     NgayTao DATETIME2 DEFAULT SYSDATETIME()
@@ -22,7 +23,6 @@ CREATE TABLE Admin (
     MaAdmin INT IDENTITY(1,1) PRIMARY KEY,
     MaTaiKhoan INT UNIQUE NOT NULL,
     HoTen NVARCHAR(100),
-    Email NVARCHAR(100),
     FOREIGN KEY (MaTaiKhoan) REFERENCES TaiKhoan(MaTaiKhoan)
 );
 
@@ -162,19 +162,19 @@ CREATE TABLE KiemDinh (
 
 
 -- 1. TÀI KHOẢN
-INSERT INTO TaiKhoan (TenDangNhap, MatKhau, LoaiTaiKhoan) VALUES
-('admin01', 'admin123', 'admin'),
-('nongdan01', 'nongdan123', 'nongdan'),
-('nongdan02', 'nongdan123', 'nongdan'),
-('nongdan03', 'nongdan123', 'nongdan'),
-('daily01', 'daily123', 'daily'),
-('daily02', 'daily123', 'daily'),
-('sieuthi01', 'sieuthi123', 'sieuthi'),
-('sieuthi02', 'sieuthi123', 'sieuthi');
+INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan) VALUES
+('admin01', 'admin123', 'admin@agrisupply.com', 'admin'),
+('nongdan01', 'nongdan123', 'nongdan01@gmail.com', 'nongdan'),
+('nongdan02', 'nongdan123', 'nongdan02@gmail.com', 'nongdan'),
+('nongdan03', 'nongdan123', 'nongdan03@gmail.com', 'nongdan'),
+('daily01', 'daily123', 'daily01@gmail.com', 'daily'),
+('daily02', 'daily123', 'daily02@gmail.com', 'daily'),
+('sieuthi01', 'sieuthi123', 'sieuthi01@gmail.com', 'sieuthi'),
+('sieuthi02', 'sieuthi123', 'sieuthi02@gmail.com', 'sieuthi');
 
 -- 2. ADMIN
-INSERT INTO Admin (MaTaiKhoan, HoTen, Email) VALUES
-(1, N'Nguyễn Văn Admin', 'admin@agrisupply.com');
+INSERT INTO Admin (MaTaiKhoan, HoTen) VALUES
+(1, N'Nguyễn Văn Admin');
 
 -- 3. NÔNG DÂN
 INSERT INTO NongDan (MaTaiKhoan, HoTen, SoDienThoai, DiaChi) VALUES
