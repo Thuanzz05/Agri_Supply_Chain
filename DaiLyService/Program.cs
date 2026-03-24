@@ -1,10 +1,16 @@
 using DaiLyService.Data;
 using DaiLyService.Services;
+using DaiLyService.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Add DbContext
+builder.Services.AddDbContext<CnwebAgriSupplyChainContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add dependency injection
 builder.Services.AddScoped<IDaiLyRepository, DaiLyRepository>();
@@ -17,6 +23,9 @@ builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 builder.Services.AddScoped<IVanChuyenRepository, VanChuyenRepository>();
 builder.Services.AddScoped<IVanChuyenService, VanChuyenService>();
+builder.Services.AddScoped<IKiemDinhRepository, KiemDinhRepository>();
+builder.Services.AddScoped<IKiemDinhService, KiemDinhService>();
+builder.Services.AddScoped<IKiemDinhService, KiemDinhService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
