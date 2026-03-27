@@ -25,7 +25,7 @@ Agri_Supply_Chain/
 ├── NongDanService/       # API quản lý nông dân, trang trại, lô nông sản
 ├── DaiLyService/         # API quản lý đại lý, kho, vận chuyển, tồn kho
 ├── SieuThiService/       # API quản lý siêu thị, bán hàng
-├── AdminService/         # API quản lý admin, người dùng, thống kê
+├── AdminService/         # API admin, quản lý người dùng, thống kê
 ├── Gateway/              # API Gateway, authentication
 └── database.sql          # Database schema
 ```
