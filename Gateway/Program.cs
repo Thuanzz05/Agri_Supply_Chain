@@ -8,6 +8,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Controllers
+builder.Services.AddControllers();
+
 // Load ocelot.json
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
@@ -59,13 +62,25 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 
-// JWT Middleware cho login
-app.UseMiddleware<JwtMiddleware>();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-await app.UseOcelot();
+// Map Controllers cho local endpoints (auth, test, etc.)
+app.MapControllers();
+
+// JWT Middleware cho login
+app.UseMiddleware<JwtMiddleware>();
+
+// Chỉ áp dụng Ocelot cho các route cụ thể, không phải tất cả
+app.MapWhen(context => 
+    context.Request.Path.StartsWithSegments("/api-nongdan") ||
+    context.Request.Path.StartsWithSegments("/api-daily") ||
+    context.Request.Path.StartsWithSegments("/api-sieuthi") ||
+    context.Request.Path.StartsWithSegments("/api-admin"),
+    appBuilder =>
+    {
+        appBuilder.UseOcelot().Wait();
+    });
 
 app.Run();
 

@@ -1,6 +1,27 @@
 @AdminService_HostAddress = http://localhost:5138
 
-GET {{AdminService_HostAddress}}/weatherforecast/
+### Test AdminService trực tiếp
+GET {{AdminService_HostAddress}}/api/dashboard/test
 Accept: application/json
 
-###
+### Thống kê người dùng (không cần token)
+GET {{AdminService_HostAddress}}/api/dashboard/users
+Accept: application/json
+
+### Dashboard admin (cần token admin)
+GET {{AdminService_HostAddress}}/api/dashboard
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Accept: application/json
+
+### Test qua Gateway - Không cần token
+GET https://localhost:7009/api-admin/dashboard/test
+Accept: application/json
+
+### Test qua Gateway - Thống kê người dùng
+GET https://localhost:7009/api-admin/dashboard/users
+Accept: application/json
+
+### Test qua Gateway - Dashboard admin (cần token)
+GET https://localhost:7009/api-admin/dashboard
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Accept: application/json
