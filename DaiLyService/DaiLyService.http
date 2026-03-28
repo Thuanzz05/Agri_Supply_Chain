@@ -1,5 +1,53 @@
 @DaiLyService_HostAddress = http://localhost:5267
 
+### Get all KiemDinh
+GET {{DaiLyService_HostAddress}}/api/kiem-dinh/get-all
+Accept: application/json
+
+### Get KiemDinh by ID
+GET {{DaiLyService_HostAddress}}/api/kiem-dinh/get-by-id/1
+Accept: application/json
+
+### Get KiemDinh by Lo
+GET {{DaiLyService_HostAddress}}/api/kiem-dinh/get-by-lo/1
+Accept: application/json
+
+### Create new KiemDinh
+POST {{DaiLyService_HostAddress}}/api/kiem-dinh/create
+Content-Type: application/json
+
+{
+  "MaLo": 2,
+  "NguoiKiemDinh": "thuan",
+  "KetQua": "dat",
+  "BienBanKiemTra": "Sản phẩm đạt tiêu chuẩn VietGAP, không có dư lượng thuốc bảo vệ thực vật",
+  "ChuKySo": "SIGN999",
+  "NgayKiemDinh": "2026-03-28T07:22:21.441Z"
+}
+
+### Update KiemDinh
+PUT {{DaiLyService_HostAddress}}/api/kiem-dinh/update/1
+Content-Type: application/json
+
+{
+  "NguoiKiemDinh": "Trần Thị B",
+  "KetQua": "khong_dat",
+  "BienBanKiemTra": "Phát hiện dư lượng thuốc bảo vệ thực vật"
+}
+
+### Delete KiemDinh
+DELETE {{DaiLyService_HostAddress}}/api/kiem-dinh/delete/1
+Accept: application/json
+
+### Get KiemDinh Statistics
+GET {{DaiLyService_HostAddress}}/api/kiem-dinh/thong-ke
+Accept: application/json
+
+### Get KiemDinh by Result
+GET {{DaiLyService_HostAddress}}/api/kiem-dinh/get-by-ket-qua/dat
+Accept: application/json
+
+### Get WeatherForecast (existing)
 GET {{DaiLyService_HostAddress}}/weatherforecast/
 Accept: application/json
 
