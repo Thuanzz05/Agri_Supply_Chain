@@ -7,11 +7,11 @@
       "UpstreamPathTemplate": "/api-nongdan/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5251
+          "Port": 44373
         }
       ]
     },
