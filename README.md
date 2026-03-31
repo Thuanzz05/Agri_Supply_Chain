@@ -1,3 +1,5 @@
+Frontend: https://github.com/Thuanzz05/Agri_Supply_Chain_UI
+
 # Hệ thống Quản lý Nông sản & Chuỗi cung ứng (Agri Supply Chain)
 
 ## Mô tả bài toán
