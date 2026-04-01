@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // JWT Authentication
-var jwtSecret = "KEY_THUAN_2026"; // Same secret as Gateway
+var jwtSecret = "KEY_THUAN_2026_JWT_SECRET_KEY_128_BITS_MINIMUM"; // Same secret as Gateway
 var key = Encoding.ASCII.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(x =>

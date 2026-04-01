@@ -1,4 +1,5 @@
 using Gateway.Helpers;
+using Gateway.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
@@ -39,7 +40,7 @@ namespace Gateway.Controllers
                     });
                 }
 
-                // Lấy thông tin user từ database (không hash password)
+                // Lấy thông tin user từ database 
                 var user = GetUser(request.TenDangNhap, request.MatKhau);
                 if (user == null)
                 {
@@ -50,7 +51,7 @@ namespace Gateway.Controllers
                     });
                 }
 
-                // Tạo JWT token đơn giản
+                // Tạo JWT token
                 var token = GenerateJwtToken(user);
 
                 return Ok(new
@@ -144,7 +145,7 @@ namespace Gateway.Controllers
             using var cmd = new SqlCommand(@"
                 SELECT MaTaiKhoan, TenDangNhap, LoaiTaiKhoan
                 FROM TaiKhoan 
-                WHERE TenDangNhap = @TenDangNhap AND MatKhau = @MatKhau AND TrangThai = 'hoat_dong'", conn);
+                WHERE TenDangNhap = @TenDangNhap AND MatKhau = @MatKhau AND TrangThai = N'hoat_dong'", conn);
 
             cmd.Parameters.AddWithValue("@TenDangNhap", tenDangNhap);
             cmd.Parameters.AddWithValue("@MatKhau", matKhau);
