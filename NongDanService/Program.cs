@@ -30,6 +30,8 @@ builder.Services.AddScoped<ISanPhamRepository, SanPhamRepository>();
 builder.Services.AddScoped<ISanPhamService, SanPhamService>();
 builder.Services.AddScoped<ILoNongSanRepository, LoNongSanRepository>();
 builder.Services.AddScoped<ILoNongSanService, LoNongSanService>();
+builder.Services.AddScoped<IDonHangRepository, DonHangRepositoryImpl>();
+builder.Services.AddScoped<IDonHangService, DonHangService>();
 
 var app = builder.Build();
 

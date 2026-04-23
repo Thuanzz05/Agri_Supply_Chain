@@ -88,6 +88,47 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Lấy đơn hàng theo nông dân (nông dân là người bán)
+        /// </summary>
+        /// <param name="maNongDan">Mã nông dân</param>
+        /// <returns>Danh sách đơn hàng</returns>
+        [HttpGet("get-by-nong-dan/{maNongDan}")]
+        public IActionResult GetByNongDan(int maNongDan)
+        {
+            try
+            {
+                if (maNongDan <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã nông dân không hợp lệ"
+                    });
+                }
+
+                var data = _donHangService.GetByNguoiBan(maNongDan, "nongdan")
+                    .Where(dh => dh.LoaiDon == "nongdan_to_daily")
+                    .ToList();
+                
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách đơn hàng thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Lấy đơn hàng theo ID
         /// </summary>
         /// <param name="id">Mã đơn hàng</param>
