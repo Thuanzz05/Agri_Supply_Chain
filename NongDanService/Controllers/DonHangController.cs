@@ -4,7 +4,7 @@ using NongDanService.Services;
 
 namespace NongDanService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/don-hang")]
     [ApiController]
     public class DonHangController : ControllerBase
     {
