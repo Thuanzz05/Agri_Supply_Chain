@@ -63,6 +63,9 @@ namespace Gateway.Controllers
                         MaTaiKhoan = user.MaTaiKhoan,
                         TenDangNhap = user.TenDangNhap,
                         LoaiTaiKhoan = user.LoaiTaiKhoan,
+                        MaNongDan = user.MaNongDan,
+                        MaDaiLy = user.MaDaiLy,
+                        MaSieuThi = user.MaSieuThi,
                         Token = token
                     }
                 });
@@ -143,9 +146,13 @@ namespace Gateway.Controllers
         {
             using var conn = new SqlConnection(_connectionString);
             using var cmd = new SqlCommand(@"
-                SELECT MaTaiKhoan, TenDangNhap, LoaiTaiKhoan
-                FROM TaiKhoan 
-                WHERE TenDangNhap = @TenDangNhap AND MatKhau = @MatKhau AND TrangThai = N'hoat_dong'", conn);
+                SELECT tk.MaTaiKhoan, tk.TenDangNhap, tk.LoaiTaiKhoan,
+                       nd.MaNongDan, dl.MaDaiLy, st.MaSieuThi
+                FROM TaiKhoan tk
+                LEFT JOIN NongDan nd ON tk.MaTaiKhoan = nd.MaTaiKhoan
+                LEFT JOIN DaiLy dl ON tk.MaTaiKhoan = dl.MaTaiKhoan
+                LEFT JOIN SieuThi st ON tk.MaTaiKhoan = st.MaTaiKhoan
+                WHERE tk.TenDangNhap = @TenDangNhap AND tk.MatKhau = @MatKhau AND tk.TrangThai = N'hoat_dong'", conn);
 
             cmd.Parameters.AddWithValue("@TenDangNhap", tenDangNhap);
             cmd.Parameters.AddWithValue("@MatKhau", matKhau);
@@ -158,7 +165,10 @@ namespace Gateway.Controllers
             {
                 MaTaiKhoan = (int)reader["MaTaiKhoan"],
                 TenDangNhap = reader["TenDangNhap"].ToString()!,
-                LoaiTaiKhoan = reader["LoaiTaiKhoan"].ToString()!
+                LoaiTaiKhoan = reader["LoaiTaiKhoan"].ToString()!,
+                MaNongDan = reader["MaNongDan"] != DBNull.Value ? (int?)reader["MaNongDan"] : null,
+                MaDaiLy = reader["MaDaiLy"] != DBNull.Value ? (int?)reader["MaDaiLy"] : null,
+                MaSieuThi = reader["MaSieuThi"] != DBNull.Value ? (int?)reader["MaSieuThi"] : null
             };
         }
     }
