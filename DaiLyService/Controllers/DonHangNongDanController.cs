@@ -129,6 +129,54 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Tạo đơn hàng mua từ nông dân (đại lý tạo)
+        /// </summary>
+        /// <param name="dto">Thông tin đơn hàng</param>
+        /// <returns>Kết quả tạo đơn hàng</returns>
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] DonHangCreateDTO dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Dữ liệu không hợp lệ",
+                        errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
+                    });
+                }
+
+                // Đảm bảo là đơn hàng nongdan_to_daily
+                if (dto.LoaiDon != "nongdan_to_daily" || dto.LoaiNguoiBan != "nongdan" || dto.LoaiNguoiMua != "daily")
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Loại đơn hàng không hợp lệ cho endpoint này"
+                    });
+                }
+
+                var maDonHang = _donHangService.Create(dto);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Tạo đơn hàng mua từ nông dân thành công",
+                    data = new { MaDonHang = maDonHang }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Lấy đơn hàng theo ID
         /// </summary>
         /// <param name="id">Mã đơn hàng</param>
