@@ -11,6 +11,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Controllers
 builder.Services.AddControllers();
 
+// Add Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Gateway API",
+        Version = "v1",
+        Description = "API Gateway cho hệ thống Chuỗi Cung Ứng Nông Sản"
+    });
+});
+
 // Load ocelot.json
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
@@ -59,6 +71,17 @@ builder.Services.AddOcelot()
 builder.Services.AddTransient<BypassSslHandler>();
 
 var app = builder.Build();
+
+// Enable Swagger
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway API V1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
 app.UseCors("AllowAll");
 

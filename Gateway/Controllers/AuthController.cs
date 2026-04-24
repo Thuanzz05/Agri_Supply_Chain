@@ -24,6 +24,83 @@ namespace Gateway.Controllers
         }
 
         /// <summary>
+        /// Đăng ký tài khoản mới
+        /// </summary>
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] RegisterRequest request)
+        {
+            try
+            {
+                // Validation
+                if (string.IsNullOrEmpty(request.TenDangNhap) || string.IsNullOrEmpty(request.MatKhau))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Tên đăng nhập và mật khẩu không được để trống"
+                    });
+                }
+
+                if (string.IsNullOrEmpty(request.Email))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Email không được để trống"
+                    });
+                }
+
+                if (string.IsNullOrEmpty(request.LoaiTaiKhoan) || 
+                    (request.LoaiTaiKhoan != "nongdan" && request.LoaiTaiKhoan != "daily" && request.LoaiTaiKhoan != "sieuthi"))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Loại tài khoản không hợp lệ"
+                    });
+                }
+
+                // Kiểm tra tên đăng nhập đã tồn tại
+                if (CheckUsernameExists(request.TenDangNhap))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Tên đăng nhập đã tồn tại"
+                    });
+                }
+
+                // Kiểm tra email đã tồn tại
+                if (CheckEmailExists(request.Email))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Email đã được sử dụng"
+                    });
+                }
+
+                // Tạo tài khoản
+                var maTaiKhoan = CreateAccount(request);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Đăng ký tài khoản thành công",
+                    data = new { MaTaiKhoan = maTaiKhoan }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Đăng nhập đơn giản
         /// </summary>
         [HttpPost("login")]
@@ -171,11 +248,113 @@ namespace Gateway.Controllers
                 MaSieuThi = reader["MaSieuThi"] != DBNull.Value ? (int?)reader["MaSieuThi"] : null
             };
         }
+
+        private bool CheckUsernameExists(string tenDangNhap)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("SELECT COUNT(*) FROM TaiKhoan WHERE TenDangNhap = @TenDangNhap", conn);
+            cmd.Parameters.AddWithValue("@TenDangNhap", tenDangNhap);
+            
+            conn.Open();
+            var count = (int)cmd.ExecuteScalar();
+            return count > 0;
+        }
+
+        private bool CheckEmailExists(string email)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("SELECT COUNT(*) FROM TaiKhoan WHERE Email = @Email", conn);
+            cmd.Parameters.AddWithValue("@Email", email);
+            
+            conn.Open();
+            var count = (int)cmd.ExecuteScalar();
+            return count > 0;
+        }
+
+        private int CreateAccount(RegisterRequest request)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            conn.Open();
+            using var transaction = conn.BeginTransaction();
+
+            try
+            {
+                // 1. Tạo tài khoản
+                var cmdAccount = new SqlCommand(@"
+                    INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan, TrangThai, NgayTao)
+                    VALUES (@TenDangNhap, @MatKhau, @Email, @LoaiTaiKhoan, N'hoat_dong', GETDATE());
+                    SELECT CAST(SCOPE_IDENTITY() as int);", conn, transaction);
+
+                cmdAccount.Parameters.AddWithValue("@TenDangNhap", request.TenDangNhap);
+                cmdAccount.Parameters.AddWithValue("@MatKhau", request.MatKhau);
+                cmdAccount.Parameters.AddWithValue("@Email", request.Email);
+                cmdAccount.Parameters.AddWithValue("@LoaiTaiKhoan", request.LoaiTaiKhoan);
+
+                var maTaiKhoan = (int)cmdAccount.ExecuteScalar();
+
+                // 2. Tạo bản ghi tương ứng theo loại tài khoản
+                if (request.LoaiTaiKhoan == "nongdan")
+                {
+                    var cmdFarmer = new SqlCommand(@"
+                        INSERT INTO NongDan (MaTaiKhoan, HoTen, SoDienThoai, DiaChi)
+                        VALUES (@MaTaiKhoan, @HoTen, @SoDienThoai, @DiaChi)", conn, transaction);
+                    
+                    cmdFarmer.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
+                    cmdFarmer.Parameters.AddWithValue("@HoTen", request.HoTen ?? "");
+                    cmdFarmer.Parameters.AddWithValue("@SoDienThoai", request.SoDienThoai ?? "");
+                    cmdFarmer.Parameters.AddWithValue("@DiaChi", request.DiaChi ?? "");
+                    cmdFarmer.ExecuteNonQuery();
+                }
+                else if (request.LoaiTaiKhoan == "daily")
+                {
+                    var cmdAgent = new SqlCommand(@"
+                        INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, SoDienThoai, DiaChi)
+                        VALUES (@MaTaiKhoan, @TenDaiLy, @SoDienThoai, @DiaChi)", conn, transaction);
+                    
+                    cmdAgent.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
+                    cmdAgent.Parameters.AddWithValue("@TenDaiLy", request.HoTen ?? "");
+                    cmdAgent.Parameters.AddWithValue("@SoDienThoai", request.SoDienThoai ?? "");
+                    cmdAgent.Parameters.AddWithValue("@DiaChi", request.DiaChi ?? "");
+                    cmdAgent.ExecuteNonQuery();
+                }
+                else if (request.LoaiTaiKhoan == "sieuthi")
+                {
+                    var cmdSupermarket = new SqlCommand(@"
+                        INSERT INTO SieuThi (MaTaiKhoan, TenSieuThi, SoDienThoai, DiaChi)
+                        VALUES (@MaTaiKhoan, @TenSieuThi, @SoDienThoai, @DiaChi)", conn, transaction);
+                    
+                    cmdSupermarket.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
+                    cmdSupermarket.Parameters.AddWithValue("@TenSieuThi", request.HoTen ?? "");
+                    cmdSupermarket.Parameters.AddWithValue("@SoDienThoai", request.SoDienThoai ?? "");
+                    cmdSupermarket.Parameters.AddWithValue("@DiaChi", request.DiaChi ?? "");
+                    cmdSupermarket.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+                return maTaiKhoan;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
     }
 
     public class LoginRequest
     {
         public string TenDangNhap { get; set; } = string.Empty;
         public string MatKhau { get; set; } = string.Empty;
+    }
+
+    public class RegisterRequest
+    {
+        public string TenDangNhap { get; set; } = string.Empty;
+        public string MatKhau { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string LoaiTaiKhoan { get; set; } = string.Empty;
+        public string? HoTen { get; set; }
+        public string? SoDienThoai { get; set; }
+        public string? DiaChi { get; set; }
     }
 }
