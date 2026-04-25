@@ -15,6 +15,84 @@ namespace DaiLyService.Data
             _logger = logger;
         }
 
+        public List<LoHangKiemDinhDTO> GetLoHangByDaiLy(int maDaiLy)
+        {
+            var list = new List<LoHangKiemDinhDTO>();
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    SELECT 
+                        ln.MaLo,
+                        sp.TenSanPham,
+                        nd.MaNongDan,
+                        nd.HoTen AS TenNongDan,
+                        ln.SoLuongHienTai AS SoLuong,
+                        sp.DonViTinh,
+                        ln.NgayThuHoach,
+                        CASE 
+                            WHEN kd.KetQua IS NULL THEN 'cho_kiem_dinh'
+                            ELSE kd.KetQua
+                        END AS TrangThaiKiemDinh,
+                        kd.BienBanKiemTra AS KetQuaKiemDinh,
+                        kd.NgayKiemDinh,
+                        kd.MaKiemDinh,
+                        CASE 
+                            WHEN kd.KetQua IS NULL THEN 0
+                            ELSE 1
+                        END AS SortOrder
+                    FROM LoNongSan ln
+                    INNER JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
+                    INNER JOIN TrangTrai tt ON ln.MaTrangTrai = tt.MaTrangTrai
+                    INNER JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
+                    LEFT JOIN KiemDinh kd ON ln.MaLo = kd.MaLo
+                    WHERE ln.SoLuongHienTai > 0
+                    ORDER BY SortOrder, ln.NgayThuHoach DESC", conn);
+
+                conn.Open();
+                
+                using var reader = cmd.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    list.Add(new LoHangKiemDinhDTO
+                    {
+                        MaLo = reader.GetInt32(reader.GetOrdinal("MaLo")),
+                        TenSanPham = reader.GetString(reader.GetOrdinal("TenSanPham")),
+                        MaNongDan = reader.GetInt32(reader.GetOrdinal("MaNongDan")),
+                        TenNongDan = reader.GetString(reader.GetOrdinal("TenNongDan")),
+                        SoLuong = reader.GetDecimal(reader.GetOrdinal("SoLuong")),
+                        DonViTinh = reader.GetString(reader.GetOrdinal("DonViTinh")),
+                        NgayThuHoach = reader.IsDBNull(reader.GetOrdinal("NgayThuHoach")) 
+                            ? null 
+                            : reader.GetDateTime(reader.GetOrdinal("NgayThuHoach")),
+                        TrangThaiKiemDinh = reader.GetString(reader.GetOrdinal("TrangThaiKiemDinh")),
+                        KetQuaKiemDinh = reader.IsDBNull(reader.GetOrdinal("KetQuaKiemDinh")) 
+                            ? null 
+                            : reader.GetString(reader.GetOrdinal("KetQuaKiemDinh")),
+                        NgayKiemDinh = reader.IsDBNull(reader.GetOrdinal("NgayKiemDinh")) 
+                            ? null 
+                            : reader.GetDateTime(reader.GetOrdinal("NgayKiemDinh")),
+                        MaKiemDinh = reader.IsDBNull(reader.GetOrdinal("MaKiemDinh")) 
+                            ? null 
+                            : reader.GetInt32(reader.GetOrdinal("MaKiemDinh"))
+                    });
+                }
+                _logger.LogInformation("Retrieved {Count} lots available for quality check", list.Count);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while getting lots for quality check. Error: {ErrorMessage}", ex.Message);
+                throw new Exception($"Lỗi truy vấn cơ sở dữ liệu: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in GetLoHangByDaiLy");
+                throw;
+            }
+            return list;
+        }
+
         public List<KiemDinhDTO> GetAll()
         {
             var list = new List<KiemDinhDTO>();

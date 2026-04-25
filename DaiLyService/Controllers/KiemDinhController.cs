@@ -9,10 +9,52 @@ namespace DaiLyService.Controllers
     public class KiemDinhController : ControllerBase
     {
         private readonly IKiemDinhService _kiemDinhService;
+        private readonly ILogger<KiemDinhController> _logger;
 
-        public KiemDinhController(IKiemDinhService kiemDinhService)
+        public KiemDinhController(IKiemDinhService kiemDinhService, ILogger<KiemDinhController> logger)
         {
             _kiemDinhService = kiemDinhService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Test endpoint - Lấy danh sách lô hàng cần kiểm định theo đại lý
+        /// </summary>
+        /// <param name="maDaiLy">Mã đại lý</param>
+        /// <returns>Danh sách lô hàng với trạng thái kiểm định</returns>
+        [HttpGet("get-lo-hang-by-dai-ly/{maDaiLy}")]
+        public IActionResult GetLoHangByDaiLy(int maDaiLy)
+        {
+            try
+            {
+                if (maDaiLy <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã đại lý không hợp lệ"
+                    });
+                }
+
+                var data = _kiemDinhService.GetLoHangByDaiLy(maDaiLy);
+                
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách lô hàng kiểm định thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetLoHangByDaiLy for agent {MaDaiLy}", maDaiLy);
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
         }
 
         /// <summary>

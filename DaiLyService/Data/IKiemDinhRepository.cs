@@ -4,6 +4,7 @@ namespace DaiLyService.Data
 {
     public interface IKiemDinhRepository
     {
+        List<LoHangKiemDinhDTO> GetLoHangByDaiLy(int maDaiLy); // Lấy lô hàng theo đại lý với trạng thái kiểm định
         List<KiemDinhDTO> GetAll(); // Lấy tất cả kiểm định liên quan đến đại lý
         List<KiemDinhDTO> GetByLo(int maLo); // Lấy kiểm định theo lô
         List<KiemDinhDTO> GetByKetQua(string ketQua); // Lấy kiểm định theo kết quả

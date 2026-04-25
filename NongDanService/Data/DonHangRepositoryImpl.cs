@@ -97,16 +97,131 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                var sql = "UPDATE DonHang SET TrangThai = @TrangThai WHERE MaDonHang = @MaDonHang";
-                var rowsAffected = conn.Execute(sql, new { TrangThai = trangThai, MaDonHang = maDonHang });
+                conn.Open();
+                
+                using var transaction = conn.BeginTransaction();
+                
+                try
+                {
+                    // 1. Cập nhật trạng thái đơn hàng
+                    var sqlUpdateOrder = "UPDATE DonHang SET TrangThai = @TrangThai WHERE MaDonHang = @MaDonHang";
+                    conn.Execute(sqlUpdateOrder, new { TrangThai = trangThai, MaDonHang = maDonHang }, transaction);
 
-                _logger.LogInformation("Updated order {OrderId} status to {Status}", maDonHang, trangThai);
-                return rowsAffected > 0;
+                    // 2. Nếu xác nhận đơn hàng (hoàn thành), cập nhật số lượng lô và tạo tồn kho
+                    if (trangThai == "hoan_thanh")
+                    {
+                        // Lấy thông tin đơn hàng
+                        var sqlGetOrder = @"
+                            SELECT dh.MaNguoiMua, dh.LoaiNguoiMua
+                            FROM DonHang dh
+                            WHERE dh.MaDonHang = @MaDonHang";
+                        
+                        var orderInfo = conn.QueryFirstOrDefault<dynamic>(sqlGetOrder, new { MaDonHang = maDonHang }, transaction);
+                        
+                        if (orderInfo == null)
+                        {
+                            throw new Exception("Không tìm thấy đơn hàng");
+                        }
+
+                        // Lấy chi tiết đơn hàng
+                        var sqlGetDetails = @"
+                            SELECT ct.MaLo, ct.SoLuong
+                            FROM ChiTietDonHang ct
+                            WHERE ct.MaDonHang = @MaDonHang";
+                        
+                        var details = conn.Query<dynamic>(sqlGetDetails, new { MaDonHang = maDonHang }, transaction).ToList();
+
+                        foreach (var detail in details)
+                        {
+                            int maLo = detail.MaLo;
+                            decimal soLuong = detail.SoLuong;
+
+                            // Giảm số lượng hiện tại của lô
+                            var sqlUpdateLot = @"
+                                UPDATE LoNongSan 
+                                SET SoLuongHienTai = SoLuongHienTai - @SoLuong
+                                WHERE MaLo = @MaLo AND SoLuongHienTai >= @SoLuong";
+                            
+                            var rowsAffected = conn.Execute(sqlUpdateLot, new { MaLo = maLo, SoLuong = soLuong }, transaction);
+                            
+                            if (rowsAffected == 0)
+                            {
+                                throw new Exception($"Lô {maLo} không đủ số lượng hoặc không tồn tại");
+                            }
+
+                            // Cập nhật trạng thái lô nếu hết hàng
+                            var sqlUpdateLotStatus = @"
+                                UPDATE LoNongSan 
+                                SET TrangThai = N'da_ban'
+                                WHERE MaLo = @MaLo AND SoLuongHienTai = 0";
+                            
+                            conn.Execute(sqlUpdateLotStatus, new { MaLo = maLo }, transaction);
+
+                            // Tạo tồn kho cho đại lý (nếu người mua là đại lý)
+                            if (orderInfo.LoaiNguoiMua == "daily")
+                            {
+                                int maDaiLy = orderInfo.MaNguoiMua;
+                                
+                                // Lấy kho của đại lý (lấy kho đầu tiên)
+                                var sqlGetWarehouse = @"
+                                    SELECT TOP 1 MaKho 
+                                    FROM Kho 
+                                    WHERE MaChuSoHuu = @MaDaiLy AND LoaiChuSoHuu = 'daily'";
+                                
+                                var maKho = conn.QueryFirstOrDefault<int?>(sqlGetWarehouse, new { MaDaiLy = maDaiLy }, transaction);
+                                
+                                if (maKho.HasValue)
+                                {
+                                    // Kiểm tra xem đã có tồn kho chưa
+                                    var sqlCheckInventory = @"
+                                        SELECT SoLuong 
+                                        FROM TonKho 
+                                        WHERE MaKho = @MaKho AND MaLo = @MaLo";
+                                    
+                                    var existingQty = conn.QueryFirstOrDefault<decimal?>(sqlCheckInventory, 
+                                        new { MaKho = maKho.Value, MaLo = maLo }, transaction);
+
+                                    if (existingQty.HasValue)
+                                    {
+                                        // Cập nhật số lượng tồn kho
+                                        var sqlUpdateInventory = @"
+                                            UPDATE TonKho 
+                                            SET SoLuong = SoLuong + @SoLuong, NgayCapNhat = GETDATE()
+                                            WHERE MaKho = @MaKho AND MaLo = @MaLo";
+                                        
+                                        conn.Execute(sqlUpdateInventory, 
+                                            new { MaKho = maKho.Value, MaLo = maLo, SoLuong = soLuong }, transaction);
+                                    }
+                                    else
+                                    {
+                                        // Tạo mới tồn kho
+                                        var sqlInsertInventory = @"
+                                            INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat)
+                                            VALUES (@MaKho, @MaLo, @SoLuong, GETDATE())";
+                                        
+                                        conn.Execute(sqlInsertInventory, 
+                                            new { MaKho = maKho.Value, MaLo = maLo, SoLuong = soLuong }, transaction);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    transaction.Commit();
+                    _logger.LogInformation("Updated order {OrderId} status to {Status} with inventory management", maDonHang, trangThai);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    _logger.LogError(ex, "Error in transaction while updating order status");
+                    throw;
+                }
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "SQL error occurred while updating order status");
-                throw new Exception("Lỗi cập nhật cơ sở dữ liệu", ex);
+                throw new Exception("Lỗi cập nhật cơ sở dữ liệu: " + ex.Message, ex);
             }
         }
     }

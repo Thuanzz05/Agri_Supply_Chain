@@ -4,6 +4,7 @@ namespace DaiLyService.Services
 {
     public interface IKiemDinhService
     {
+        List<LoHangKiemDinhDTO> GetLoHangByDaiLy(int maDaiLy);
         List<KiemDinhDTO> GetAll();
         List<KiemDinhDTO> GetByLo(int maLo);
         List<KiemDinhDTO> GetByKetQua(string ketQua);
