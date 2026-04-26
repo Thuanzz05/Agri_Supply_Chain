@@ -162,26 +162,55 @@ namespace SieuThiService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(@"
-                    UPDATE SieuThi 
-                    SET TenSieuThi = @TenSieuThi, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi
-                    WHERE MaSieuThi = @MaSieuThi", conn);
-
-                cmd.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
-                cmd.Parameters.AddWithValue("@TenSieuThi", sieuThiDto.TenSieuThi);
-                cmd.Parameters.AddWithValue("@SoDienThoai", (object?)sieuThiDto.SoDienThoai ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@DiaChi", (object?)sieuThiDto.DiaChi ?? DBNull.Value);
-
                 conn.Open();
-                var rowsAffected = cmd.ExecuteNonQuery();
+
+                // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
+                using var transaction = conn.BeginTransaction();
                 
-                if (rowsAffected > 0)
+                try
                 {
+                    // Cập nhật thông tin siêu thị
+                    using var cmd1 = new SqlCommand(@"
+                        UPDATE SieuThi 
+                        SET TenSieuThi = @TenSieuThi, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi
+                        WHERE MaSieuThi = @MaSieuThi", conn, transaction);
+
+                    cmd1.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
+                    cmd1.Parameters.AddWithValue("@TenSieuThi", sieuThiDto.TenSieuThi);
+                    cmd1.Parameters.AddWithValue("@SoDienThoai", (object?)sieuThiDto.SoDienThoai ?? DBNull.Value);
+                    cmd1.Parameters.AddWithValue("@DiaChi", (object?)sieuThiDto.DiaChi ?? DBNull.Value);
+
+                    var rowsAffected = cmd1.ExecuteNonQuery();
+                    
+                    if (rowsAffected == 0)
+                    {
+                        _logger.LogWarning("No supermarket found with ID {SupermarketId} to update", maSieuThi);
+                        transaction.Rollback();
+                        return false;
+                    }
+
+                    // Cập nhật Email trong bảng TaiKhoan nếu có
+                    if (!string.IsNullOrWhiteSpace(sieuThiDto.Email))
+                    {
+                        using var cmd2 = new SqlCommand(@"
+                            UPDATE TaiKhoan 
+                            SET Email = @Email 
+                            WHERE MaTaiKhoan = (SELECT MaTaiKhoan FROM SieuThi WHERE MaSieuThi = @MaSieuThi)", conn, transaction);
+
+                        cmd2.Parameters.AddWithValue("@Email", sieuThiDto.Email);
+                        cmd2.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
+                        cmd2.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                     _logger.LogInformation("Updated supermarket {SupermarketId}", maSieuThi);
                     return true;
                 }
-                
-                return false;
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
             catch (SqlException ex)
             {

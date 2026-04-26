@@ -13,5 +13,9 @@ namespace SieuThiService.Models.DTOs
 
         [StringLength(255, ErrorMessage = "Địa chỉ không được vượt quá 255 ký tự")]
         public string? DiaChi { get; set; }
+
+        [StringLength(255, ErrorMessage = "Email không được vượt quá 255 ký tự")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string? Email { get; set; }
     }
 }
