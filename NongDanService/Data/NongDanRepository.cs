@@ -157,27 +157,55 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(@"
-                    UPDATE NongDan 
-                    SET HoTen = @HoTen, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi 
-                    WHERE MaNongDan = @MaNongDan", conn);
-
-                cmd.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = id;
-                cmd.Parameters.Add("@HoTen", SqlDbType.NVarChar, 100).Value = (object?)dto.HoTen ?? DBNull.Value;
-                cmd.Parameters.Add("@SoDienThoai", SqlDbType.NVarChar, 20).Value = (object?)dto.SoDienThoai ?? DBNull.Value;
-                cmd.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
-
                 conn.Open();
-                var rowsAffected = cmd.ExecuteNonQuery();
+
+                // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
+                using var transaction = conn.BeginTransaction();
                 
-                if (rowsAffected > 0)
+                try
                 {
+                    // Cập nhật thông tin nông dân
+                    using var cmd1 = new SqlCommand(@"
+                        UPDATE NongDan 
+                        SET HoTen = @HoTen, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi 
+                        WHERE MaNongDan = @MaNongDan", conn, transaction);
+
+                    cmd1.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = id;
+                    cmd1.Parameters.Add("@HoTen", SqlDbType.NVarChar, 100).Value = (object?)dto.HoTen ?? DBNull.Value;
+                    cmd1.Parameters.Add("@SoDienThoai", SqlDbType.NVarChar, 20).Value = (object?)dto.SoDienThoai ?? DBNull.Value;
+                    cmd1.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
+
+                    var rowsAffected = cmd1.ExecuteNonQuery();
+                    
+                    if (rowsAffected == 0)
+                    {
+                        _logger.LogWarning("No farmer found with ID {FarmerId} to update", id);
+                        transaction.Rollback();
+                        return false;
+                    }
+
+                    // Cập nhật Email trong bảng TaiKhoan nếu có
+                    if (!string.IsNullOrWhiteSpace(dto.Email))
+                    {
+                        using var cmd2 = new SqlCommand(@"
+                            UPDATE TaiKhoan 
+                            SET Email = @Email 
+                            WHERE MaTaiKhoan = (SELECT MaTaiKhoan FROM NongDan WHERE MaNongDan = @MaNongDan)", conn, transaction);
+
+                        cmd2.Parameters.Add("@Email", SqlDbType.NVarChar, 255).Value = dto.Email;
+                        cmd2.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = id;
+                        cmd2.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                     _logger.LogInformation("Updated farmer with ID {FarmerId}", id);
                     return true;
                 }
-                
-                _logger.LogWarning("No farmer found with ID {FarmerId} to update", id);
-                return false;
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
             catch (SqlException ex)
             {
