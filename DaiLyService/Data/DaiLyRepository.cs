@@ -159,27 +159,55 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(@"
-                    UPDATE DaiLy 
-                    SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai 
-                    WHERE MaDaiLy = @MaDaiLy", conn);
-
-                cmd.Parameters.AddWithValue("@MaDaiLy", id);
-                cmd.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
-                cmd.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
-
                 conn.Open();
-                var rowsAffected = cmd.ExecuteNonQuery();
+
+                // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
+                using var transaction = conn.BeginTransaction();
                 
-                if (rowsAffected > 0)
+                try
                 {
+                    // Cập nhật thông tin đại lý
+                    using var cmd1 = new SqlCommand(@"
+                        UPDATE DaiLy 
+                        SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai 
+                        WHERE MaDaiLy = @MaDaiLy", conn, transaction);
+
+                    cmd1.Parameters.AddWithValue("@MaDaiLy", id);
+                    cmd1.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
+                    cmd1.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
+                    cmd1.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
+
+                    var rowsAffected = cmd1.ExecuteNonQuery();
+                    
+                    if (rowsAffected == 0)
+                    {
+                        _logger.LogWarning("No distributor found with ID {DistributorId} to update", id);
+                        transaction.Rollback();
+                        return false;
+                    }
+
+                    // Cập nhật Email trong bảng TaiKhoan nếu có
+                    if (!string.IsNullOrWhiteSpace(dto.Email))
+                    {
+                        using var cmd2 = new SqlCommand(@"
+                            UPDATE TaiKhoan 
+                            SET Email = @Email 
+                            WHERE MaTaiKhoan = (SELECT MaTaiKhoan FROM DaiLy WHERE MaDaiLy = @MaDaiLy)", conn, transaction);
+
+                        cmd2.Parameters.AddWithValue("@Email", dto.Email);
+                        cmd2.Parameters.AddWithValue("@MaDaiLy", id);
+                        cmd2.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                     _logger.LogInformation("Updated distributor with ID {DistributorId}", id);
                     return true;
                 }
-                
-                _logger.LogWarning("No distributor found with ID {DistributorId} to update", id);
-                return false;
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
             catch (SqlException ex)
             {

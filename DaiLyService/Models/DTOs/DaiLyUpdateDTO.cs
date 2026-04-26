@@ -13,5 +13,9 @@ namespace DaiLyService.Models.DTOs
 
         [StringLength(20, ErrorMessage = "Số điện thoại không được vượt quá 20 ký tự")]
         public string? SoDienThoai { get; set; }
+
+        [StringLength(255, ErrorMessage = "Email không được vượt quá 255 ký tự")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string? Email { get; set; }
     }
 }
