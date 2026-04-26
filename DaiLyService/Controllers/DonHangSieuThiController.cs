@@ -88,6 +88,47 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Lấy đơn hàng theo siêu thị (người mua)
+        /// </summary>
+        /// <param name="maSieuThi">Mã siêu thị</param>
+        /// <returns>Danh sách đơn hàng</returns>
+        [HttpGet("get-by-sieu-thi/{maSieuThi}")]
+        public IActionResult GetBySieuThi(int maSieuThi)
+        {
+            try
+            {
+                if (maSieuThi <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã siêu thị không hợp lệ"
+                    });
+                }
+
+                var data = _donHangService.GetByNguoiMua(maSieuThi, "sieuthi")
+                    .Where(dh => dh.LoaiDon == "daily_to_sieuthi")
+                    .ToList();
+                
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách đơn hàng của siêu thị thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Tạo đơn hàng bán cho siêu thị
         /// </summary>
         /// <param name="dto">Thông tin đơn hàng</param>
