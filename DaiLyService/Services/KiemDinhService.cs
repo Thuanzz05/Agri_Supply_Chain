@@ -14,6 +14,8 @@ namespace DaiLyService.Services
 
         public List<LoHangKiemDinhDTO> GetLoHangByDaiLy(int maDaiLy) => _repo.GetLoHangByDaiLy(maDaiLy);
 
+        public List<LoHangKiemDinhDTO> GetAllLoHangAvailable() => _repo.GetAllLoHangAvailable();
+
         public List<KiemDinhDTO> GetAll() => _repo.GetAll();
 
         public List<KiemDinhDTO> GetByLo(int maLo) => _repo.GetByLo(maLo);

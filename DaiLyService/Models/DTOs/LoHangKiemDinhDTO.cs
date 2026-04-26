@@ -9,6 +9,7 @@ namespace DaiLyService.Models.DTOs
         public decimal SoLuong { get; set; }
         public string DonViTinh { get; set; } = string.Empty;
         public DateTime? NgayThuHoach { get; set; }
+        public DateTime? HanSuDung { get; set; }
         public string TrangThaiKiemDinh { get; set; } = "cho_kiem_dinh"; // cho_kiem_dinh, dat, khong_dat
         public string? KetQuaKiemDinh { get; set; }
         public DateTime? NgayKiemDinh { get; set; }

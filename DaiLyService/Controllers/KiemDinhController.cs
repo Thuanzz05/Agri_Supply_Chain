@@ -58,6 +58,36 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Lấy tất cả lô hàng available (để tạo đơn hàng)
+        /// </summary>
+        /// <returns>Danh sách tất cả lô hàng có sẵn</returns>
+        [HttpGet("get-all-lo-hang-available")]
+        public IActionResult GetAllLoHangAvailable()
+        {
+            try
+            {
+                var data = _kiemDinhService.GetAllLoHangAvailable();
+                
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách lô hàng thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllLoHangAvailable");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Lấy tất cả kiểm định
         /// </summary>
         /// <returns>Danh sách kiểm định</returns>
