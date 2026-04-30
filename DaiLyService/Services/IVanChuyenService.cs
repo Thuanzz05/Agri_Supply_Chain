@@ -7,6 +7,7 @@ namespace DaiLyService.Services
         List<VanChuyenDTO> GetAll();
         List<VanChuyenDTO> GetByTrangThai(string trangThai);
         List<VanChuyenDTO> GetByLo(int maLo);
+        List<VanChuyenDTO> GetByDaiLy(int maDaiLy);
         VanChuyenDTO? GetById(int maVanChuyen);
         int Create(VanChuyenCreateDTO dto);
         bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null);

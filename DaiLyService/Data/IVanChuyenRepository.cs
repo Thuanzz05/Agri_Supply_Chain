@@ -8,6 +8,7 @@ namespace DaiLyService.Data
         List<VanChuyenDTO> GetAll(); // Lấy tất cả vận chuyển
         List<VanChuyenDTO> GetByTrangThai(string trangThai); // Lấy theo trạng thái
         List<VanChuyenDTO> GetByLo(int maLo); // Lấy theo lô nông sản
+        List<VanChuyenDTO> GetByDaiLy(int maDaiLy); // Lấy theo đại lý
         VanChuyenDTO? GetById(int maVanChuyen);
         
         // CRUD vận chuyển

@@ -98,7 +98,7 @@ namespace DaiLyService.Data
                     LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
                     WHERE vc.MaLo = @MaLo
                     ORDER BY vc.NgayBatDau DESC", conn);
-                
+
                 cmd.Parameters.AddWithValue("@MaLo", maLo);
 
                 conn.Open();
@@ -107,11 +107,48 @@ namespace DaiLyService.Data
                 {
                     list.Add(MapToDTO(reader));
                 }
-                _logger.LogInformation("Retrieved {Count} shipping records for lot {LotId}", list.Count, maLo);
+                _logger.LogInformation("Retrieved {Count} shipping records for batch {MaLo}", list.Count, maLo);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "SQL error occurred while getting shipping records for lot {LotId}", maLo);
+                _logger.LogError(ex, "SQL error occurred while getting shipping records by batch");
+                throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
+            }
+            return list;
+        }
+
+        public List<VanChuyenDTO> GetByDaiLy(int maDaiLy)
+        {
+            var list = new List<VanChuyenDTO>();
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    SELECT DISTINCT vc.MaVanChuyen, vc.MaLo, vc.DiemDi, vc.DiemDen, 
+                           vc.NgayBatDau, vc.NgayKetThuc, vc.TrangThai,
+                           sp.TenSanPham, sp.DonViTinh, ln.MaQR, ln.SoLuongHienTai,
+                           ln.NgayThuHoach, ln.HanSuDung
+                    FROM VanChuyen vc
+                    INNER JOIN LoNongSan ln ON vc.MaLo = ln.MaLo
+                    INNER JOIN TonKho tk ON ln.MaLo = tk.MaLo
+                    INNER JOIN Kho k ON tk.MaKho = k.MaKho
+                    LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
+                    WHERE k.MaChuSoHuu = @MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                    ORDER BY vc.NgayBatDau DESC", conn);
+
+                cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
+
+                conn.Open();
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(MapToDTO(reader));
+                }
+                _logger.LogInformation("Retrieved {Count} shipping records for agent {MaDaiLy}", list.Count, maDaiLy);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while getting shipping records by agent");
                 throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
             }
             return list;

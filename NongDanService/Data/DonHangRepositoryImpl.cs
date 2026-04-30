@@ -157,7 +157,7 @@ namespace NongDanService.Data
                             
                             conn.Execute(sqlUpdateLotStatus, new { MaLo = maLo }, transaction);
 
-                            // Tạo tồn kho cho đại lý (nếu người mua là đại lý)
+                            // Tạo tồn kho và vận chuyển cho đại lý (nếu người mua là đại lý)
                             if (orderInfo.LoaiNguoiMua == "daily")
                             {
                                 int maDaiLy = orderInfo.MaNguoiMua;
@@ -202,6 +202,45 @@ namespace NongDanService.Data
                                         conn.Execute(sqlInsertInventory, 
                                             new { MaKho = maKho.Value, MaLo = maLo, SoLuong = soLuong }, transaction);
                                     }
+                                }
+
+                                // Tạo đơn vận chuyển tự động
+                                // Lấy địa chỉ nông dân (điểm đi) và đại lý (điểm đến)
+                                var sqlGetAddresses = @"
+                                    SELECT 
+                                        (SELECT TOP 1 ISNULL(tt.DiaChi, nd.DiaChi) 
+                                         FROM LoNongSan ln 
+                                         LEFT JOIN TrangTrai tt ON ln.MaTrangTrai = tt.MaTrangTrai
+                                         LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
+                                         WHERE ln.MaLo = @MaLo) AS DiemDi,
+                                        (SELECT TOP 1 ISNULL(k.DiaChi, dl.DiaChi) 
+                                         FROM DaiLy dl 
+                                         LEFT JOIN Kho k ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                                         WHERE dl.MaDaiLy = @MaDaiLy) AS DiemDen";
+                                
+                                var addresses = conn.QueryFirstOrDefault<dynamic>(sqlGetAddresses, 
+                                    new { MaLo = maLo, MaDaiLy = maDaiLy }, transaction);
+
+                                string diemDi = addresses?.DiemDi ?? "Trang trại nông dân";
+                                string diemDen = addresses?.DiemDen ?? "Kho đại lý";
+
+                                // Kiểm tra chưa có vận chuyển cho lô này
+                                var sqlCheckTransport = @"
+                                    SELECT COUNT(*) FROM VanChuyen 
+                                    WHERE MaLo = @MaLo AND TrangThai = 'dang_van_chuyen'";
+                                var existingTransport = conn.QueryFirstOrDefault<int>(sqlCheckTransport, 
+                                    new { MaLo = maLo }, transaction);
+
+                                if (existingTransport == 0)
+                                {
+                                    var sqlInsertTransport = @"
+                                        INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, TrangThai)
+                                        VALUES (@MaLo, @DiemDi, @DiemDen, GETDATE(), N'dang_van_chuyen')";
+                                    
+                                    conn.Execute(sqlInsertTransport, 
+                                        new { MaLo = maLo, DiemDi = diemDi, DiemDen = diemDen }, transaction);
+                                    
+                                    _logger.LogInformation("Created transport for lot {MaLo}: {DiemDi} -> {DiemDen}", maLo, diemDi, diemDen);
                                 }
                             }
                         }

@@ -18,6 +18,8 @@ namespace DaiLyService.Services
 
         public List<VanChuyenDTO> GetByLo(int maLo) => _repo.GetByLo(maLo);
 
+        public List<VanChuyenDTO> GetByDaiLy(int maDaiLy) => _repo.GetByDaiLy(maDaiLy);
+
         public VanChuyenDTO? GetById(int maVanChuyen) => _repo.GetById(maVanChuyen);
 
         public int Create(VanChuyenCreateDTO dto) => _repo.Create(dto);
