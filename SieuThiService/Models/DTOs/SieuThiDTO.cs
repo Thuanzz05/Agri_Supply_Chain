@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SieuThiService.Models.DTOs
 {
     public class SieuThiDTO
@@ -7,6 +9,11 @@ namespace SieuThiService.Models.DTOs
         public string TenSieuThi { get; set; } = string.Empty;
         public string? SoDienThoai { get; set; }
         public string? DiaChi { get; set; }
+        [JsonPropertyName("facebook")]
+        public string? Facebook { get; set; }
+
+        [JsonPropertyName("tiktok")]
+        public string? TikTok { get; set; }
         
         // Thông tin từ bảng TaiKhoan
         public string? TenDangNhap { get; set; }

@@ -41,6 +41,8 @@ namespace AdminService.Controllers
                             nd.HoTen,
                             nd.SoDienThoai,
                             nd.DiaChi,
+                            nd.Facebook,
+                            nd.TikTok,
                             nd.NgayTao,
                             tk.TrangThai,
                             'nongdan' as LoaiNguoiDung
@@ -59,6 +61,8 @@ namespace AdminService.Controllers
                             HoTen = reader["HoTen"].ToString(),
                             SoDienThoai = reader["SoDienThoai"].ToString(),
                             DiaChi = reader["DiaChi"].ToString(),
+                            facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                            tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                             NgayTao = reader["NgayTao"],
                             TrangThai = reader["TrangThai"].ToString(),
                             LoaiNguoiDung = reader["LoaiNguoiDung"].ToString()
@@ -77,6 +81,8 @@ namespace AdminService.Controllers
                             dl.TenDaiLy as HoTen,
                             dl.SoDienThoai,
                             dl.DiaChi,
+                            dl.Facebook,
+                            dl.TikTok,
                             dl.NgayTao,
                             tk.TrangThai,
                             'daily' as LoaiNguoiDung
@@ -95,6 +101,8 @@ namespace AdminService.Controllers
                             HoTen = reader["HoTen"].ToString(),
                             SoDienThoai = reader["SoDienThoai"].ToString(),
                             DiaChi = reader["DiaChi"].ToString(),
+                            facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                            tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                             NgayTao = reader["NgayTao"],
                             TrangThai = reader["TrangThai"].ToString(),
                             LoaiNguoiDung = reader["LoaiNguoiDung"].ToString()
@@ -113,6 +121,8 @@ namespace AdminService.Controllers
                             st.TenSieuThi as HoTen,
                             st.SoDienThoai,
                             st.DiaChi,
+                            st.Facebook,
+                            st.TikTok,
                             st.NgayTao,
                             tk.TrangThai,
                             'sieuthi' as LoaiNguoiDung
@@ -131,6 +141,8 @@ namespace AdminService.Controllers
                             HoTen = reader["HoTen"].ToString(),
                             SoDienThoai = reader["SoDienThoai"].ToString(),
                             DiaChi = reader["DiaChi"].ToString(),
+                            facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                            tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                             NgayTao = reader["NgayTao"],
                             TrangThai = reader["TrangThai"].ToString(),
                             LoaiNguoiDung = reader["LoaiNguoiDung"].ToString()
@@ -187,6 +199,8 @@ namespace AdminService.Controllers
                         nd.HoTen,
                         nd.SoDienThoai,
                         nd.DiaChi,
+                        nd.Facebook,
+                        nd.TikTok,
                         nd.NgayTao,
                         nd.NgayCapNhat,
                         COUNT(tt.MaTrangTrai) as SoTrangTrai,
@@ -197,7 +211,8 @@ namespace AdminService.Controllers
                     LEFT JOIN LoNongSan lo ON tt.MaTrangTrai = lo.MaTrangTrai
                     WHERE nd.MaNongDan = @Id
                     GROUP BY nd.MaNongDan, nd.MaTaiKhoan, tk.TenDangNhap, tk.Email, tk.TrangThai, 
-                             nd.HoTen, nd.SoDienThoai, nd.DiaChi, nd.NgayTao, nd.NgayCapNhat", conn);
+                             nd.HoTen, nd.SoDienThoai, nd.DiaChi, nd.Facebook, nd.TikTok,
+                             nd.NgayTao, nd.NgayCapNhat", conn);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -221,6 +236,8 @@ namespace AdminService.Controllers
                     HoTen = reader["HoTen"].ToString(),
                     SoDienThoai = reader["SoDienThoai"].ToString(),
                     DiaChi = reader["DiaChi"].ToString(),
+                    facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                    tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                     NgayTao = reader["NgayTao"],
                     NgayCapNhat = reader["NgayCapNhat"] != DBNull.Value ? reader["NgayCapNhat"] : null,
                     SoTrangTrai = (int)reader["SoTrangTrai"],
@@ -266,6 +283,8 @@ namespace AdminService.Controllers
                         dl.TenDaiLy,
                         dl.SoDienThoai,
                         dl.DiaChi,
+                        dl.Facebook,
+                        dl.TikTok,
                         dl.NgayTao,
                         dl.NgayCapNhat,
                         COUNT(DISTINCT dh1.MaDonHang) as SoDonHangNhan,
@@ -278,7 +297,8 @@ namespace AdminService.Controllers
                     LEFT JOIN KiemDinh kd ON kd.NguoiKiemDinh = tk.TenDangNhap
                     WHERE dl.MaDaiLy = @Id
                     GROUP BY dl.MaDaiLy, dl.MaTaiKhoan, tk.TenDangNhap, tk.Email, tk.TrangThai,
-                             dl.TenDaiLy, dl.SoDienThoai, dl.DiaChi, dl.NgayTao, dl.NgayCapNhat", conn);
+                             dl.TenDaiLy, dl.SoDienThoai, dl.DiaChi, dl.Facebook, dl.TikTok,
+                             dl.NgayTao, dl.NgayCapNhat", conn);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -302,6 +322,8 @@ namespace AdminService.Controllers
                     TenDaiLy = reader["TenDaiLy"].ToString(),
                     SoDienThoai = reader["SoDienThoai"].ToString(),
                     DiaChi = reader["DiaChi"].ToString(),
+                    facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                    tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                     NgayTao = reader["NgayTao"],
                     NgayCapNhat = reader["NgayCapNhat"] != DBNull.Value ? reader["NgayCapNhat"] : null,
                     SoDonHangNhan = (int)reader["SoDonHangNhan"],
@@ -348,6 +370,8 @@ namespace AdminService.Controllers
                         st.TenSieuThi,
                         st.SoDienThoai,
                         st.DiaChi,
+                        st.Facebook,
+                        st.TikTok,
                         st.NgayTao,
                         st.NgayCapNhat,
                         COUNT(DISTINCT dh.MaDonHang) as SoDonHangMua,
@@ -358,7 +382,8 @@ namespace AdminService.Controllers
                     LEFT JOIN Kho k ON st.MaSieuThi = k.MaChuSoHuu AND k.LoaiChuSoHuu = 'sieuthi'
                     WHERE st.MaSieuThi = @Id
                     GROUP BY st.MaSieuThi, st.MaTaiKhoan, tk.TenDangNhap, tk.Email, tk.TrangThai,
-                             st.TenSieuThi, st.SoDienThoai, st.DiaChi, st.NgayTao, st.NgayCapNhat", conn);
+                             st.TenSieuThi, st.SoDienThoai, st.DiaChi, st.Facebook, st.TikTok,
+                             st.NgayTao, st.NgayCapNhat", conn);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -382,6 +407,8 @@ namespace AdminService.Controllers
                     TenSieuThi = reader["TenSieuThi"].ToString(),
                     SoDienThoai = reader["SoDienThoai"].ToString(),
                     DiaChi = reader["DiaChi"].ToString(),
+                    facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                    tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                     NgayTao = reader["NgayTao"],
                     NgayCapNhat = reader["NgayCapNhat"] != DBNull.Value ? reader["NgayCapNhat"] : null,
                     SoDonHangMua = (int)reader["SoDonHangMua"],

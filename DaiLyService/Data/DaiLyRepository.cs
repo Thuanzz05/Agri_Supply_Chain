@@ -22,7 +22,8 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
+                    SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai,
+                           dl.Facebook, dl.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
@@ -50,7 +51,8 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
+                    SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai,
+                           dl.Facebook, dl.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
@@ -80,7 +82,8 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai, 
+                    SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai,
+                           dl.Facebook, dl.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
@@ -126,14 +129,16 @@ namespace DaiLyService.Data
                 
                 // Tạo đại lý
                 using var cmd2 = new SqlCommand(@"
-                    INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, DiaChi, SoDienThoai) 
+                    INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, DiaChi, SoDienThoai, Facebook, TikTok)
                     OUTPUT INSERTED.MaDaiLy 
-                    VALUES (@MaTaiKhoan, @TenDaiLy, @DiaChi, @SoDienThoai)", conn);
+                    VALUES (@MaTaiKhoan, @TenDaiLy, @DiaChi, @SoDienThoai, @Facebook, @TikTok)", conn);
 
                 cmd2.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
                 cmd2.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
                 cmd2.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
                 cmd2.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@Facebook", (object?)dto.Facebook ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@TikTok", (object?)dto.TikTok ?? DBNull.Value);
 
                 var maDaiLy = (int)cmd2.ExecuteScalar();
                 
@@ -169,13 +174,16 @@ namespace DaiLyService.Data
                     // Cập nhật thông tin đại lý
                     using var cmd1 = new SqlCommand(@"
                         UPDATE DaiLy 
-                        SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai 
+                        SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai,
+                            Facebook = @Facebook, TikTok = @TikTok
                         WHERE MaDaiLy = @MaDaiLy", conn, transaction);
 
                     cmd1.Parameters.AddWithValue("@MaDaiLy", id);
                     cmd1.Parameters.AddWithValue("@TenDaiLy", dto.TenDaiLy);
                     cmd1.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
                     cmd1.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
+                    cmd1.Parameters.AddWithValue("@Facebook", (object?)dto.Facebook ?? DBNull.Value);
+                    cmd1.Parameters.AddWithValue("@TikTok", (object?)dto.TikTok ?? DBNull.Value);
 
                     var rowsAffected = cmd1.ExecuteNonQuery();
                     
@@ -254,6 +262,8 @@ namespace DaiLyService.Data
                 TenDaiLy = reader.GetString("TenDaiLy"),
                 DiaChi = reader.IsDBNull("DiaChi") ? string.Empty : reader.GetString("DiaChi"),
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? string.Empty : reader.GetString("SoDienThoai"),
+                Facebook = reader.IsDBNull("Facebook") ? null : reader.GetString("Facebook"),
+                TikTok = reader.IsDBNull("TikTok") ? null : reader.GetString("TikTok"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")

@@ -24,7 +24,10 @@ namespace SieuThiService.Data
                            l.SoLuongBanDau, l.SoLuongHienTai, l.NgayThuHoach, l.HanSuDung,
                            l.TrangThai, l.NgayTao,
                            tt.TenTrangTrai, tt.DiaChi AS DiaChiTrangTrai, tt.SoChungNhan,
-                           nd.HoTen AS TenNongDan, nd.SoDienThoai AS SoDienThoaiNongDan, nd.DiaChi AS DiaChiNongDan
+                           nd.HoTen AS TenNongDan, nd.SoDienThoai AS SoDienThoaiNongDan,
+                           nd.DiaChi AS DiaChiNongDan, 
+                           ISNULL(nd.Facebook, '') AS FacebookNongDan,
+                           ISNULL(nd.TikTok, '') AS TikTokNongDan
                     FROM LoNongSan l
                     INNER JOIN SanPham sp ON l.MaSanPham = sp.MaSanPham
                     INNER JOIN TrangTrai tt ON l.MaTrangTrai = tt.MaTrangTrai
@@ -55,6 +58,8 @@ namespace SieuThiService.Data
                     TenNongDan = reader.GetString(reader.GetOrdinal("TenNongDan")),
                     SoDienThoaiNongDan = reader.IsDBNull(reader.GetOrdinal("SoDienThoaiNongDan")) ? null : reader.GetString(reader.GetOrdinal("SoDienThoaiNongDan")),
                     DiaChiNongDan = reader.IsDBNull(reader.GetOrdinal("DiaChiNongDan")) ? null : reader.GetString(reader.GetOrdinal("DiaChiNongDan")),
+                    FacebookNongDan = reader.GetString(reader.GetOrdinal("FacebookNongDan")),
+                    TiktokNongDan = reader.GetString(reader.GetOrdinal("TikTokNongDan")),
                 };
             }
             catch (SqlException ex)

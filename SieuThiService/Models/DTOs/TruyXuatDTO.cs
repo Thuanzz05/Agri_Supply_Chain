@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SieuThiService.Models.DTOs
 {
     public class TruyXuatLoInfoDTO
@@ -18,6 +20,12 @@ namespace SieuThiService.Models.DTOs
         public string TenNongDan { get; set; } = string.Empty;
         public string? SoDienThoaiNongDan { get; set; }
         public string? DiaChiNongDan { get; set; }
+        
+        [JsonPropertyName("facebookNongDan")]
+        public string? FacebookNongDan { get; set; }
+        
+        [JsonPropertyName("tiktokNongDan")]
+        public string? TiktokNongDan { get; set; }
     }
 
     public class TruyXuatKiemDinhDTO

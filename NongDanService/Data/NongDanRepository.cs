@@ -23,6 +23,7 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
+                           nd.Facebook, nd.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM NongDan nd
                     LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
@@ -51,6 +52,7 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
+                           nd.Facebook, nd.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM NongDan nd
                     LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
@@ -80,6 +82,7 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
+                           nd.Facebook, nd.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM NongDan nd
                     LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
@@ -124,14 +127,16 @@ namespace NongDanService.Data
                 
                 // Tạo nông dân
                 using var cmd2 = new SqlCommand(@"
-                    INSERT INTO NongDan (MaTaiKhoan, HoTen, SoDienThoai, DiaChi) 
+                    INSERT INTO NongDan (MaTaiKhoan, HoTen, SoDienThoai, DiaChi, Facebook, TikTok)
                     OUTPUT INSERTED.MaNongDan 
-                    VALUES (@MaTaiKhoan, @HoTen, @SoDienThoai, @DiaChi)", conn);
+                    VALUES (@MaTaiKhoan, @HoTen, @SoDienThoai, @DiaChi, @Facebook, @TikTok)", conn);
                 
                 cmd2.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
                 cmd2.Parameters.AddWithValue("@HoTen", (object?)dto.HoTen ?? DBNull.Value);
                 cmd2.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
                 cmd2.Parameters.AddWithValue("@DiaChi", (object?)dto.DiaChi ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@Facebook", (object?)dto.Facebook ?? DBNull.Value);
+                cmd2.Parameters.AddWithValue("@TikTok", (object?)dto.TikTok ?? DBNull.Value);
                 
                 var maNongDan = (int)cmd2.ExecuteScalar();
                 
@@ -167,13 +172,16 @@ namespace NongDanService.Data
                     // Cập nhật thông tin nông dân
                     using var cmd1 = new SqlCommand(@"
                         UPDATE NongDan 
-                        SET HoTen = @HoTen, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi 
+                        SET HoTen = @HoTen, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi,
+                            Facebook = @Facebook, TikTok = @TikTok
                         WHERE MaNongDan = @MaNongDan", conn, transaction);
 
                     cmd1.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = id;
                     cmd1.Parameters.Add("@HoTen", SqlDbType.NVarChar, 100).Value = (object?)dto.HoTen ?? DBNull.Value;
                     cmd1.Parameters.Add("@SoDienThoai", SqlDbType.NVarChar, 20).Value = (object?)dto.SoDienThoai ?? DBNull.Value;
                     cmd1.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
+                    cmd1.Parameters.Add("@Facebook", SqlDbType.NVarChar, 255).Value = (object?)dto.Facebook ?? DBNull.Value;
+                    cmd1.Parameters.Add("@TikTok", SqlDbType.NVarChar, 255).Value = (object?)dto.TikTok ?? DBNull.Value;
 
                     var rowsAffected = cmd1.ExecuteNonQuery();
                     
@@ -252,6 +260,8 @@ namespace NongDanService.Data
                 HoTen = reader.IsDBNull("HoTen") ? null : reader.GetString("HoTen"),
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? null : reader.GetString("SoDienThoai"),
                 DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
+                Facebook = reader.IsDBNull("Facebook") ? null : reader.GetString("Facebook"),
+                TikTok = reader.IsDBNull("TikTok") ? null : reader.GetString("TikTok"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")

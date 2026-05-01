@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SieuThiService.Models.DTOs
 {
@@ -13,6 +14,14 @@ namespace SieuThiService.Models.DTOs
 
         [StringLength(255, ErrorMessage = "Địa chỉ không được vượt quá 255 ký tự")]
         public string? DiaChi { get; set; }
+
+        [StringLength(255, ErrorMessage = "Facebook khong duoc vuot qua 255 ky tu")]
+        [JsonPropertyName("facebook")]
+        public string? Facebook { get; set; }
+
+        [StringLength(255, ErrorMessage = "TikTok khong duoc vuot qua 255 ky tu")]
+        [JsonPropertyName("tiktok")]
+        public string? TikTok { get; set; }
 
         // Thông tin tài khoản
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]

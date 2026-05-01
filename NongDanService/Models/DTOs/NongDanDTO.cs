@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace NongDanService.Models.DTOs
 {
     public class NongDanDTO
@@ -7,6 +9,11 @@ namespace NongDanService.Models.DTOs
         public string? HoTen { get; set; }
         public string? SoDienThoai { get; set; }
         public string? DiaChi { get; set; }
+        [JsonPropertyName("facebook")]
+        public string? Facebook { get; set; }
+
+        [JsonPropertyName("tiktok")]
+        public string? TikTok { get; set; }
         
         // Thông tin từ bảng TaiKhoan
         public string? TenDangNhap { get; set; }

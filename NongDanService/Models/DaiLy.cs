@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace NongDanService.Models;
@@ -14,6 +14,10 @@ public partial class DaiLy
     public string? SoDienThoai { get; set; }
 
     public string? DiaChi { get; set; }
+
+    public string? Facebook { get; set; }
+
+    public string? TikTok { get; set; }
 
     public virtual TaiKhoan MaTaiKhoanNavigation { get; set; } = null!;
 }

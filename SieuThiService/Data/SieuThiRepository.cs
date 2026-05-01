@@ -24,6 +24,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
+                           st.Facebook, st.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
@@ -59,6 +60,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
+                           st.Facebook, st.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
@@ -88,6 +90,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
+                           st.Facebook, st.TikTok,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
@@ -133,13 +136,15 @@ namespace SieuThiService.Data
 
                 // Tạo siêu thị
                 using var cmdSupermarket = new SqlCommand(@"
-                    INSERT INTO SieuThi (MaTaiKhoan, TenSieuThi, SoDienThoai, DiaChi) 
-                    VALUES (@MaTaiKhoan, @TenSieuThi, @SoDienThoai, @DiaChi)", conn, transaction);
+                    INSERT INTO SieuThi (MaTaiKhoan, TenSieuThi, SoDienThoai, DiaChi, Facebook, TikTok)
+                    VALUES (@MaTaiKhoan, @TenSieuThi, @SoDienThoai, @DiaChi, @Facebook, @TikTok)", conn, transaction);
 
                 cmdSupermarket.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
                 cmdSupermarket.Parameters.AddWithValue("@TenSieuThi", sieuThiDto.TenSieuThi);
                 cmdSupermarket.Parameters.AddWithValue("@SoDienThoai", (object?)sieuThiDto.SoDienThoai ?? DBNull.Value);
                 cmdSupermarket.Parameters.AddWithValue("@DiaChi", (object?)sieuThiDto.DiaChi ?? DBNull.Value);
+                cmdSupermarket.Parameters.AddWithValue("@Facebook", (object?)sieuThiDto.Facebook ?? DBNull.Value);
+                cmdSupermarket.Parameters.AddWithValue("@TikTok", (object?)sieuThiDto.TikTok ?? DBNull.Value);
 
                 var rowsAffected = cmdSupermarket.ExecuteNonQuery();
                 
@@ -172,13 +177,16 @@ namespace SieuThiService.Data
                     // Cập nhật thông tin siêu thị
                     using var cmd1 = new SqlCommand(@"
                         UPDATE SieuThi 
-                        SET TenSieuThi = @TenSieuThi, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi
+                        SET TenSieuThi = @TenSieuThi, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi,
+                            Facebook = @Facebook, TikTok = @TikTok
                         WHERE MaSieuThi = @MaSieuThi", conn, transaction);
 
                     cmd1.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
                     cmd1.Parameters.AddWithValue("@TenSieuThi", sieuThiDto.TenSieuThi);
                     cmd1.Parameters.AddWithValue("@SoDienThoai", (object?)sieuThiDto.SoDienThoai ?? DBNull.Value);
                     cmd1.Parameters.AddWithValue("@DiaChi", (object?)sieuThiDto.DiaChi ?? DBNull.Value);
+                    cmd1.Parameters.AddWithValue("@Facebook", (object?)sieuThiDto.Facebook ?? DBNull.Value);
+                    cmd1.Parameters.AddWithValue("@TikTok", (object?)sieuThiDto.TikTok ?? DBNull.Value);
 
                     var rowsAffected = cmd1.ExecuteNonQuery();
                     
@@ -294,6 +302,8 @@ namespace SieuThiService.Data
                 TenSieuThi = reader.GetString("TenSieuThi"),
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? null : reader.GetString("SoDienThoai"),
                 DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
+                Facebook = reader.IsDBNull("Facebook") ? null : reader.GetString("Facebook"),
+                TikTok = reader.IsDBNull("TikTok") ? null : reader.GetString("TikTok"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")

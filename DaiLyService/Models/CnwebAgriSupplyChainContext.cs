@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -96,8 +96,10 @@ public partial class CnwebAgriSupplyChainContext : DbContext
             entity.HasIndex(e => e.MaTaiKhoan, "UQ__DaiLy__AD7C652881403A90").IsUnique();
 
             entity.Property(e => e.DiaChi).HasMaxLength(255);
+            entity.Property(e => e.Facebook).HasMaxLength(255);
             entity.Property(e => e.SoDienThoai).HasMaxLength(20);
             entity.Property(e => e.TenDaiLy).HasMaxLength(100);
+            entity.Property(e => e.TikTok).HasMaxLength(255);
 
             entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.DaiLy)
                 .HasForeignKey<DaiLy>(d => d.MaTaiKhoan)
@@ -190,8 +192,10 @@ public partial class CnwebAgriSupplyChainContext : DbContext
             entity.HasIndex(e => e.MaTaiKhoan, "UQ__NongDan__AD7C65287F2DCDA0").IsUnique();
 
             entity.Property(e => e.DiaChi).HasMaxLength(255);
+            entity.Property(e => e.Facebook).HasMaxLength(255);
             entity.Property(e => e.HoTen).HasMaxLength(100);
             entity.Property(e => e.SoDienThoai).HasMaxLength(20);
+            entity.Property(e => e.TikTok).HasMaxLength(255);
 
             entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.NongDan)
                 .HasForeignKey<NongDan>(d => d.MaTaiKhoan)
@@ -219,8 +223,10 @@ public partial class CnwebAgriSupplyChainContext : DbContext
             entity.HasIndex(e => e.MaTaiKhoan, "UQ__SieuThi__AD7C65280D681795").IsUnique();
 
             entity.Property(e => e.DiaChi).HasMaxLength(255);
+            entity.Property(e => e.Facebook).HasMaxLength(255);
             entity.Property(e => e.SoDienThoai).HasMaxLength(20);
             entity.Property(e => e.TenSieuThi).HasMaxLength(100);
+            entity.Property(e => e.TikTok).HasMaxLength(255);
 
             entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.SieuThi)
                 .HasForeignKey<SieuThi>(d => d.MaTaiKhoan)

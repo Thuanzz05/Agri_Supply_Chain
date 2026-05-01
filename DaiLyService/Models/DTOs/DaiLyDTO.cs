@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DaiLyService.Models.DTOs
 {
     public class DaiLyDTO
@@ -7,6 +9,11 @@ namespace DaiLyService.Models.DTOs
         public string TenDaiLy { get; set; } = string.Empty;
         public string DiaChi { get; set; } = string.Empty;
         public string SoDienThoai { get; set; } = string.Empty;
+        [JsonPropertyName("facebook")]
+        public string? Facebook { get; set; }
+
+        [JsonPropertyName("tiktok")]
+        public string? TikTok { get; set; }
         
         // Thông tin từ bảng TaiKhoan
         public string? TenDangNhap { get; set; }

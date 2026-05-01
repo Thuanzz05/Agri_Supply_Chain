@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DaiLyService.Models.DTOs
 {
@@ -17,5 +18,13 @@ namespace DaiLyService.Models.DTOs
         [StringLength(255, ErrorMessage = "Email không được vượt quá 255 ký tự")]
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string? Email { get; set; }
+
+        [StringLength(255, ErrorMessage = "Facebook khong duoc vuot qua 255 ky tu")]
+        [JsonPropertyName("facebook")]
+        public string? Facebook { get; set; }
+
+        [StringLength(255, ErrorMessage = "TikTok khong duoc vuot qua 255 ky tu")]
+        [JsonPropertyName("tiktok")]
+        public string? TikTok { get; set; }
     }
 }

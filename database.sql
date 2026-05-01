@@ -33,6 +33,8 @@ CREATE TABLE NongDan (
     HoTen NVARCHAR(100) NOT NULL,
     SoDienThoai NVARCHAR(20),
     DiaChi NVARCHAR(255),
+    Facebook NVARCHAR(255) NULL,
+    TikTok NVARCHAR(255) NULL,
     FOREIGN KEY (MaTaiKhoan) REFERENCES TaiKhoan(MaTaiKhoan)
 );
 
@@ -43,6 +45,8 @@ CREATE TABLE DaiLy (
     TenDaiLy NVARCHAR(100) NOT NULL,
     SoDienThoai NVARCHAR(20),
     DiaChi NVARCHAR(255),
+    Facebook NVARCHAR(255) NULL,
+    TikTok NVARCHAR(255) NULL,
     FOREIGN KEY (MaTaiKhoan) REFERENCES TaiKhoan(MaTaiKhoan)
 );
 
@@ -53,6 +57,8 @@ CREATE TABLE SieuThi (
     TenSieuThi NVARCHAR(100) NOT NULL,
     SoDienThoai NVARCHAR(20),
     DiaChi NVARCHAR(255),
+    Facebook NVARCHAR(255) NULL,
+    TikTok NVARCHAR(255) NULL,
     FOREIGN KEY (MaTaiKhoan) REFERENCES TaiKhoan(MaTaiKhoan)
 );
 
@@ -716,3 +722,45 @@ SELECT * FROM VanChuyen;
 SELECT * FROM DonHang;
 SELECT * FROM ChiTietDonHang;
 SELECT * FROM KiemDinh;
+
+
+
+
+USE CNWEB_Agri_Supply_Chain;
+GO
+
+IF COL_LENGTH('dbo.NongDan', 'Facebook') IS NULL
+BEGIN
+    ALTER TABLE dbo.NongDan ADD Facebook NVARCHAR(255) NULL;
+END
+GO
+
+IF COL_LENGTH('dbo.NongDan', 'TikTok') IS NULL
+BEGIN
+    ALTER TABLE dbo.NongDan ADD TikTok NVARCHAR(255) NULL;
+END
+GO
+
+IF COL_LENGTH('dbo.DaiLy', 'Facebook') IS NULL
+BEGIN
+    ALTER TABLE dbo.DaiLy ADD Facebook NVARCHAR(255) NULL;
+END
+GO
+
+IF COL_LENGTH('dbo.DaiLy', 'TikTok') IS NULL
+BEGIN
+    ALTER TABLE dbo.DaiLy ADD TikTok NVARCHAR(255) NULL;
+END
+GO
+
+IF COL_LENGTH('dbo.SieuThi', 'Facebook') IS NULL
+BEGIN
+    ALTER TABLE dbo.SieuThi ADD Facebook NVARCHAR(255) NULL;
+END
+GO
+
+IF COL_LENGTH('dbo.SieuThi', 'TikTok') IS NULL
+BEGIN
+    ALTER TABLE dbo.SieuThi ADD TikTok NVARCHAR(255) NULL;
+END
+GO

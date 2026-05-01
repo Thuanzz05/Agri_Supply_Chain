@@ -37,7 +37,9 @@ namespace SieuThiService.Services
                 SoChungNhan = loInfo.SoChungNhan,
                 TenNongDan = loInfo.TenNongDan,
                 SoDienThoaiNongDan = loInfo.SoDienThoaiNongDan,
-                DiaChiNongDan = loInfo.DiaChiNongDan
+                DiaChiNongDan = loInfo.DiaChiNongDan,
+                FacebookNongDan = loInfo.FacebookNongDan,
+                TiktokNongDan = loInfo.TiktokNongDan
             };
 
             result.KiemDinh = _truyXuatRepository.GetKiemDinh(loInfo.MaLo);
