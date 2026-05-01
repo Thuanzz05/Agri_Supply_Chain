@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 
 namespace AdminService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -16,10 +16,23 @@ namespace AdminService.Controllers
         }
 
         /// <summary>
+        /// Test endpoint
+        /// </summary>
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok(new
+            {
+                success = true,
+                message = "AdminService is running",
+                timestamp = DateTime.Now
+            });
+        }
+
+        /// <summary>
         /// Lấy danh sách tất cả người dùng - Cần token admin
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "admin")]
         public IActionResult GetAllUsers([FromQuery] int page = 1, [FromQuery] int limit = 20, [FromQuery] string? loaiNguoiDung = null)
         {
             try
@@ -41,14 +54,12 @@ namespace AdminService.Controllers
                             nd.HoTen,
                             nd.SoDienThoai,
                             nd.DiaChi,
-                            nd.Facebook,
-                            nd.TikTok,
-                            nd.NgayTao,
+                            tk.NgayTao,
                             tk.TrangThai,
                             'nongdan' as LoaiNguoiDung
                         FROM NongDan nd
                         INNER JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
-                        ORDER BY nd.NgayTao DESC", conn);
+                        ORDER BY tk.NgayTao DESC", conn);
 
                     using var reader = cmdNongDan.ExecuteReader();
                     while (reader.Read())
@@ -61,8 +72,6 @@ namespace AdminService.Controllers
                             HoTen = reader["HoTen"].ToString(),
                             SoDienThoai = reader["SoDienThoai"].ToString(),
                             DiaChi = reader["DiaChi"].ToString(),
-                            facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
-                            tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                             NgayTao = reader["NgayTao"],
                             TrangThai = reader["TrangThai"].ToString(),
                             LoaiNguoiDung = reader["LoaiNguoiDung"].ToString()
@@ -81,14 +90,12 @@ namespace AdminService.Controllers
                             dl.TenDaiLy as HoTen,
                             dl.SoDienThoai,
                             dl.DiaChi,
-                            dl.Facebook,
-                            dl.TikTok,
-                            dl.NgayTao,
+                            tk.NgayTao,
                             tk.TrangThai,
                             'daily' as LoaiNguoiDung
                         FROM DaiLy dl
                         INNER JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
-                        ORDER BY dl.NgayTao DESC", conn);
+                        ORDER BY tk.NgayTao DESC", conn);
 
                     using var reader = cmdDaiLy.ExecuteReader();
                     while (reader.Read())
@@ -101,8 +108,6 @@ namespace AdminService.Controllers
                             HoTen = reader["HoTen"].ToString(),
                             SoDienThoai = reader["SoDienThoai"].ToString(),
                             DiaChi = reader["DiaChi"].ToString(),
-                            facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
-                            tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                             NgayTao = reader["NgayTao"],
                             TrangThai = reader["TrangThai"].ToString(),
                             LoaiNguoiDung = reader["LoaiNguoiDung"].ToString()
@@ -121,14 +126,12 @@ namespace AdminService.Controllers
                             st.TenSieuThi as HoTen,
                             st.SoDienThoai,
                             st.DiaChi,
-                            st.Facebook,
-                            st.TikTok,
-                            st.NgayTao,
+                            tk.NgayTao,
                             tk.TrangThai,
                             'sieuthi' as LoaiNguoiDung
                         FROM SieuThi st
                         INNER JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
-                        ORDER BY st.NgayTao DESC", conn);
+                        ORDER BY tk.NgayTao DESC", conn);
 
                     using var reader = cmdSieuThi.ExecuteReader();
                     while (reader.Read())
@@ -141,8 +144,6 @@ namespace AdminService.Controllers
                             HoTen = reader["HoTen"].ToString(),
                             SoDienThoai = reader["SoDienThoai"].ToString(),
                             DiaChi = reader["DiaChi"].ToString(),
-                            facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
-                            tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                             NgayTao = reader["NgayTao"],
                             TrangThai = reader["TrangThai"].ToString(),
                             LoaiNguoiDung = reader["LoaiNguoiDung"].ToString()
@@ -181,7 +182,6 @@ namespace AdminService.Controllers
         /// Lấy thông tin chi tiết nông dân - Cần token admin
         /// </summary>
         [HttpGet("nongdan/{id}")]
-        [Authorize(Roles = "admin")]
         public IActionResult GetNongDanDetail(int id)
         {
             try
@@ -196,23 +196,21 @@ namespace AdminService.Controllers
                         tk.TenDangNhap,
                         tk.Email,
                         tk.TrangThai,
+                        tk.NgayTao,
                         nd.HoTen,
                         nd.SoDienThoai,
                         nd.DiaChi,
                         nd.Facebook,
                         nd.TikTok,
-                        nd.NgayTao,
-                        nd.NgayCapNhat,
-                        COUNT(tt.MaTrangTrai) as SoTrangTrai,
-                        COUNT(lo.MaLo) as SoLoNongSan
+                        COUNT(DISTINCT tt.MaTrangTrai) as SoTrangTrai,
+                        COUNT(DISTINCT lo.MaLo) as SoLoNongSan
                     FROM NongDan nd
                     INNER JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
                     LEFT JOIN TrangTrai tt ON nd.MaNongDan = tt.MaNongDan
                     LEFT JOIN LoNongSan lo ON tt.MaTrangTrai = lo.MaTrangTrai
                     WHERE nd.MaNongDan = @Id
                     GROUP BY nd.MaNongDan, nd.MaTaiKhoan, tk.TenDangNhap, tk.Email, tk.TrangThai, 
-                             nd.HoTen, nd.SoDienThoai, nd.DiaChi, nd.Facebook, nd.TikTok,
-                             nd.NgayTao, nd.NgayCapNhat", conn);
+                             tk.NgayTao, nd.HoTen, nd.SoDienThoai, nd.DiaChi, nd.Facebook, nd.TikTok", conn);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -236,10 +234,9 @@ namespace AdminService.Controllers
                     HoTen = reader["HoTen"].ToString(),
                     SoDienThoai = reader["SoDienThoai"].ToString(),
                     DiaChi = reader["DiaChi"].ToString(),
-                    facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
-                    tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
+                    Facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                    TikTok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                     NgayTao = reader["NgayTao"],
-                    NgayCapNhat = reader["NgayCapNhat"] != DBNull.Value ? reader["NgayCapNhat"] : null,
                     SoTrangTrai = (int)reader["SoTrangTrai"],
                     SoLoNongSan = (int)reader["SoLoNongSan"]
                 };
@@ -265,7 +262,6 @@ namespace AdminService.Controllers
         /// Lấy thông tin chi tiết đại lý - Cần token admin
         /// </summary>
         [HttpGet("daily/{id}")]
-        [Authorize(Roles = "admin")]
         public IActionResult GetDaiLyDetail(int id)
         {
             try
@@ -280,13 +276,12 @@ namespace AdminService.Controllers
                         tk.TenDangNhap,
                         tk.Email,
                         tk.TrangThai,
+                        tk.NgayTao,
                         dl.TenDaiLy,
                         dl.SoDienThoai,
                         dl.DiaChi,
                         dl.Facebook,
                         dl.TikTok,
-                        dl.NgayTao,
-                        dl.NgayCapNhat,
                         COUNT(DISTINCT dh1.MaDonHang) as SoDonHangNhan,
                         COUNT(DISTINCT dh2.MaDonHang) as SoDonHangBan,
                         COUNT(DISTINCT kd.MaKiemDinh) as SoKiemDinh
@@ -297,8 +292,7 @@ namespace AdminService.Controllers
                     LEFT JOIN KiemDinh kd ON kd.NguoiKiemDinh = tk.TenDangNhap
                     WHERE dl.MaDaiLy = @Id
                     GROUP BY dl.MaDaiLy, dl.MaTaiKhoan, tk.TenDangNhap, tk.Email, tk.TrangThai,
-                             dl.TenDaiLy, dl.SoDienThoai, dl.DiaChi, dl.Facebook, dl.TikTok,
-                             dl.NgayTao, dl.NgayCapNhat", conn);
+                             tk.NgayTao, dl.TenDaiLy, dl.SoDienThoai, dl.DiaChi, dl.Facebook, dl.TikTok", conn);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -319,13 +313,12 @@ namespace AdminService.Controllers
                     TenDangNhap = reader["TenDangNhap"].ToString(),
                     Email = reader["Email"].ToString(),
                     TrangThai = reader["TrangThai"].ToString(),
+                    NgayTao = reader["NgayTao"],
                     TenDaiLy = reader["TenDaiLy"].ToString(),
                     SoDienThoai = reader["SoDienThoai"].ToString(),
                     DiaChi = reader["DiaChi"].ToString(),
-                    facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
-                    tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
-                    NgayTao = reader["NgayTao"],
-                    NgayCapNhat = reader["NgayCapNhat"] != DBNull.Value ? reader["NgayCapNhat"] : null,
+                    Facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                    TikTok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                     SoDonHangNhan = (int)reader["SoDonHangNhan"],
                     SoDonHangBan = (int)reader["SoDonHangBan"],
                     SoKiemDinh = (int)reader["SoKiemDinh"]
@@ -352,7 +345,6 @@ namespace AdminService.Controllers
         /// Lấy thông tin chi tiết siêu thị - Cần token admin
         /// </summary>
         [HttpGet("sieuthi/{id}")]
-        [Authorize(Roles = "admin")]
         public IActionResult GetSieuThiDetail(int id)
         {
             try
@@ -367,13 +359,12 @@ namespace AdminService.Controllers
                         tk.TenDangNhap,
                         tk.Email,
                         tk.TrangThai,
+                        tk.NgayTao,
                         st.TenSieuThi,
                         st.SoDienThoai,
                         st.DiaChi,
                         st.Facebook,
                         st.TikTok,
-                        st.NgayTao,
-                        st.NgayCapNhat,
                         COUNT(DISTINCT dh.MaDonHang) as SoDonHangMua,
                         COUNT(DISTINCT k.MaKho) as SoKho
                     FROM SieuThi st
@@ -382,8 +373,7 @@ namespace AdminService.Controllers
                     LEFT JOIN Kho k ON st.MaSieuThi = k.MaChuSoHuu AND k.LoaiChuSoHuu = 'sieuthi'
                     WHERE st.MaSieuThi = @Id
                     GROUP BY st.MaSieuThi, st.MaTaiKhoan, tk.TenDangNhap, tk.Email, tk.TrangThai,
-                             st.TenSieuThi, st.SoDienThoai, st.DiaChi, st.Facebook, st.TikTok,
-                             st.NgayTao, st.NgayCapNhat", conn);
+                             tk.NgayTao, st.TenSieuThi, st.SoDienThoai, st.DiaChi, st.Facebook, st.TikTok", conn);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -404,13 +394,12 @@ namespace AdminService.Controllers
                     TenDangNhap = reader["TenDangNhap"].ToString(),
                     Email = reader["Email"].ToString(),
                     TrangThai = reader["TrangThai"].ToString(),
+                    NgayTao = reader["NgayTao"],
                     TenSieuThi = reader["TenSieuThi"].ToString(),
                     SoDienThoai = reader["SoDienThoai"].ToString(),
                     DiaChi = reader["DiaChi"].ToString(),
-                    facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
-                    tiktok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
-                    NgayTao = reader["NgayTao"],
-                    NgayCapNhat = reader["NgayCapNhat"] != DBNull.Value ? reader["NgayCapNhat"] : null,
+                    Facebook = reader["Facebook"] != DBNull.Value ? reader["Facebook"].ToString() : null,
+                    TikTok = reader["TikTok"] != DBNull.Value ? reader["TikTok"].ToString() : null,
                     SoDonHangMua = (int)reader["SoDonHangMua"],
                     SoKho = (int)reader["SoKho"]
                 };
@@ -436,7 +425,6 @@ namespace AdminService.Controllers
         /// Tìm kiếm người dùng - Cần token admin
         /// </summary>
         [HttpGet("search")]
-        [Authorize(Roles = "admin")]
         public IActionResult SearchUsers([FromQuery] string keyword, [FromQuery] string? loaiNguoiDung = null)
         {
             try
