@@ -18,6 +18,10 @@ builder.Services.AddScoped<IKhoService, KhoService>();
 builder.Services.AddScoped<ITonKhoRepository, TonKhoRepository>();
 builder.Services.AddScoped<ITonKhoService, TonKhoService>();
 
+// Register TruyXuat dependencies
+builder.Services.AddScoped<ITruyXuatRepository, TruyXuatRepository>();
+builder.Services.AddScoped<ITruyXuatService, TruyXuatService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
