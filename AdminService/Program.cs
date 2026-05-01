@@ -1,11 +1,18 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AdminService.Data;
+using AdminService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Register Repository and Service
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+builder.Services.AddScoped(sp => new TaiKhoanRepository(connectionString));
+builder.Services.AddScoped<TaiKhoanService>();
 
 // JWT Authentication
 var jwtSecret = "KEY_THUAN_2026_JWT_SECRET_KEY_128_BITS_MINIMUM"; // Same secret as Gateway
