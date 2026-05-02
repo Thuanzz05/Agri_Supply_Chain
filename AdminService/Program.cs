@@ -15,6 +15,8 @@ builder.Services.AddScoped(sp => new TaiKhoanRepository(connectionString));
 builder.Services.AddScoped<TaiKhoanService>();
 builder.Services.AddScoped(sp => new UserRepository(connectionString));
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped(sp => new DashboardRepository(connectionString));
+builder.Services.AddScoped<DashboardService>();
 
 // JWT Authentication
 var jwtSecret = "KEY_THUAN_2026_JWT_SECRET_KEY_128_BITS_MINIMUM"; // Same secret as Gateway

@@ -15,20 +15,6 @@ namespace AdminService.Controllers
         }
 
         /// <summary>
-        /// Test endpoint
-        /// </summary>
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            return Ok(new
-            {
-                success = true,
-                message = "AdminService is running",
-                timestamp = DateTime.Now
-            });
-        }
-
-        /// <summary>
         /// Lấy danh sách tất cả người dùng - Cần token admin
         /// </summary>
         [HttpGet]

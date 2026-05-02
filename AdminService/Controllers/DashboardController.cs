@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AdminService.Services;
 
 namespace AdminService.Controllers
 {
@@ -7,87 +8,36 @@ namespace AdminService.Controllers
     [ApiController]
     public class DashboardController : ControllerBase
     {
+        private readonly DashboardService _service;
+
+        public DashboardController(DashboardService service)
+        {
+            _service = service;
+        }
+
         /// <summary>
-        /// Dashboard tổng quan - Cần token admin
+        /// Lấy thống kê tổng quan - Cần token admin
         /// </summary>
-        [HttpGet]
+        [HttpGet("stats")]
         [Authorize(Roles = "admin")]
-        public IActionResult GetDashboard()
+        public IActionResult GetStats()
         {
-            try
-            {
-                var data = new
-                {
-                    TongNongDan = 150,
-                    TongDaiLy = 45,
-                    TongSieuThi = 25,
-                    TongGiaoDich = 1250,
-                    DoanhThuThang = 2500000000,
-                    SanPhamDatChatLuong = 95.5
-                };
+            var (success, message, data) = _service.GetDashboardStats();
 
-                return Ok(new
-                {
-                    success = true,
-                    message = "Lấy thông tin dashboard thành công",
-                    data = data
-                });
-            }
-            catch (Exception ex)
+            if (!success)
             {
                 return StatusCode(500, new
                 {
                     success = false,
-                    message = "Lỗi server: " + ex.Message
+                    message = "Lỗi server: " + message
                 });
             }
-        }
 
-        /// <summary>
-        /// Thống kê người dùng - Không cần token
-        /// </summary>
-        [HttpGet("users")]
-        public IActionResult GetUserStats()
-        {
-            try
-            {
-                var data = new
-                {
-                    NongDan = 150,
-                    DaiLy = 45,
-                    SieuThi = 25,
-                    Admin = 5,
-                    TongCong = 225
-                };
-
-                return Ok(new
-                {
-                    success = true,
-                    message = "Lấy thống kê người dùng thành công",
-                    data = data
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Lỗi server: " + ex.Message
-                });
-            }
-        }
-
-        /// <summary>
-        /// Test endpoint đơn giản
-        /// </summary>
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
             return Ok(new
             {
                 success = true,
-                message = "AdminService đang hoạt động bình thường",
-                timestamp = DateTime.Now
+                message,
+                data
             });
         }
     }
