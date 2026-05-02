@@ -13,5 +13,6 @@ namespace DaiLyService.Services
         bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null);
         bool Delete(int maVanChuyen);
         int CountByTrangThai(string trangThai);
+        object GetStatsByDaiLy(int maDaiLy);
     }
 }

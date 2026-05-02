@@ -14,5 +14,6 @@ namespace DaiLyService.Services
         bool Update(int maKiemDinh, KiemDinhUpdateDTO dto);
         bool Delete(int maKiemDinh);
         int CountByKetQua(string ketQua);
+        object GetStatsByDaiLy(int maDaiLy);
     }
 }

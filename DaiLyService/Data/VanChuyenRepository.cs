@@ -306,6 +306,46 @@ namespace DaiLyService.Data
             }
         }
 
+        public object GetStatsByDaiLy(int maDaiLy)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    SELECT 
+                        COUNT(DISTINCT vc.MaVanChuyen) AS TongVanChuyen,
+                        COUNT(DISTINCT CASE WHEN vc.TrangThai = 'dang_van_chuyen' THEN vc.MaVanChuyen END) AS DangVanChuyen,
+                        COUNT(DISTINCT CASE WHEN vc.TrangThai = 'hoan_thanh' THEN vc.MaVanChuyen END) AS HoanThanh
+                    FROM VanChuyen vc
+                    INNER JOIN LoNongSan ln ON vc.MaLo = ln.MaLo
+                    INNER JOIN ChiTietDonHang ct ON ln.MaLo = ct.MaLo
+                    INNER JOIN DonHang dh ON ct.MaDonHang = dh.MaDonHang
+                    WHERE dh.MaNguoiBan = @MaDaiLy
+                        AND dh.LoaiNguoiBan = 'daily'", conn);
+
+                cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
+                conn.Open();
+
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new
+                    {
+                        tongVanChuyen = reader.IsDBNull(0) ? 0 : reader.GetInt32(0),
+                        dangVanChuyen = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                        hoanThanh = reader.IsDBNull(2) ? 0 : reader.GetInt32(2)
+                    };
+                }
+
+                return new { tongVanChuyen = 0, dangVanChuyen = 0, hoanThanh = 0 };
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while getting shipping stats for agent {AgentId}", maDaiLy);
+                throw new Exception("Lỗi truy vấn thống kê vận chuyển", ex);
+            }
+        }
+
         private static VanChuyenDTO MapToDTO(SqlDataReader reader)
         {
             return new VanChuyenDTO

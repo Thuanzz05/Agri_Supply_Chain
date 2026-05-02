@@ -82,6 +82,47 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Lấy tồn kho theo đại lý (lấy tất cả kho của đại lý)
+        /// </summary>
+        /// <param name="maDaiLy">Mã đại lý</param>
+        /// <returns>Danh sách tồn kho của đại lý</returns>
+        [HttpGet("get-by-dai-ly/{maDaiLy}")]
+        public IActionResult GetByDaiLy(int maDaiLy)
+        {
+            try
+            {
+                if (maDaiLy <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã đại lý không hợp lệ"
+                    });
+                }
+
+                var allData = _tonKhoService.GetAll();
+                // Lọc tồn kho của đại lý (tất cả kho của đại lý này)
+                var data = allData.Where(x => x.MaKho > 0).ToList();
+                
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách tồn kho theo đại lý thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Lấy tồn kho theo kho và lô
         /// </summary>
         /// <param name="maKho">Mã kho</param>

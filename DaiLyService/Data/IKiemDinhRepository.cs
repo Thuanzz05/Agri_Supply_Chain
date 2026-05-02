@@ -14,5 +14,6 @@ namespace DaiLyService.Data
         bool Update(int maKiemDinh, KiemDinhUpdateDTO dto); // Cập nhật kiểm định
         bool Delete(int maKiemDinh); // Xóa kiểm định
         int CountByKetQua(string ketQua); // Đếm số lượng theo kết quả
+        object GetStatsByDaiLy(int maDaiLy); // Lấy thống kê kiểm định theo đại lý
     }
 }

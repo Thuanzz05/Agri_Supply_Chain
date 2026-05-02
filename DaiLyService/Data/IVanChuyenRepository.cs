@@ -18,5 +18,6 @@ namespace DaiLyService.Data
         
         // Thống kê
         int CountByTrangThai(string trangThai);
+        object GetStatsByDaiLy(int maDaiLy);
     }
 }

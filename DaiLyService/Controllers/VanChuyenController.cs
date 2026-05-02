@@ -388,6 +388,43 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Thống kê vận chuyển theo đại lý
+        /// </summary>
+        /// <param name="maDaiLy">Mã đại lý</param>
+        /// <returns>Thống kê vận chuyển</returns>
+        [HttpGet("stats/{maDaiLy}")]
+        public IActionResult GetStats(int maDaiLy)
+        {
+            try
+            {
+                if (maDaiLy <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã đại lý không hợp lệ"
+                    });
+                }
+
+                var stats = _vanChuyenService.GetStatsByDaiLy(maDaiLy);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy thống kê vận chuyển thành công",
+                    data = stats
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Thống kê vận chuyển theo trạng thái
         /// </summary>
         /// <returns>Thống kê vận chuyển</returns>

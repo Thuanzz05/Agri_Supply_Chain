@@ -377,6 +377,44 @@ namespace DaiLyService.Controllers
         }
 
         /// <summary>
+        /// Thống kê kiểm định theo đại lý
+        /// </summary>
+        /// <param name="maDaiLy">Mã đại lý</param>
+        /// <returns>Thống kê kiểm định</returns>
+        [HttpGet("stats/{maDaiLy}")]
+        public IActionResult GetStats(int maDaiLy)
+        {
+            try
+            {
+                if (maDaiLy <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã đại lý không hợp lệ"
+                    });
+                }
+
+                var stats = _kiemDinhService.GetStatsByDaiLy(maDaiLy);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy thống kê kiểm định thành công",
+                    data = stats
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetStats for agent {MaDaiLy}", maDaiLy);
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Thống kê kiểm định theo kết quả
         /// </summary>
         /// <returns>Thống kê kiểm định</returns>

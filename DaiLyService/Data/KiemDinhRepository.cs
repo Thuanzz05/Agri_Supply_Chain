@@ -435,6 +435,48 @@ namespace DaiLyService.Data
             }
         }
 
+        public object GetStatsByDaiLy(int maDaiLy)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    SELECT 
+                        COUNT(DISTINCT CASE WHEN kd.KetQua IS NULL THEN ln.MaLo END) AS ChoKiemDinh,
+                        COUNT(DISTINCT CASE WHEN kd.KetQua = 'dat' THEN ln.MaLo END) AS DatChuanCount,
+                        COUNT(DISTINCT CASE WHEN kd.KetQua = 'khong_dat' THEN ln.MaLo END) AS KhongDatCount
+                    FROM LoNongSan ln
+                    INNER JOIN ChiTietDonHang ct ON ln.MaLo = ct.MaLo
+                    INNER JOIN DonHang dh ON ct.MaDonHang = dh.MaDonHang
+                    LEFT JOIN KiemDinh kd ON ln.MaLo = kd.MaLo
+                    WHERE dh.MaNguoiMua = @MaDaiLy
+                        AND dh.LoaiNguoiMua = 'daily'
+                        AND dh.LoaiNguoiBan = 'nongdan'
+                        AND ln.SoLuongHienTai > 0", conn);
+
+                cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
+                conn.Open();
+
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new
+                    {
+                        choKiemDinh = reader.IsDBNull(0) ? 0 : reader.GetInt32(0),
+                        datChuanCount = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                        khongDatCount = reader.IsDBNull(2) ? 0 : reader.GetInt32(2)
+                    };
+                }
+
+                return new { choKiemDinh = 0, datChuanCount = 0, khongDatCount = 0 };
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while getting inspection stats for agent {AgentId}", maDaiLy);
+                throw new Exception("Lỗi truy vấn thống kê kiểm định", ex);
+            }
+        }
+
         private static KiemDinhDTO MapToDTO(SqlDataReader reader)
         {
             return new KiemDinhDTO

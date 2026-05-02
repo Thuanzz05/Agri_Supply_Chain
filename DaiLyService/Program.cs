@@ -13,6 +13,7 @@ builder.Services.AddDbContext<CnwebAgriSupplyChainContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add dependency injection
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddScoped<IDaiLyRepository, DaiLyRepository>();
 builder.Services.AddScoped<IDaiLyService, DaiLyService.Services.DaiLyService>();
 builder.Services.AddScoped<IKhoRepository, KhoRepository>();
@@ -26,6 +27,8 @@ builder.Services.AddScoped<IVanChuyenService, VanChuyenService>();
 builder.Services.AddScoped<IKiemDinhRepository, KiemDinhRepository>();
 builder.Services.AddScoped<IKiemDinhService, KiemDinhService>();
 builder.Services.AddScoped<IKiemDinhService, KiemDinhService>();
+builder.Services.AddScoped<IDashboardRepository>(sp => new DashboardRepository(connectionString));
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

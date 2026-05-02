@@ -30,5 +30,7 @@ namespace DaiLyService.Services
         public bool Delete(int maVanChuyen) => _repo.Delete(maVanChuyen);
 
         public int CountByTrangThai(string trangThai) => _repo.CountByTrangThai(trangThai);
+
+        public object GetStatsByDaiLy(int maDaiLy) => _repo.GetStatsByDaiLy(maDaiLy);
     }
 }

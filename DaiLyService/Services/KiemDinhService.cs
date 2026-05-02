@@ -31,5 +31,7 @@ namespace DaiLyService.Services
         public bool Delete(int maKiemDinh) => _repo.Delete(maKiemDinh);
 
         public int CountByKetQua(string ketQua) => _repo.CountByKetQua(ketQua);
+
+        public object GetStatsByDaiLy(int maDaiLy) => _repo.GetStatsByDaiLy(maDaiLy);
     }
 }
