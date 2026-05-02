@@ -22,6 +22,7 @@ builder.Services.AddCors(options =>
 });
 
 // Register dependencies
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddScoped<INongDanRepository, NongDanRepository>();
 builder.Services.AddScoped<INongDanService, NongDanService.Services.NongDanService>();
 builder.Services.AddScoped<ITrangTraiRepository, TrangTraiRepository>();
@@ -32,6 +33,8 @@ builder.Services.AddScoped<ILoNongSanRepository, LoNongSanRepository>();
 builder.Services.AddScoped<ILoNongSanService, LoNongSanService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepositoryImpl>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
+builder.Services.AddScoped<IDashboardRepository>(sp => new DashboardRepository(connectionString));
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var app = builder.Build();
 
