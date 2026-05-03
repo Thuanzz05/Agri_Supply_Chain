@@ -23,7 +23,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai,
-                           dl.Facebook, dl.TikTok,
+                           dl.Facebook, dl.TikTok, dl.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
@@ -52,7 +52,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai,
-                           dl.Facebook, dl.TikTok,
+                           dl.Facebook, dl.TikTok, dl.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
@@ -83,7 +83,7 @@ namespace DaiLyService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT dl.MaDaiLy, dl.MaTaiKhoan, dl.TenDaiLy, dl.DiaChi, dl.SoDienThoai,
-                           dl.Facebook, dl.TikTok,
+                           dl.Facebook, dl.TikTok, dl.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM DaiLy dl
                     LEFT JOIN TaiKhoan tk ON dl.MaTaiKhoan = tk.MaTaiKhoan
@@ -175,7 +175,7 @@ namespace DaiLyService.Data
                     using var cmd1 = new SqlCommand(@"
                         UPDATE DaiLy 
                         SET TenDaiLy = @TenDaiLy, DiaChi = @DiaChi, SoDienThoai = @SoDienThoai,
-                            Facebook = @Facebook, TikTok = @TikTok
+                            Facebook = @Facebook, TikTok = @TikTok, AnhDaiDien = @AnhDaiDien
                         WHERE MaDaiLy = @MaDaiLy", conn, transaction);
 
                     cmd1.Parameters.AddWithValue("@MaDaiLy", id);
@@ -184,6 +184,7 @@ namespace DaiLyService.Data
                     cmd1.Parameters.AddWithValue("@SoDienThoai", (object?)dto.SoDienThoai ?? DBNull.Value);
                     cmd1.Parameters.AddWithValue("@Facebook", (object?)dto.Facebook ?? DBNull.Value);
                     cmd1.Parameters.AddWithValue("@TikTok", (object?)dto.TikTok ?? DBNull.Value);
+                    cmd1.Parameters.Add("@AnhDaiDien", SqlDbType.NVarChar, -1).Value = (object?)dto.AnhDaiDien ?? DBNull.Value;
 
                     var rowsAffected = cmd1.ExecuteNonQuery();
                     
@@ -264,6 +265,7 @@ namespace DaiLyService.Data
                 SoDienThoai = reader.IsDBNull("SoDienThoai") ? string.Empty : reader.GetString("SoDienThoai"),
                 Facebook = reader.IsDBNull("Facebook") ? null : reader.GetString("Facebook"),
                 TikTok = reader.IsDBNull("TikTok") ? null : reader.GetString("TikTok"),
+                AnhDaiDien = reader.IsDBNull("AnhDaiDien") ? null : reader.GetString("AnhDaiDien"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")

@@ -24,7 +24,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
-                           st.Facebook, st.TikTok,
+                           st.Facebook, st.TikTok, st.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
@@ -60,7 +60,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
-                           st.Facebook, st.TikTok,
+                           st.Facebook, st.TikTok, st.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
@@ -90,7 +90,7 @@ namespace SieuThiService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT st.MaSieuThi, st.MaTaiKhoan, st.TenSieuThi, st.SoDienThoai, st.DiaChi,
-                           st.Facebook, st.TikTok,
+                           st.Facebook, st.TikTok, st.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM SieuThi st
                     LEFT JOIN TaiKhoan tk ON st.MaTaiKhoan = tk.MaTaiKhoan
@@ -178,7 +178,7 @@ namespace SieuThiService.Data
                     using var cmd1 = new SqlCommand(@"
                         UPDATE SieuThi 
                         SET TenSieuThi = @TenSieuThi, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi,
-                            Facebook = @Facebook, TikTok = @TikTok
+                            Facebook = @Facebook, TikTok = @TikTok, AnhDaiDien = @AnhDaiDien
                         WHERE MaSieuThi = @MaSieuThi", conn, transaction);
 
                     cmd1.Parameters.AddWithValue("@MaSieuThi", maSieuThi);
@@ -187,6 +187,7 @@ namespace SieuThiService.Data
                     cmd1.Parameters.AddWithValue("@DiaChi", (object?)sieuThiDto.DiaChi ?? DBNull.Value);
                     cmd1.Parameters.AddWithValue("@Facebook", (object?)sieuThiDto.Facebook ?? DBNull.Value);
                     cmd1.Parameters.AddWithValue("@TikTok", (object?)sieuThiDto.TikTok ?? DBNull.Value);
+                    cmd1.Parameters.Add("@AnhDaiDien", SqlDbType.NVarChar, -1).Value = (object?)sieuThiDto.AnhDaiDien ?? DBNull.Value;
 
                     var rowsAffected = cmd1.ExecuteNonQuery();
                     
@@ -304,6 +305,7 @@ namespace SieuThiService.Data
                 DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
                 Facebook = reader.IsDBNull("Facebook") ? null : reader.GetString("Facebook"),
                 TikTok = reader.IsDBNull("TikTok") ? null : reader.GetString("TikTok"),
+                AnhDaiDien = reader.IsDBNull("AnhDaiDien") ? null : reader.GetString("AnhDaiDien"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")

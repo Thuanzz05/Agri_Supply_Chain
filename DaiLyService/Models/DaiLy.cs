@@ -19,5 +19,7 @@ public partial class DaiLy
 
     public string? TikTok { get; set; }
 
+    public string? AnhDaiDien { get; set; }
+
     public virtual TaiKhoan MaTaiKhoanNavigation { get; set; } = null!;
 }
