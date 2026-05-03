@@ -22,7 +22,7 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT tt.MaTrangTrai, tt.MaNongDan, tt.TenTrangTrai, tt.DiaChi, tt.SoChungNhan, nd.HoTen as TenNongDan
+                    SELECT tt.MaTrangTrai, tt.MaNongDan, tt.TenTrangTrai, tt.DiaChi, tt.SoChungNhan, tt.HinhAnh, nd.HoTen as TenNongDan
                     FROM TrangTrai tt
                     LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan", conn);
 
@@ -49,7 +49,7 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT tt.MaTrangTrai, tt.MaNongDan, tt.TenTrangTrai, tt.DiaChi, tt.SoChungNhan, nd.HoTen as TenNongDan
+                    SELECT tt.MaTrangTrai, tt.MaNongDan, tt.TenTrangTrai, tt.DiaChi, tt.SoChungNhan, tt.HinhAnh, nd.HoTen as TenNongDan
                     FROM TrangTrai tt
                     LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
                     WHERE tt.MaNongDan = @MaNongDan", conn);
@@ -78,7 +78,7 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT tt.MaTrangTrai, tt.MaNongDan, tt.TenTrangTrai, tt.DiaChi, tt.SoChungNhan, nd.HoTen as TenNongDan
+                    SELECT tt.MaTrangTrai, tt.MaNongDan, tt.TenTrangTrai, tt.DiaChi, tt.SoChungNhan, tt.HinhAnh, nd.HoTen as TenNongDan
                     FROM TrangTrai tt
                     LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
                     WHERE tt.MaTrangTrai = @MaTrangTrai", conn);
@@ -107,14 +107,15 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    INSERT INTO TrangTrai (MaNongDan, TenTrangTrai, DiaChi, SoChungNhan) 
+                    INSERT INTO TrangTrai (MaNongDan, TenTrangTrai, DiaChi, SoChungNhan, HinhAnh) 
                     OUTPUT INSERTED.MaTrangTrai 
-                    VALUES (@MaNongDan, @TenTrangTrai, @DiaChi, @SoChungNhan)", conn);
+                    VALUES (@MaNongDan, @TenTrangTrai, @DiaChi, @SoChungNhan, @HinhAnh)", conn);
 
                 cmd.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = dto.MaNongDan;
                 cmd.Parameters.Add("@TenTrangTrai", SqlDbType.NVarChar, 100).Value = dto.TenTrangTrai;
                 cmd.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
                 cmd.Parameters.Add("@SoChungNhan", SqlDbType.NVarChar, 50).Value = (object?)dto.SoChungNhan ?? DBNull.Value;
+                cmd.Parameters.Add("@HinhAnh", SqlDbType.NVarChar, -1).Value = (object?)dto.HinhAnh ?? DBNull.Value; // -1 = MAX
 
                 conn.Open();
                 var maTrangTrai = (int)cmd.ExecuteScalar();
@@ -138,13 +139,14 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     UPDATE TrangTrai 
-                    SET TenTrangTrai = @TenTrangTrai, DiaChi = @DiaChi, SoChungNhan = @SoChungNhan 
+                    SET TenTrangTrai = @TenTrangTrai, DiaChi = @DiaChi, SoChungNhan = @SoChungNhan, HinhAnh = @HinhAnh 
                     WHERE MaTrangTrai = @MaTrangTrai", conn);
 
                 cmd.Parameters.Add("@MaTrangTrai", SqlDbType.Int).Value = id;
                 cmd.Parameters.Add("@TenTrangTrai", SqlDbType.NVarChar, 100).Value = dto.TenTrangTrai;
                 cmd.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
                 cmd.Parameters.Add("@SoChungNhan", SqlDbType.NVarChar, 50).Value = (object?)dto.SoChungNhan ?? DBNull.Value;
+                cmd.Parameters.Add("@HinhAnh", SqlDbType.NVarChar, -1).Value = (object?)dto.HinhAnh ?? DBNull.Value; // -1 = MAX
 
                 conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
@@ -203,7 +205,8 @@ namespace NongDanService.Data
                 TenTrangTrai = reader.GetString("TenTrangTrai"),
                 DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
                 SoChungNhan = reader.IsDBNull("SoChungNhan") ? null : reader.GetString("SoChungNhan"),
-                TenNongDan = reader.IsDBNull("TenNongDan") ? null : reader.GetString("TenNongDan")
+                TenNongDan = reader.IsDBNull("TenNongDan") ? null : reader.GetString("TenNongDan"),
+                HinhAnh = reader.IsDBNull("HinhAnh") ? null : reader.GetString("HinhAnh")
             };
         }
     }

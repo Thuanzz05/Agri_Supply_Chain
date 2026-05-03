@@ -13,5 +13,7 @@ namespace NongDanService.Models.DTOs
 
         [StringLength(50, ErrorMessage = "Số chứng nhận không được vượt quá 50 ký tự")]
         public string? SoChungNhan { get; set; }
+
+        public string? HinhAnh { get; set; }
     }
 }

@@ -8,5 +8,6 @@ namespace NongDanService.Models.DTOs
         public string? DiaChi { get; set; }
         public string? SoChungNhan { get; set; }
         public string? TenNongDan { get; set; } // Thông tin nông dân
+        public string? HinhAnh { get; set; }
     }
 }

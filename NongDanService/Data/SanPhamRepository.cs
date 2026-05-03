@@ -21,7 +21,7 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("SELECT MaSanPham, TenSanPham, DonViTinh, MoTa FROM SanPham ORDER BY TenSanPham", conn);
+                using var cmd = new SqlCommand("SELECT MaSanPham, TenSanPham, DonViTinh, MoTa, HinhAnh FROM SanPham ORDER BY TenSanPham", conn);
 
                 conn.Open();
                 using var reader = cmd.ExecuteReader();
@@ -44,7 +44,7 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("SELECT MaSanPham, TenSanPham, DonViTinh, MoTa FROM SanPham WHERE MaSanPham = @MaSanPham", conn);
+                using var cmd = new SqlCommand("SELECT MaSanPham, TenSanPham, DonViTinh, MoTa, HinhAnh FROM SanPham WHERE MaSanPham = @MaSanPham", conn);
                 cmd.Parameters.AddWithValue("@MaSanPham", id);
 
                 conn.Open();
@@ -70,7 +70,7 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT MaSanPham, TenSanPham, DonViTinh, MoTa 
+                    SELECT MaSanPham, TenSanPham, DonViTinh, MoTa, HinhAnh 
                     FROM SanPham 
                     WHERE TenSanPham LIKE @TenSanPham 
                     ORDER BY TenSanPham", conn);
@@ -99,13 +99,14 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    INSERT INTO SanPham (TenSanPham, DonViTinh, MoTa) 
+                    INSERT INTO SanPham (TenSanPham, DonViTinh, MoTa, HinhAnh) 
                     OUTPUT INSERTED.MaSanPham 
-                    VALUES (@TenSanPham, @DonViTinh, @MoTa)", conn);
+                    VALUES (@TenSanPham, @DonViTinh, @MoTa, @HinhAnh)", conn);
 
                 cmd.Parameters.AddWithValue("@TenSanPham", dto.TenSanPham);
                 cmd.Parameters.AddWithValue("@DonViTinh", dto.DonViTinh);
                 cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@HinhAnh", (object?)dto.HinhAnh ?? DBNull.Value);
 
                 conn.Open();
                 var maSanPham = (int)cmd.ExecuteScalar();
@@ -129,13 +130,14 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     UPDATE SanPham 
-                    SET TenSanPham = @TenSanPham, DonViTinh = @DonViTinh, MoTa = @MoTa 
+                    SET TenSanPham = @TenSanPham, DonViTinh = @DonViTinh, MoTa = @MoTa, HinhAnh = @HinhAnh 
                     WHERE MaSanPham = @MaSanPham", conn);
 
                 cmd.Parameters.AddWithValue("@MaSanPham", id);
                 cmd.Parameters.AddWithValue("@TenSanPham", dto.TenSanPham);
                 cmd.Parameters.AddWithValue("@DonViTinh", dto.DonViTinh);
                 cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@HinhAnh", (object?)dto.HinhAnh ?? DBNull.Value);
 
                 conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
@@ -192,7 +194,8 @@ namespace NongDanService.Data
                 MaSanPham = reader.GetInt32("MaSanPham"),
                 TenSanPham = reader.GetString("TenSanPham"),
                 DonViTinh = reader.GetString("DonViTinh"),
-                MoTa = reader.IsDBNull("MoTa") ? null : reader.GetString("MoTa")
+                MoTa = reader.IsDBNull("MoTa") ? null : reader.GetString("MoTa"),
+                HinhAnh = reader.IsDBNull("HinhAnh") ? null : reader.GetString("HinhAnh")
             };
         }
     }

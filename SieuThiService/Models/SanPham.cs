@@ -13,5 +13,7 @@ public partial class SanPham
 
     public string? MoTa { get; set; }
 
+    public string? HinhAnh { get; set; }
+
     public virtual ICollection<LoNongSan> LoNongSans { get; set; } = new List<LoNongSan>();
 }

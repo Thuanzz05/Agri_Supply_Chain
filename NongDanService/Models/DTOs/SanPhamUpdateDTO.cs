@@ -14,5 +14,7 @@ namespace NongDanService.Models.DTOs
 
         [StringLength(255, ErrorMessage = "Mô tả không được vượt quá 255 ký tự")]
         public string? MoTa { get; set; }
+
+        public string? HinhAnh { get; set; }
     }
 }
