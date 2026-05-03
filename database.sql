@@ -795,3 +795,20 @@ END
 GO
 
 PRINT 'Hoàn thành cập nhật database!';
+
+
+
+
+-- Thêm cột AnhDaiDien vào bảng NongDan
+ALTER TABLE [dbo].[NongDan]
+ADD AnhDaiDien NVARCHAR(MAX) NULL;
+
+-- Thêm cột AnhDaiDien vào bảng DaiLy
+ALTER TABLE [dbo].[DaiLy]
+ADD AnhDaiDien NVARCHAR(MAX) NULL;
+
+-- Thêm cột AnhDaiDien vào bảng SieuThi
+ALTER TABLE [dbo].[SieuThi]
+ADD AnhDaiDien NVARCHAR(MAX) NULL;
+
+PRINT 'Đã thêm cột AnhDaiDien vào các bảng NongDan, DaiLy, SieuThi!';
