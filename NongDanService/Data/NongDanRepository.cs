@@ -52,7 +52,7 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
-                           nd.Facebook, nd.TikTok,
+                           nd.Facebook, nd.TikTok, nd.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM NongDan nd
                     LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
@@ -82,7 +82,7 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
                     SELECT nd.MaNongDan, nd.MaTaiKhoan, nd.HoTen, nd.SoDienThoai, nd.DiaChi,
-                           nd.Facebook, nd.TikTok,
+                           nd.Facebook, nd.TikTok, nd.AnhDaiDien,
                            tk.TenDangNhap, tk.Email, tk.NgayTao
                     FROM NongDan nd
                     LEFT JOIN TaiKhoan tk ON nd.MaTaiKhoan = tk.MaTaiKhoan
@@ -164,16 +164,14 @@ namespace NongDanService.Data
                 using var conn = new SqlConnection(_connectionString);
                 conn.Open();
 
-                // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
                 using var transaction = conn.BeginTransaction();
                 
                 try
                 {
-                    // Cập nhật thông tin nông dân
                     using var cmd1 = new SqlCommand(@"
                         UPDATE NongDan 
                         SET HoTen = @HoTen, SoDienThoai = @SoDienThoai, DiaChi = @DiaChi,
-                            Facebook = @Facebook, TikTok = @TikTok
+                            Facebook = @Facebook, TikTok = @TikTok, AnhDaiDien = @AnhDaiDien
                         WHERE MaNongDan = @MaNongDan", conn, transaction);
 
                     cmd1.Parameters.Add("@MaNongDan", SqlDbType.Int).Value = id;
@@ -182,6 +180,7 @@ namespace NongDanService.Data
                     cmd1.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
                     cmd1.Parameters.Add("@Facebook", SqlDbType.NVarChar, 255).Value = (object?)dto.Facebook ?? DBNull.Value;
                     cmd1.Parameters.Add("@TikTok", SqlDbType.NVarChar, 255).Value = (object?)dto.TikTok ?? DBNull.Value;
+                    cmd1.Parameters.Add("@AnhDaiDien", SqlDbType.NVarChar, -1).Value = (object?)dto.AnhDaiDien ?? DBNull.Value;
 
                     var rowsAffected = cmd1.ExecuteNonQuery();
                     
@@ -192,7 +191,6 @@ namespace NongDanService.Data
                         return false;
                     }
 
-                    // Cập nhật Email trong bảng TaiKhoan nếu có
                     if (!string.IsNullOrWhiteSpace(dto.Email))
                     {
                         using var cmd2 = new SqlCommand(@"
@@ -262,6 +260,7 @@ namespace NongDanService.Data
                 DiaChi = reader.IsDBNull("DiaChi") ? null : reader.GetString("DiaChi"),
                 Facebook = reader.IsDBNull("Facebook") ? null : reader.GetString("Facebook"),
                 TikTok = reader.IsDBNull("TikTok") ? null : reader.GetString("TikTok"),
+                AnhDaiDien = reader.IsDBNull("AnhDaiDien") ? null : reader.GetString("AnhDaiDien"),
                 TenDangNhap = reader.IsDBNull("TenDangNhap") ? null : reader.GetString("TenDangNhap"),
                 Email = reader.IsDBNull("Email") ? null : reader.GetString("Email"),
                 NgayTao = reader.IsDBNull("NgayTao") ? null : reader.GetDateTime("NgayTao")

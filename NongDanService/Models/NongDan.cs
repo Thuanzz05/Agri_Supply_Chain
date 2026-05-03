@@ -19,6 +19,8 @@ public partial class NongDan
 
     public string? TikTok { get; set; }
 
+    public string? AnhDaiDien { get; set; }
+
     public virtual TaiKhoan MaTaiKhoanNavigation { get; set; } = null!;
 
     public virtual ICollection<TrangTrai> TrangTrais { get; set; } = new List<TrangTrai>();

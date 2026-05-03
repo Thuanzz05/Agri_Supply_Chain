@@ -14,6 +14,8 @@ namespace NongDanService.Models.DTOs
 
         [JsonPropertyName("tiktok")]
         public string? TikTok { get; set; }
+
+        public string? AnhDaiDien { get; set; }
         
         // Thông tin từ bảng TaiKhoan
         public string? TenDangNhap { get; set; }

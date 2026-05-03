@@ -26,5 +26,7 @@ namespace NongDanService.Models.DTOs
         [StringLength(255, ErrorMessage = "TikTok khong duoc vuot qua 255 ky tu")]
         [JsonPropertyName("tiktok")]
         public string? TikTok { get; set; }
+
+        public string? AnhDaiDien { get; set; }
     }
 }
