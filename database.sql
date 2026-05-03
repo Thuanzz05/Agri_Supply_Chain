@@ -764,3 +764,34 @@ BEGIN
     ALTER TABLE dbo.SieuThi ADD TikTok NVARCHAR(255) NULL;
 END
 GO
+
+
+
+
+-- Thêm cột HinhAnh vào bảng SanPham
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SanPham]') AND name = 'HinhAnh')
+BEGIN
+    ALTER TABLE [dbo].[SanPham]
+    ADD HinhAnh NVARCHAR(500) NULL;
+    PRINT 'Đã thêm cột HinhAnh vào bảng SanPham';
+END
+ELSE
+BEGIN
+    PRINT 'Cột HinhAnh đã tồn tại trong bảng SanPham';
+END
+GO
+
+-- Thêm cột HinhAnh vào bảng TrangTrai
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[TrangTrai]') AND name = 'HinhAnh')
+BEGIN
+    ALTER TABLE [dbo].[TrangTrai]
+    ADD HinhAnh NVARCHAR(500) NULL;
+    PRINT 'Đã thêm cột HinhAnh vào bảng TrangTrai';
+END
+ELSE
+BEGIN
+    PRINT 'Cột HinhAnh đã tồn tại trong bảng TrangTrai';
+END
+GO
+
+PRINT 'Hoàn thành cập nhật database!';
