@@ -22,6 +22,10 @@ builder.Services.AddScoped<ITonKhoService, TonKhoService>();
 builder.Services.AddScoped<ITruyXuatRepository, TruyXuatRepository>();
 builder.Services.AddScoped<ITruyXuatService, TruyXuatService>();
 
+// Register Dashboard dependencies
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
