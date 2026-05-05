@@ -17,6 +17,7 @@ builder.Services.AddScoped(sp => new UserRepository(connectionString));
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped(sp => new DashboardRepository(connectionString));
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped(sp => new ChatRepository(sp.GetRequiredService<IConfiguration>()));
 
 // JWT Authentication
 var jwtSecret = "KEY_THUAN_2026_JWT_SECRET_KEY_128_BITS_MINIMUM"; // Same secret as Gateway

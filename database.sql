@@ -812,3 +812,69 @@ ALTER TABLE [dbo].[SieuThi]
 ADD AnhDaiDien NVARCHAR(MAX) NULL;
 
 PRINT 'Đã thêm cột AnhDaiDien vào các bảng NongDan, DaiLy, SieuThi!';
+
+
+
+-- =============================================
+-- CHỨC NĂNG CHAT/TIN NHẮN
+-- =============================================
+
+-- Bảng CuocTroChuyen (Conversations)
+CREATE TABLE CuocTroChuyen (
+    MaCuocTroChuyen INT IDENTITY(1,1) PRIMARY KEY,
+    MaNguoi1 INT NOT NULL,
+    LoaiNguoi1 NVARCHAR(20) NOT NULL, -- 'nongdan', 'daily', 'sieuthi'
+    MaNguoi2 INT NOT NULL,
+    LoaiNguoi2 NVARCHAR(20) NOT NULL,
+    TinNhanCuoi NVARCHAR(MAX) NULL,
+    NgayCapNhat DATETIME2 DEFAULT SYSDATETIME(),
+    NgayTao DATETIME2 DEFAULT SYSDATETIME()
+);
+
+-- Bảng TinNhan (Messages)
+CREATE TABLE TinNhan (
+    MaTinNhan INT IDENTITY(1,1) PRIMARY KEY,
+    MaCuocTroChuyen INT NOT NULL,
+    MaNguoiGui INT NOT NULL,
+    LoaiNguoiGui NVARCHAR(20) NOT NULL, -- 'nongdan', 'daily', 'sieuthi'
+    NoiDung NVARCHAR(MAX) NOT NULL,
+    DaDoc BIT DEFAULT 0,
+    NgayGui DATETIME2 DEFAULT SYSDATETIME(),
+    FOREIGN KEY (MaCuocTroChuyen) REFERENCES CuocTroChuyen(MaCuocTroChuyen) ON DELETE CASCADE
+);
+
+-- Index để tăng tốc truy vấn
+CREATE INDEX IX_CuocTroChuyen_Nguoi1 ON CuocTroChuyen(MaNguoi1, LoaiNguoi1);
+CREATE INDEX IX_CuocTroChuyen_Nguoi2 ON CuocTroChuyen(MaNguoi2, LoaiNguoi2);
+CREATE INDEX IX_TinNhan_CuocTroChuyen ON TinNhan(MaCuocTroChuyen);
+CREATE INDEX IX_TinNhan_DaDoc ON TinNhan(DaDoc);
+
+PRINT 'Đã tạo bảng CuocTroChuyen và TinNhan cho chức năng chat!';
+GO
+
+-- Dữ liệu mẫu cho chat
+INSERT INTO CuocTroChuyen (MaNguoi1, LoaiNguoi1, MaNguoi2, LoaiNguoi2, TinNhanCuoi, NgayCapNhat) VALUES
+(1, 'nongdan', 1, 'daily', N'Vâng, tôi sẽ giao hàng vào sáng mai', SYSDATETIME()),
+(1, 'daily', 1, 'sieuthi', N'Đơn hàng đã được xác nhận', SYSDATETIME()),
+(2, 'nongdan', 2, 'daily', N'Cảm ơn bạn đã đặt hàng', SYSDATETIME());
+
+INSERT INTO TinNhan (MaCuocTroChuyen, MaNguoiGui, LoaiNguoiGui, NoiDung, DaDoc, NgayGui) VALUES
+-- Cuộc trò chuyện 1: Nông dân 1 - Đại lý 1
+(1, 1, 'daily', N'Chào bạn, tôi muốn đặt 100kg cà chua', 1, DATEADD(HOUR, -2, SYSDATETIME())),
+(1, 1, 'nongdan', N'Chào bạn, hiện tại tôi có sẵn hàng. Giá 25.000đ/kg', 1, DATEADD(HOUR, -1, SYSDATETIME())),
+(1, 1, 'daily', N'Được, khi nào có thể giao hàng?', 1, DATEADD(MINUTE, -30, SYSDATETIME())),
+(1, 1, 'nongdan', N'Vâng, tôi sẽ giao hàng vào sáng mai', 0, DATEADD(MINUTE, -5, SYSDATETIME())),
+
+-- Cuộc trò chuyện 2: Đại lý 1 - Siêu thị 1
+(2, 1, 'sieuthi', N'Tôi cần đặt 200kg rau muống', 1, DATEADD(HOUR, -3, SYSDATETIME())),
+(2, 1, 'daily', N'Dạ, hiện tại shop có sẵn. Giá 30.000đ/kg', 1, DATEADD(HOUR, -2, SYSDATETIME())),
+(2, 1, 'sieuthi', N'OK, tôi đặt luôn nhé', 1, DATEADD(HOUR, -1, SYSDATETIME())),
+(2, 1, 'daily', N'Đơn hàng đã được xác nhận', 0, DATEADD(MINUTE, -10, SYSDATETIME())),
+
+-- Cuộc trò chuyện 3: Nông dân 2 - Đại lý 2
+(3, 2, 'daily', N'Bạn có bí xanh không?', 1, DATEADD(HOUR, -1, SYSDATETIME())),
+(3, 2, 'nongdan', N'Có bạn, tôi có 50kg', 1, DATEADD(MINUTE, -30, SYSDATETIME())),
+(3, 2, 'daily', N'Cảm ơn bạn đã đặt hàng', 0, DATEADD(MINUTE, -2, SYSDATETIME()));
+
+PRINT 'Đã thêm dữ liệu mẫu cho chức năng chat!';
+GO
