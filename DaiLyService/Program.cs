@@ -20,6 +20,8 @@ builder.Services.AddScoped<IKhoRepository, KhoRepository>();
 builder.Services.AddScoped<IKhoService, KhoService>();
 builder.Services.AddScoped<ITonKhoRepository, InventoryRepository>();
 builder.Services.AddScoped<ITonKhoService, TonKhoService>();
+builder.Services.AddScoped<IChuyenKhoRepository, ChuyenKhoRepository>();
+builder.Services.AddScoped<IChuyenKhoService, ChuyenKhoService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 builder.Services.AddScoped<IVanChuyenRepository, VanChuyenRepository>();

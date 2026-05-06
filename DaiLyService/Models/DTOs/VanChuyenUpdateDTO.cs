@@ -8,5 +8,8 @@ namespace DaiLyService.Models.DTOs
         public string TrangThai { get; set; } = string.Empty; // 'dang_van_chuyen', 'hoan_thanh'
 
         public DateTime? NgayKetThuc { get; set; } // Nếu null và trạng thái = 'hoan_thanh' sẽ dùng DateTime.Now
+
+        // Kho đích nhận hàng (khi hoàn thành)
+        public int? MaKhoDich { get; set; }
     }
 }

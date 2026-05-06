@@ -271,7 +271,16 @@ namespace DaiLyService.Controllers
                     });
                 }
 
-                var result = _vanChuyenService.UpdateTrangThai(id, dto.TrangThai, dto.NgayKetThuc);
+                if (dto.TrangThai == "hoan_thanh" && (!dto.MaKhoDich.HasValue || dto.MaKhoDich <= 0))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Vui lòng chọn kho đích (MaKhoDich) khi hoàn thành vận chuyển"
+                    });
+                }
+
+                var result = _vanChuyenService.UpdateTrangThai(id, dto.TrangThai, dto.NgayKetThuc, dto.MaKhoDich);
                 if (result)
                 {
                     return Ok(new
@@ -303,7 +312,7 @@ namespace DaiLyService.Controllers
         /// <param name="id">Mã vận chuyển</param>
         /// <returns>Kết quả hoàn thành</returns>
         [HttpPut("hoan-thanh/{id}")]
-        public IActionResult HoanThanh(int id)
+        public IActionResult HoanThanh(int id, [FromQuery] int maKhoDich)
         {
             try
             {
@@ -316,7 +325,16 @@ namespace DaiLyService.Controllers
                     });
                 }
 
-                var result = _vanChuyenService.UpdateTrangThai(id, "hoan_thanh", DateTime.Now);
+                if (maKhoDich <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Vui lòng chọn kho đích (maKhoDich)"
+                    });
+                }
+
+                var result = _vanChuyenService.UpdateTrangThai(id, "hoan_thanh", DateTime.Now, maKhoDich);
                 if (result)
                 {
                     return Ok(new

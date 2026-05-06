@@ -22,6 +22,22 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
+                    WITH LatestKiemDinh AS (
+                        SELECT
+                            kd.*,
+                            ROW_NUMBER() OVER (PARTITION BY kd.MaLo ORDER BY kd.NgayKiemDinh DESC, kd.MaKiemDinh DESC) AS rn
+                        FROM KiemDinh kd
+                    ),
+                    PendingOrders AS (
+                        SELECT ct.MaLo, COUNT(*) AS PendingCount
+                        FROM DonHang dh
+                        INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
+                        WHERE dh.MaNguoiMua = @MaDaiLy
+                          AND dh.LoaiNguoiMua = 'daily'
+                          AND dh.LoaiNguoiBan = 'nongdan'
+                          AND dh.TrangThai = 'cho_kiem_dinh'
+                        GROUP BY ct.MaLo
+                    )
                     SELECT DISTINCT
                         ln.MaLo,
                         sp.TenSanPham,
@@ -31,6 +47,7 @@ namespace DaiLyService.Data
                         sp.DonViTinh,
                         ln.NgayThuHoach,
                         CASE 
+                            WHEN po.PendingCount > 0 THEN 'cho_kiem_dinh'
                             WHEN kd.KetQua IS NULL THEN 'cho_kiem_dinh'
                             ELSE kd.KetQua
                         END AS TrangThaiKiemDinh,
@@ -49,11 +66,13 @@ namespace DaiLyService.Data
                     INNER JOIN ChiTietDonHang ct ON ln.MaLo = ct.MaLo
                     INNER JOIN DonHang dh ON ct.MaDonHang = dh.MaDonHang
                     -- Lấy kết quả kiểm định (nếu có)
-                    LEFT JOIN KiemDinh kd ON ln.MaLo = kd.MaLo
+                    LEFT JOIN LatestKiemDinh kd ON ln.MaLo = kd.MaLo AND kd.rn = 1
+                    LEFT JOIN PendingOrders po ON ln.MaLo = po.MaLo
                     WHERE dh.MaNguoiMua = @MaDaiLy
                         AND dh.LoaiNguoiMua = 'daily'
                         AND dh.LoaiNguoiBan = 'nongdan'
                         AND ln.SoLuongHienTai > 0
+                        AND dh.TrangThai IN ('cho_kiem_dinh', 'dang_van_chuyen', 'tra_hang')
                     ORDER BY SortOrder, ln.NgayThuHoach DESC", conn);
 
                 cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
@@ -108,6 +127,12 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
+                    WITH LatestKiemDinh AS (
+                        SELECT
+                            kd.*,
+                            ROW_NUMBER() OVER (PARTITION BY kd.MaLo ORDER BY kd.NgayKiemDinh DESC, kd.MaKiemDinh DESC) AS rn
+                        FROM KiemDinh kd
+                    )
                     SELECT 
                         ln.MaLo,
                         sp.TenSanPham,
@@ -132,7 +157,7 @@ namespace DaiLyService.Data
                     INNER JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
                     INNER JOIN TrangTrai tt ON ln.MaTrangTrai = tt.MaTrangTrai
                     INNER JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
-                    LEFT JOIN KiemDinh kd ON ln.MaLo = kd.MaLo
+                    LEFT JOIN LatestKiemDinh kd ON ln.MaLo = kd.MaLo AND kd.rn = 1
                     WHERE ln.SoLuongHienTai > 0
                     ORDER BY SortOrder, ln.NgayThuHoach DESC", conn);
 
@@ -327,23 +352,102 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand(@"
-                    INSERT INTO KiemDinh (MaLo, NguoiKiemDinh, NgayKiemDinh, KetQua, BienBanKiemTra, ChuKySo) 
-                    OUTPUT INSERTED.MaKiemDinh 
-                    VALUES (@MaLo, @NguoiKiemDinh, @NgayKiemDinh, @KetQua, @BienBanKiemTra, @ChuKySo)", conn);
-
-                cmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
-                cmd.Parameters.AddWithValue("@NguoiKiemDinh", dto.NguoiKiemDinh);
-                cmd.Parameters.AddWithValue("@NgayKiemDinh", dto.NgayKiemDinh ?? DateTime.Now);
-                cmd.Parameters.AddWithValue("@KetQua", dto.KetQua);
-                cmd.Parameters.AddWithValue("@BienBanKiemTra", (object?)dto.BienBanKiemTra ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@ChuKySo", (object?)dto.ChuKySo ?? DBNull.Value);
-
                 conn.Open();
-                var maKiemDinh = (int)cmd.ExecuteScalar();
+                using var transaction = conn.BeginTransaction();
+
+                try
+                {
+                    using var cmd = new SqlCommand(@"
+                        INSERT INTO KiemDinh (MaLo, NguoiKiemDinh, NgayKiemDinh, KetQua, BienBanKiemTra, ChuKySo) 
+                        OUTPUT INSERTED.MaKiemDinh 
+                        VALUES (@MaLo, @NguoiKiemDinh, @NgayKiemDinh, @KetQua, @BienBanKiemTra, @ChuKySo)", conn, transaction);
+
+                    cmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
+                    cmd.Parameters.AddWithValue("@NguoiKiemDinh", dto.NguoiKiemDinh);
+                    cmd.Parameters.AddWithValue("@NgayKiemDinh", dto.NgayKiemDinh ?? DateTime.Now);
+                    cmd.Parameters.AddWithValue("@KetQua", dto.KetQua);
+                    cmd.Parameters.AddWithValue("@BienBanKiemTra", (object?)dto.BienBanKiemTra ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ChuKySo", (object?)dto.ChuKySo ?? DBNull.Value);
+
+                    var maKiemDinh = (int)cmd.ExecuteScalar();
+
+                    var targetOrderStatus = dto.KetQua == "dat" ? "dang_van_chuyen" : "tra_hang";
+                    using var orderStatusCmd = new SqlCommand(@"
+                        UPDATE dh
+                        SET dh.TrangThai = @TrangThai
+                        FROM DonHang dh
+                        INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
+                        WHERE ct.MaLo = @MaLo
+                          AND dh.LoaiDon = 'nongdan_to_daily'
+                          AND dh.TrangThai = 'cho_kiem_dinh'", conn, transaction);
+                    orderStatusCmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
+                    orderStatusCmd.Parameters.AddWithValue("@TrangThai", targetOrderStatus);
+                    orderStatusCmd.ExecuteNonQuery();
+
+                    if (dto.KetQua == "dat")
+                    {
+                        using var checkTransportCmd = new SqlCommand(@"
+                            SELECT COUNT(*) FROM VanChuyen WHERE MaLo = @MaLo AND TrangThai = 'dang_van_chuyen'", conn, transaction);
+                        checkTransportCmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
+                        var existingTransport = (int)checkTransportCmd.ExecuteScalar();
+
+                        if (existingTransport == 0)
+                        {
+                            using var getOrderInfoCmd = new SqlCommand(@"
+                                SELECT TOP 1 dh.MaNguoiMua
+                                FROM DonHang dh
+                                INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
+                                WHERE ct.MaLo = @MaLo
+                                  AND dh.LoaiDon = 'nongdan_to_daily'
+                                  AND dh.TrangThai = 'dang_van_chuyen'
+                                ORDER BY dh.NgayDat DESC", conn, transaction);
+                            getOrderInfoCmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
+                            var maDaiLyObj = getOrderInfoCmd.ExecuteScalar();
+                            var maDaiLy = maDaiLyObj == null ? 0 : (int)maDaiLyObj;
+
+                            using var getAddrCmd = new SqlCommand(@"
+                                SELECT 
+                                    (SELECT TOP 1 ISNULL(tt.DiaChi, nd.DiaChi) FROM LoNongSan ln 
+                                     LEFT JOIN TrangTrai tt ON ln.MaTrangTrai = tt.MaTrangTrai
+                                     LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
+                                     WHERE ln.MaLo = @MaLo) AS DiemDi,
+                                    (SELECT TOP 1 ISNULL(k.DiaChi, dl.DiaChi) FROM DaiLy dl 
+                                     LEFT JOIN Kho k ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                                     WHERE dl.MaDaiLy = @MaDaiLy) AS DiemDen", conn, transaction);
+                            getAddrCmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
+                            getAddrCmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
+
+                            string diemDi = "Trang trại nông dân";
+                            string diemDen = "Kho đại lý";
+                            using (var addrReader = getAddrCmd.ExecuteReader())
+                            {
+                                if (addrReader.Read())
+                                {
+                                    if (!addrReader.IsDBNull(0)) diemDi = addrReader.GetString(0);
+                                    if (!addrReader.IsDBNull(1)) diemDen = addrReader.GetString(1);
+                                }
+                            }
+
+                            using var insertTransportCmd = new SqlCommand(@"
+                                INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, TrangThai)
+                                VALUES (@MaLo, @DiemDi, @DiemDen, GETDATE(), N'dang_van_chuyen')", conn, transaction);
+                            insertTransportCmd.Parameters.AddWithValue("@MaLo", dto.MaLo);
+                            insertTransportCmd.Parameters.AddWithValue("@DiemDi", diemDi);
+                            insertTransportCmd.Parameters.AddWithValue("@DiemDen", diemDen);
+                            insertTransportCmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    transaction.Commit();
                 
-                _logger.LogInformation("Created inspection record {InspectionId} for lot {LotId}", maKiemDinh, dto.MaLo);
-                return maKiemDinh;
+                    _logger.LogInformation("Created inspection record {InspectionId} for lot {LotId} with result {Result}", maKiemDinh, dto.MaLo, dto.KetQua);
+                    return maKiemDinh;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
             catch (SqlException ex)
             {
@@ -441,18 +545,36 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
+                    WITH LatestKiemDinh AS (
+                        SELECT
+                            kd.*,
+                            ROW_NUMBER() OVER (PARTITION BY kd.MaLo ORDER BY kd.NgayKiemDinh DESC, kd.MaKiemDinh DESC) AS rn
+                        FROM KiemDinh kd
+                    ),
+                    PendingOrders AS (
+                        SELECT ct.MaLo
+                        FROM DonHang dh
+                        INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
+                        WHERE dh.MaNguoiMua = @MaDaiLy
+                          AND dh.LoaiNguoiMua = 'daily'
+                          AND dh.LoaiNguoiBan = 'nongdan'
+                          AND dh.TrangThai = 'cho_kiem_dinh'
+                        GROUP BY ct.MaLo
+                    )
                     SELECT 
-                        COUNT(DISTINCT CASE WHEN kd.KetQua IS NULL THEN ln.MaLo END) AS ChoKiemDinh,
-                        COUNT(DISTINCT CASE WHEN kd.KetQua = 'dat' THEN ln.MaLo END) AS DatChuanCount,
-                        COUNT(DISTINCT CASE WHEN kd.KetQua = 'khong_dat' THEN ln.MaLo END) AS KhongDatCount
+                        COUNT(DISTINCT CASE WHEN po.MaLo IS NOT NULL THEN ln.MaLo END) AS ChoKiemDinh,
+                        COUNT(DISTINCT CASE WHEN po.MaLo IS NULL AND kd.KetQua = 'dat' THEN ln.MaLo END) AS DatChuanCount,
+                        COUNT(DISTINCT CASE WHEN po.MaLo IS NULL AND kd.KetQua = 'khong_dat' THEN ln.MaLo END) AS KhongDatCount
                     FROM LoNongSan ln
                     INNER JOIN ChiTietDonHang ct ON ln.MaLo = ct.MaLo
                     INNER JOIN DonHang dh ON ct.MaDonHang = dh.MaDonHang
-                    LEFT JOIN KiemDinh kd ON ln.MaLo = kd.MaLo
+                    LEFT JOIN LatestKiemDinh kd ON ln.MaLo = kd.MaLo AND kd.rn = 1
+                    LEFT JOIN PendingOrders po ON ln.MaLo = po.MaLo
                     WHERE dh.MaNguoiMua = @MaDaiLy
                         AND dh.LoaiNguoiMua = 'daily'
                         AND dh.LoaiNguoiBan = 'nongdan'
-                        AND ln.SoLuongHienTai > 0", conn);
+                        AND ln.SoLuongHienTai > 0
+                        AND dh.TrangThai IN ('cho_kiem_dinh', 'dang_van_chuyen', 'tra_hang')", conn);
 
                 cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
                 conn.Open();

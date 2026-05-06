@@ -878,3 +878,35 @@ INSERT INTO TinNhan (MaCuocTroChuyen, MaNguoiGui, LoaiNguoiGui, NoiDung, DaDoc, 
 
 PRINT 'Đã thêm dữ liệu mẫu cho chức năng chat!';
 GO
+
+
+
+
+
+
+IF OBJECT_ID(N'dbo.PhieuChuyenKho', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.PhieuChuyenKho
+    (
+        MaPhieu      INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        MaKhoNguon   INT NOT NULL,
+        MaKhoDich    INT NOT NULL,
+        MaLo         INT NOT NULL,
+        SoLuong      DECIMAL(18,2) NOT NULL,
+        NgayChuyen   DATETIME NOT NULL CONSTRAINT DF_PhieuChuyenKho_NgayChuyen DEFAULT (GETDATE()),
+        GhiChu       NVARCHAR(500) NULL
+    );
+
+    ALTER TABLE dbo.PhieuChuyenKho
+      ADD CONSTRAINT FK_PhieuChuyenKho_KhoNguon FOREIGN KEY (MaKhoNguon) REFERENCES dbo.Kho(MaKho);
+
+    ALTER TABLE dbo.PhieuChuyenKho
+      ADD CONSTRAINT FK_PhieuChuyenKho_KhoDich FOREIGN KEY (MaKhoDich) REFERENCES dbo.Kho(MaKho);
+
+    ALTER TABLE dbo.PhieuChuyenKho
+      ADD CONSTRAINT FK_PhieuChuyenKho_LoNongSan FOREIGN KEY (MaLo) REFERENCES dbo.LoNongSan(MaLo);
+
+    CREATE INDEX IX_PhieuChuyenKho_NgayChuyen ON dbo.PhieuChuyenKho(NgayChuyen DESC);
+    CREATE INDEX IX_PhieuChuyenKho_KhoNguon ON dbo.PhieuChuyenKho(MaKhoNguon);
+END
+GO

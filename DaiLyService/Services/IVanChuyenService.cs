@@ -10,7 +10,7 @@ namespace DaiLyService.Services
         List<VanChuyenDTO> GetByDaiLy(int maDaiLy);
         VanChuyenDTO? GetById(int maVanChuyen);
         int Create(VanChuyenCreateDTO dto);
-        bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null);
+        bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null, int? maKhoDich = null);
         bool Delete(int maVanChuyen);
         int CountByTrangThai(string trangThai);
         object GetStatsByDaiLy(int maDaiLy);

@@ -98,156 +98,47 @@ namespace NongDanService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 conn.Open();
-                
+
                 using var transaction = conn.BeginTransaction();
-                
+
                 try
                 {
-                    // 1. Cập nhật trạng thái đơn hàng
-                    var sqlUpdateOrder = "UPDATE DonHang SET TrangThai = @TrangThai WHERE MaDonHang = @MaDonHang";
-                    conn.Execute(sqlUpdateOrder, new { TrangThai = trangThai, MaDonHang = maDonHang }, transaction);
+                    var order = conn.QueryFirstOrDefault<dynamic>(@"
+                        SELECT MaDonHang, LoaiDon, TrangThai
+                        FROM DonHang
+                        WHERE MaDonHang = @MaDonHang AND LoaiDon = 'nongdan_to_daily'",
+                        new { MaDonHang = maDonHang }, transaction);
 
-                    // 2. Nếu xác nhận đơn hàng (hoàn thành), cập nhật số lượng lô và tạo tồn kho
-                    if (trangThai == "hoan_thanh")
+                    if (order == null)
                     {
-                        // Lấy thông tin đơn hàng
-                        var sqlGetOrder = @"
-                            SELECT dh.MaNguoiMua, dh.LoaiNguoiMua
-                            FROM DonHang dh
-                            WHERE dh.MaDonHang = @MaDonHang";
-                        
-                        var orderInfo = conn.QueryFirstOrDefault<dynamic>(sqlGetOrder, new { MaDonHang = maDonHang }, transaction);
-                        
-                        if (orderInfo == null)
-                        {
-                            throw new Exception("Không tìm thấy đơn hàng");
-                        }
+                        transaction.Rollback();
+                        return false;
+                    }
 
-                        // Lấy chi tiết đơn hàng
-                        var sqlGetDetails = @"
-                            SELECT ct.MaLo, ct.SoLuong
-                            FROM ChiTietDonHang ct
-                            WHERE ct.MaDonHang = @MaDonHang";
-                        
-                        var details = conn.Query<dynamic>(sqlGetDetails, new { MaDonHang = maDonHang }, transaction).ToList();
+                    string currentStatus = order.TrangThai;
+                    string normalizedTarget = trangThai == "hoan_thanh" ? "cho_kiem_dinh" : trangThai;
+                    bool validTransition =
+                        (currentStatus == "cho_xac_nhan" && (normalizedTarget == "cho_kiem_dinh" || normalizedTarget == "da_huy"));
 
-                        foreach (var detail in details)
-                        {
-                            int maLo = detail.MaLo;
-                            decimal soLuong = detail.SoLuong;
+                    if (!validTransition)
+                    {
+                        throw new Exception($"Không thể chuyển trạng thái từ '{currentStatus}' sang '{normalizedTarget}'");
+                    }
 
-                            // Giảm số lượng hiện tại của lô
-                            var sqlUpdateLot = @"
-                                UPDATE LoNongSan 
-                                SET SoLuongHienTai = SoLuongHienTai - @SoLuong
-                                WHERE MaLo = @MaLo AND SoLuongHienTai >= @SoLuong";
-                            
-                            var rowsAffected = conn.Execute(sqlUpdateLot, new { MaLo = maLo, SoLuong = soLuong }, transaction);
-                            
-                            if (rowsAffected == 0)
-                            {
-                                throw new Exception($"Lô {maLo} không đủ số lượng hoặc không tồn tại");
-                            }
+                    var rowsAffected = conn.Execute(@"
+                        UPDATE DonHang
+                        SET TrangThai = @TrangThai
+                        WHERE MaDonHang = @MaDonHang",
+                        new { TrangThai = normalizedTarget, MaDonHang = maDonHang }, transaction);
 
-                            // Cập nhật trạng thái lô nếu hết hàng
-                            var sqlUpdateLotStatus = @"
-                                UPDATE LoNongSan 
-                                SET TrangThai = N'da_ban'
-                                WHERE MaLo = @MaLo AND SoLuongHienTai = 0";
-                            
-                            conn.Execute(sqlUpdateLotStatus, new { MaLo = maLo }, transaction);
-
-                            // Tạo tồn kho và vận chuyển cho đại lý (nếu người mua là đại lý)
-                            if (orderInfo.LoaiNguoiMua == "daily")
-                            {
-                                int maDaiLy = orderInfo.MaNguoiMua;
-                                
-                                // Lấy kho của đại lý (lấy kho đầu tiên)
-                                var sqlGetWarehouse = @"
-                                    SELECT TOP 1 MaKho 
-                                    FROM Kho 
-                                    WHERE MaChuSoHuu = @MaDaiLy AND LoaiChuSoHuu = 'daily'";
-                                
-                                var maKho = conn.QueryFirstOrDefault<int?>(sqlGetWarehouse, new { MaDaiLy = maDaiLy }, transaction);
-                                
-                                if (maKho.HasValue)
-                                {
-                                    // Kiểm tra xem đã có tồn kho chưa
-                                    var sqlCheckInventory = @"
-                                        SELECT SoLuong 
-                                        FROM TonKho 
-                                        WHERE MaKho = @MaKho AND MaLo = @MaLo";
-                                    
-                                    var existingQty = conn.QueryFirstOrDefault<decimal?>(sqlCheckInventory, 
-                                        new { MaKho = maKho.Value, MaLo = maLo }, transaction);
-
-                                    if (existingQty.HasValue)
-                                    {
-                                        // Cập nhật số lượng tồn kho
-                                        var sqlUpdateInventory = @"
-                                            UPDATE TonKho 
-                                            SET SoLuong = SoLuong + @SoLuong, NgayCapNhat = GETDATE()
-                                            WHERE MaKho = @MaKho AND MaLo = @MaLo";
-                                        
-                                        conn.Execute(sqlUpdateInventory, 
-                                            new { MaKho = maKho.Value, MaLo = maLo, SoLuong = soLuong }, transaction);
-                                    }
-                                    else
-                                    {
-                                        // Tạo mới tồn kho
-                                        var sqlInsertInventory = @"
-                                            INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat)
-                                            VALUES (@MaKho, @MaLo, @SoLuong, GETDATE())";
-                                        
-                                        conn.Execute(sqlInsertInventory, 
-                                            new { MaKho = maKho.Value, MaLo = maLo, SoLuong = soLuong }, transaction);
-                                    }
-                                }
-
-                                // Tạo đơn vận chuyển tự động
-                                // Lấy địa chỉ nông dân (điểm đi) và đại lý (điểm đến)
-                                var sqlGetAddresses = @"
-                                    SELECT 
-                                        (SELECT TOP 1 ISNULL(tt.DiaChi, nd.DiaChi) 
-                                         FROM LoNongSan ln 
-                                         LEFT JOIN TrangTrai tt ON ln.MaTrangTrai = tt.MaTrangTrai
-                                         LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
-                                         WHERE ln.MaLo = @MaLo) AS DiemDi,
-                                        (SELECT TOP 1 ISNULL(k.DiaChi, dl.DiaChi) 
-                                         FROM DaiLy dl 
-                                         LEFT JOIN Kho k ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
-                                         WHERE dl.MaDaiLy = @MaDaiLy) AS DiemDen";
-                                
-                                var addresses = conn.QueryFirstOrDefault<dynamic>(sqlGetAddresses, 
-                                    new { MaLo = maLo, MaDaiLy = maDaiLy }, transaction);
-
-                                string diemDi = addresses?.DiemDi ?? "Trang trại nông dân";
-                                string diemDen = addresses?.DiemDen ?? "Kho đại lý";
-
-                                // Kiểm tra chưa có vận chuyển cho lô này
-                                var sqlCheckTransport = @"
-                                    SELECT COUNT(*) FROM VanChuyen 
-                                    WHERE MaLo = @MaLo AND TrangThai = 'dang_van_chuyen'";
-                                var existingTransport = conn.QueryFirstOrDefault<int>(sqlCheckTransport, 
-                                    new { MaLo = maLo }, transaction);
-
-                                if (existingTransport == 0)
-                                {
-                                    var sqlInsertTransport = @"
-                                        INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, TrangThai)
-                                        VALUES (@MaLo, @DiemDi, @DiemDen, GETDATE(), N'dang_van_chuyen')";
-                                    
-                                    conn.Execute(sqlInsertTransport, 
-                                        new { MaLo = maLo, DiemDi = diemDi, DiemDen = diemDen }, transaction);
-                                    
-                                    _logger.LogInformation("Created transport for lot {MaLo}: {DiemDi} -> {DiemDen}", maLo, diemDi, diemDen);
-                                }
-                            }
-                        }
+                    if (rowsAffected == 0)
+                    {
+                        transaction.Rollback();
+                        return false;
                     }
 
                     transaction.Commit();
-                    _logger.LogInformation("Updated order {OrderId} status to {Status} with inventory management", maDonHang, trangThai);
+                    _logger.LogInformation("Updated farmer order {OrderId} status {FromStatus} -> {ToStatus}", maDonHang, currentStatus, normalizedTarget);
                     return true;
                 }
                 catch (Exception ex)

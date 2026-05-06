@@ -302,164 +302,62 @@ namespace DaiLyService.Data
 
                 try
                 {
-                    // 1. Cập nhật trạng thái đơn hàng
+                    using var orderCmd = new SqlCommand(@"
+                        SELECT LoaiDon, TrangThai
+                        FROM DonHang
+                        WHERE MaDonHang = @MaDonHang
+                          AND (LoaiNguoiBan = 'daily' OR LoaiNguoiMua = 'daily')", conn, transaction);
+                    orderCmd.Parameters.AddWithValue("@MaDonHang", maDonHang);
+
+                    string loaiDon;
+                    string currentStatus;
+                    using (var orderReader = orderCmd.ExecuteReader())
+                    {
+                        if (!orderReader.Read())
+                        {
+                            transaction.Rollback();
+                            return false;
+                        }
+                        loaiDon = orderReader.GetString(orderReader.GetOrdinal("LoaiDon"));
+                        currentStatus = orderReader.GetString(orderReader.GetOrdinal("TrangThai"));
+                    }
+
+                    bool validTransition = false;
+                    if (loaiDon == "nongdan_to_daily")
+                    {
+                        validTransition =
+                            (currentStatus == "cho_xac_nhan" && (trangThai == "cho_kiem_dinh" || trangThai == "da_huy")) ||
+                            (currentStatus == "cho_kiem_dinh" && (trangThai == "dang_van_chuyen" || trangThai == "tra_hang")) ||
+                            (currentStatus == "dang_van_chuyen" && trangThai == "hoan_thanh");
+                    }
+                    else if (loaiDon == "daily_to_sieuthi")
+                    {
+                        validTransition =
+                            (currentStatus == "cho_xac_nhan" && (trangThai == "hoan_thanh" || trangThai == "da_huy"));
+                    }
+
+                    if (!validTransition)
+                    {
+                        throw new Exception($"Không thể chuyển trạng thái đơn {loaiDon} từ '{currentStatus}' sang '{trangThai}'");
+                    }
+
                     using var cmd = new SqlCommand(@"
                         UPDATE DonHang 
                         SET TrangThai = @TrangThai
-                        WHERE MaDonHang = @MaDonHang 
-                          AND (LoaiNguoiBan = 'daily' OR LoaiNguoiMua = 'daily')", conn, transaction);
+                        WHERE MaDonHang = @MaDonHang", conn, transaction);
 
                     cmd.Parameters.AddWithValue("@MaDonHang", maDonHang);
                     cmd.Parameters.AddWithValue("@TrangThai", trangThai);
 
                     var rowsAffected = cmd.ExecuteNonQuery();
-                    
                     if (rowsAffected == 0)
                     {
                         transaction.Rollback();
                         return false;
                     }
 
-                    // 2. Nếu xác nhận hoàn thành, xử lý tồn kho và vận chuyển
-                    if (trangThai == "hoan_thanh")
-                    {
-                        // Lấy thông tin đơn hàng
-                        using var getOrderCmd = new SqlCommand(@"
-                            SELECT MaNguoiBan, LoaiNguoiBan, MaNguoiMua, LoaiNguoiMua, LoaiDon
-                            FROM DonHang WHERE MaDonHang = @MaDonHang", conn, transaction);
-                        getOrderCmd.Parameters.AddWithValue("@MaDonHang", maDonHang);
-                        
-                        using var orderReader = getOrderCmd.ExecuteReader();
-                        if (!orderReader.Read())
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
-                        
-                        var loaiDon = orderReader.GetString(orderReader.GetOrdinal("LoaiDon"));
-                        var maNguoiMua = orderReader.GetInt32(orderReader.GetOrdinal("MaNguoiMua"));
-                        var loaiNguoiMua = orderReader.GetString(orderReader.GetOrdinal("LoaiNguoiMua"));
-                        orderReader.Close();
-
-                        // Lấy chi tiết đơn hàng
-                        using var getDetailsCmd = new SqlCommand(@"
-                            SELECT MaLo, SoLuong FROM ChiTietDonHang WHERE MaDonHang = @MaDonHang", conn, transaction);
-                        getDetailsCmd.Parameters.AddWithValue("@MaDonHang", maDonHang);
-                        
-                        var details = new List<(int MaLo, decimal SoLuong)>();
-                        using (var detailReader = getDetailsCmd.ExecuteReader())
-                        {
-                            while (detailReader.Read())
-                            {
-                                details.Add((detailReader.GetInt32(0), detailReader.GetDecimal(1)));
-                            }
-                        }
-
-                        foreach (var (maLo, soLuong) in details)
-                        {
-                            // Giảm số lượng lô nông sản
-                            if (loaiDon == "nongdan_to_daily")
-                            {
-                                using var updateLotCmd = new SqlCommand(@"
-                                    UPDATE LoNongSan SET SoLuongHienTai = SoLuongHienTai - @SoLuong 
-                                    WHERE MaLo = @MaLo AND SoLuongHienTai >= @SoLuong", conn, transaction);
-                                updateLotCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                updateLotCmd.Parameters.AddWithValue("@SoLuong", soLuong);
-                                updateLotCmd.ExecuteNonQuery();
-
-                                // Cập nhật trạng thái lô nếu hết
-                                using var updateStatusCmd = new SqlCommand(@"
-                                    UPDATE LoNongSan SET TrangThai = N'da_ban' WHERE MaLo = @MaLo AND SoLuongHienTai = 0", conn, transaction);
-                                updateStatusCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                updateStatusCmd.ExecuteNonQuery();
-                            }
-
-                            // Tạo tồn kho cho người mua
-                            string loaiChuSoHuu = loaiNguoiMua;
-                            using var getWarehouseCmd = new SqlCommand(@"
-                                SELECT TOP 1 MaKho FROM Kho WHERE MaChuSoHuu = @MaChuSoHuu AND LoaiChuSoHuu = @LoaiChuSoHuu", conn, transaction);
-                            getWarehouseCmd.Parameters.AddWithValue("@MaChuSoHuu", maNguoiMua);
-                            getWarehouseCmd.Parameters.AddWithValue("@LoaiChuSoHuu", loaiChuSoHuu);
-                            var maKhoObj = getWarehouseCmd.ExecuteScalar();
-
-                            if (maKhoObj != null)
-                            {
-                                int maKho = (int)maKhoObj;
-
-                                // Kiểm tra tồn kho hiện có
-                                using var checkInvCmd = new SqlCommand(@"
-                                    SELECT SoLuong FROM TonKho WHERE MaKho = @MaKho AND MaLo = @MaLo", conn, transaction);
-                                checkInvCmd.Parameters.AddWithValue("@MaKho", maKho);
-                                checkInvCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                var existingQty = checkInvCmd.ExecuteScalar();
-
-                                if (existingQty != null)
-                                {
-                                    using var updateInvCmd = new SqlCommand(@"
-                                        UPDATE TonKho SET SoLuong = SoLuong + @SoLuong, NgayCapNhat = GETDATE() WHERE MaKho = @MaKho AND MaLo = @MaLo", conn, transaction);
-                                    updateInvCmd.Parameters.AddWithValue("@MaKho", maKho);
-                                    updateInvCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                    updateInvCmd.Parameters.AddWithValue("@SoLuong", soLuong);
-                                    updateInvCmd.ExecuteNonQuery();
-                                }
-                                else
-                                {
-                                    using var insertInvCmd = new SqlCommand(@"
-                                        INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat) VALUES (@MaKho, @MaLo, @SoLuong, GETDATE())", conn, transaction);
-                                    insertInvCmd.Parameters.AddWithValue("@MaKho", maKho);
-                                    insertInvCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                    insertInvCmd.Parameters.AddWithValue("@SoLuong", soLuong);
-                                    insertInvCmd.ExecuteNonQuery();
-                                }
-                            }
-
-                            // Tạo đơn vận chuyển tự động
-                            using var checkTransportCmd = new SqlCommand(@"
-                                SELECT COUNT(*) FROM VanChuyen WHERE MaLo = @MaLo AND TrangThai = 'dang_van_chuyen'", conn, transaction);
-                            checkTransportCmd.Parameters.AddWithValue("@MaLo", maLo);
-                            var existingTransport = (int)checkTransportCmd.ExecuteScalar();
-
-                            if (existingTransport == 0)
-                            {
-                                // Lấy địa chỉ cho vận chuyển
-                                using var getAddrCmd = new SqlCommand(@"
-                                    SELECT 
-                                        (SELECT TOP 1 ISNULL(tt.DiaChi, nd.DiaChi) FROM LoNongSan ln 
-                                         LEFT JOIN TrangTrai tt ON ln.MaTrangTrai = tt.MaTrangTrai
-                                         LEFT JOIN NongDan nd ON tt.MaNongDan = nd.MaNongDan
-                                         WHERE ln.MaLo = @MaLo) AS DiemDi,
-                                        (SELECT TOP 1 ISNULL(k.DiaChi, dl.DiaChi) FROM DaiLy dl 
-                                         LEFT JOIN Kho k ON k.MaChuSoHuu = dl.MaDaiLy AND k.LoaiChuSoHuu = 'daily'
-                                         WHERE dl.MaDaiLy = @MaNguoiMua) AS DiemDen", conn, transaction);
-                                getAddrCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                getAddrCmd.Parameters.AddWithValue("@MaNguoiMua", maNguoiMua);
-
-                                string diemDi = "Trang trại nông dân";
-                                string diemDen = "Kho đại lý";
-                                using (var addrReader = getAddrCmd.ExecuteReader())
-                                {
-                                    if (addrReader.Read())
-                                    {
-                                        if (!addrReader.IsDBNull(0)) diemDi = addrReader.GetString(0);
-                                        if (!addrReader.IsDBNull(1)) diemDen = addrReader.GetString(1);
-                                    }
-                                }
-
-                                using var insertTransportCmd = new SqlCommand(@"
-                                    INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, TrangThai)
-                                    VALUES (@MaLo, @DiemDi, @DiemDen, GETDATE(), N'dang_van_chuyen')", conn, transaction);
-                                insertTransportCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                insertTransportCmd.Parameters.AddWithValue("@DiemDi", diemDi);
-                                insertTransportCmd.Parameters.AddWithValue("@DiemDen", diemDen);
-                                insertTransportCmd.ExecuteNonQuery();
-
-                                _logger.LogInformation("Auto-created transport for lot {MaLo}: {DiemDi} -> {DiemDen}", maLo, diemDi, diemDen);
-                            }
-                        }
-                    }
-
                     transaction.Commit();
-                    _logger.LogInformation("Updated order {OrderId} status to {Status}", maDonHang, trangThai);
+                    _logger.LogInformation("Updated order {OrderId} status {FromStatus} -> {ToStatus}", maDonHang, currentStatus, trangThai);
                     return true;
                 }
                 catch (Exception ex)

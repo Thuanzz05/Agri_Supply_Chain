@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace NongDanService.Models.DTOs
 {
     public class DonHangDTO
@@ -32,6 +34,8 @@ namespace NongDanService.Models.DTOs
 
     public class UpdateTrangThaiDTO
     {
+        [Required(ErrorMessage = "Trạng thái là bắt buộc")]
+        [RegularExpression("^(cho_kiem_dinh|da_huy|hoan_thanh)$", ErrorMessage = "Trạng thái không hợp lệ")]
         public string TrangThai { get; set; } = string.Empty;
     }
 }

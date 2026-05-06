@@ -208,10 +208,24 @@ namespace DaiLyService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                conn.Open();
+
+                // Chặn xóa nếu kho còn hàng tồn
+                using (var checkCmd = new SqlCommand(@"
+                    SELECT COUNT(*)
+                    FROM TonKho
+                    WHERE MaKho = @MaKho AND SoLuong > 0", conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@MaKho", id);
+                    var count = (int)checkCmd.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        throw new Exception("Không thể xóa kho này vì kho đang còn hàng tồn");
+                    }
+                }
+
                 using var cmd = new SqlCommand("DELETE FROM Kho WHERE MaKho = @MaKho", conn);
                 cmd.Parameters.AddWithValue("@MaKho", id);
-
-                conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
                 
                 if (rowsAffected > 0)

@@ -13,7 +13,7 @@ namespace DaiLyService.Data
         
         // CRUD vận chuyển
         int Create(VanChuyenCreateDTO dto);
-        bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null);
+        bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null, int? maKhoDich = null);
         bool Delete(int maVanChuyen);
         
         // Thống kê

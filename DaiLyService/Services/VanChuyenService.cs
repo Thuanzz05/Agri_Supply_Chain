@@ -24,8 +24,8 @@ namespace DaiLyService.Services
 
         public int Create(VanChuyenCreateDTO dto) => _repo.Create(dto);
 
-        public bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null) => 
-            _repo.UpdateTrangThai(maVanChuyen, trangThai, ngayKetThuc);
+        public bool UpdateTrangThai(int maVanChuyen, string trangThai, DateTime? ngayKetThuc = null, int? maKhoDich = null) =>
+            _repo.UpdateTrangThai(maVanChuyen, trangThai, ngayKetThuc, maKhoDich);
 
         public bool Delete(int maVanChuyen) => _repo.Delete(maVanChuyen);
 
