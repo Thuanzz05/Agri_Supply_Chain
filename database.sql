@@ -910,3 +910,54 @@ BEGIN
     CREATE INDEX IX_PhieuChuyenKho_KhoNguon ON dbo.PhieuChuyenKho(MaKhoNguon);
 END
 GO
+
+
+
+
+-- 1. Tạo stored procedure để cập nhật trạng thái hết hạn
+CREATE OR ALTER PROCEDURE sp_UpdateExpiredBatchStatus
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Chỉ cập nhật trạng thái hết hạn cho các lô:
+    -- - Đã quá hạn sử dụng
+    -- - Đang ở trạng thái 'san_sang' hoặc 'dang_van_chuyen'
+    -- - Còn số lượng (SoLuongHienTai > 0)
+    UPDATE LoNongSan
+    SET TrangThai = 'het_han'
+    WHERE HanSuDung < CAST(GETDATE() AS DATE)
+      AND TrangThai IN ('san_sang', 'dang_van_chuyen')
+      AND SoLuongHienTai > 0;
+    
+    -- Log số lượng bản ghi đã cập nhật
+    DECLARE @UpdatedCount INT = @@ROWCOUNT;
+    IF @UpdatedCount > 0
+    BEGIN
+        PRINT CONCAT('Đã cập nhật ', @UpdatedCount, ' lô nông sản sang trạng thái hết hạn');
+    END
+END;
+GO
+
+
+EXEC sp_UpdateExpiredBatchStatus;
+GO
+
+
+
+-- 3. Cập nhật ngay lập tức tất cả lô đã hết hạn
+EXEC sp_UpdateExpiredBatchStatus;
+GO
+
+-- 4. Kiểm tra kết quả
+SELECT 
+    MaLo,
+    TenSanPham = sp.TenSanPham,
+    HanSuDung,
+    TrangThai,
+    DaysExpired = DATEDIFF(DAY, HanSuDung, GETDATE())
+FROM LoNongSan ln
+LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
+WHERE HanSuDung < CAST(GETDATE() AS DATE)
+ORDER BY HanSuDung DESC;
+GO
