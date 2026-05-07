@@ -21,6 +21,10 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                
+                // Cập nhật trạng thái hết hạn trước khi query
+                UpdateExpiredStatus(conn);
+                
                 using var cmd = new SqlCommand(@"
                     SELECT ln.MaLo, ln.MaTrangTrai, ln.MaSanPham, ln.SoLuongBanDau, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung, ln.MaQR, ln.TrangThai, ln.NgayTao,
@@ -52,6 +56,10 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                
+                // Cập nhật trạng thái hết hạn trước khi query
+                UpdateExpiredStatus(conn);
+                
                 using var cmd = new SqlCommand(@"
                     SELECT ln.MaLo, ln.MaTrangTrai, ln.MaSanPham, ln.SoLuongBanDau, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung, ln.MaQR, ln.TrangThai, ln.NgayTao,
@@ -86,6 +94,10 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                
+                // Cập nhật trạng thái hết hạn trước khi query
+                UpdateExpiredStatus(conn);
+                
                 using var cmd = new SqlCommand(@"
                     SELECT ln.MaLo, ln.MaTrangTrai, ln.MaSanPham, ln.SoLuongBanDau, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung, ln.MaQR, ln.TrangThai, ln.NgayTao,
@@ -260,59 +272,114 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                var setParts = new List<string>();
-                var cmd = new SqlCommand();
-                cmd.Connection = conn;
-
-                if (dto.SoLuongHienTai.HasValue)
-                {
-                    setParts.Add("SoLuongHienTai = @SoLuongHienTai");
-                    cmd.Parameters.AddWithValue("@SoLuongHienTai", dto.SoLuongHienTai.Value);
-                }
-
-                if (dto.NgayThuHoach.HasValue)
-                {
-                    setParts.Add("NgayThuHoach = @NgayThuHoach");
-                    cmd.Parameters.AddWithValue("@NgayThuHoach", dto.NgayThuHoach.Value);
-                }
-
-                if (dto.HanSuDung.HasValue)
-                {
-                    setParts.Add("HanSuDung = @HanSuDung");
-                    cmd.Parameters.AddWithValue("@HanSuDung", dto.HanSuDung.Value);
-                }
-
-                if (!string.IsNullOrEmpty(dto.MaQR))
-                {
-                    setParts.Add("MaQR = @MaQR");
-                    cmd.Parameters.AddWithValue("@MaQR", dto.MaQR);
-                }
-
-                if (!string.IsNullOrEmpty(dto.TrangThai))
-                {
-                    setParts.Add("TrangThai = @TrangThai");
-                    cmd.Parameters.AddWithValue("@TrangThai", dto.TrangThai);
-                }
-
-                if (setParts.Count == 0)
-                {
-                    return false; // Không có gì để cập nhật
-                }
-
-                cmd.CommandText = $"UPDATE LoNongSan SET {string.Join(", ", setParts)} WHERE MaLo = @MaLo";
-                cmd.Parameters.AddWithValue("@MaLo", id);
-
                 conn.Open();
-                var rowsAffected = cmd.ExecuteNonQuery();
                 
-                if (rowsAffected > 0)
+                using var transaction = conn.BeginTransaction();
+                
+                try
                 {
+                    var setParts = new List<string>();
+                    var cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.Transaction = transaction;
+
+                    if (dto.SoLuongHienTai.HasValue)
+                    {
+                        setParts.Add("SoLuongHienTai = @SoLuongHienTai");
+                        cmd.Parameters.AddWithValue("@SoLuongHienTai", dto.SoLuongHienTai.Value);
+                    }
+
+                    if (dto.NgayThuHoach.HasValue)
+                    {
+                        setParts.Add("NgayThuHoach = @NgayThuHoach");
+                        cmd.Parameters.AddWithValue("@NgayThuHoach", dto.NgayThuHoach.Value);
+                    }
+
+                    if (dto.HanSuDung.HasValue)
+                    {
+                        setParts.Add("HanSuDung = @HanSuDung");
+                        cmd.Parameters.AddWithValue("@HanSuDung", dto.HanSuDung.Value);
+                    }
+
+                    if (!string.IsNullOrEmpty(dto.MaQR))
+                    {
+                        setParts.Add("MaQR = @MaQR");
+                        cmd.Parameters.AddWithValue("@MaQR", dto.MaQR);
+                    }
+
+                    if (!string.IsNullOrEmpty(dto.TrangThai))
+                    {
+                        setParts.Add("TrangThai = @TrangThai");
+                        cmd.Parameters.AddWithValue("@TrangThai", dto.TrangThai);
+                    }
+
+                    if (setParts.Count == 0)
+                    {
+                        transaction.Rollback();
+                        return false; // Không có gì để cập nhật
+                    }
+
+                    cmd.CommandText = $"UPDATE LoNongSan SET {string.Join(", ", setParts)} WHERE MaLo = @MaLo";
+                    cmd.Parameters.AddWithValue("@MaLo", id);
+
+                    var rowsAffected = cmd.ExecuteNonQuery();
+                    
+                    if (rowsAffected == 0)
+                    {
+                        transaction.Rollback();
+                        _logger.LogWarning("No crop lot found with ID {LotId} to update", id);
+                        return false;
+                    }
+
+                    // Nếu cập nhật HanSuDung, tự động điều chỉnh trạng thái
+                    if (dto.HanSuDung.HasValue && string.IsNullOrEmpty(dto.TrangThai))
+                    {
+                        using var updateStatusCmd = new SqlCommand(@"
+                            UPDATE LoNongSan
+                            SET TrangThai = CASE
+                                -- Nếu hết hạn và còn hàng → het_han
+                                WHEN HanSuDung < CAST(GETDATE() AS DATE) 
+                                     AND SoLuongHienTai > 0 
+                                     AND TrangThai IN ('san_sang', 'dang_van_chuyen', 'het_han')
+                                THEN 'het_han'
+                                -- Nếu còn hạn và đang ở trạng thái het_han → san_sang
+                                WHEN HanSuDung >= CAST(GETDATE() AS DATE) 
+                                     AND TrangThai = 'het_han'
+                                THEN 'san_sang'
+                                -- Giữ nguyên trạng thái khác
+                                ELSE TrangThai
+                            END
+                            WHERE MaLo = @MaLo", conn, transaction);
+                        
+                        updateStatusCmd.Parameters.AddWithValue("@MaLo", id);
+                        updateStatusCmd.ExecuteNonQuery();
+                        
+                        _logger.LogInformation("Auto-adjusted status for crop lot {LotId} after updating expiry date", id);
+                    }
+
+                    // Nếu cập nhật SoLuongHienTai = 0, tự động chuyển sang da_ban
+                    if (dto.SoLuongHienTai.HasValue && dto.SoLuongHienTai.Value == 0 && string.IsNullOrEmpty(dto.TrangThai))
+                    {
+                        using var updateStatusCmd = new SqlCommand(@"
+                            UPDATE LoNongSan
+                            SET TrangThai = 'da_ban'
+                            WHERE MaLo = @MaLo AND SoLuongHienTai = 0", conn, transaction);
+                        
+                        updateStatusCmd.Parameters.AddWithValue("@MaLo", id);
+                        updateStatusCmd.ExecuteNonQuery();
+                        
+                        _logger.LogInformation("Auto-changed status to 'da_ban' for crop lot {LotId} (quantity = 0)", id);
+                    }
+
+                    transaction.Commit();
                     _logger.LogInformation("Updated crop lot with ID {LotId}", id);
                     return true;
                 }
-                
-                _logger.LogWarning("No crop lot found with ID {LotId} to update", id);
-                return false;
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
             catch (SqlException ex)
             {
@@ -349,6 +416,42 @@ namespace NongDanService.Data
                 if (ex.Number == 547)
                     throw new Exception("Không thể xóa lô nông sản này vì đang có dữ liệu liên quan", ex);
                 throw new Exception("Lỗi xóa lô nông sản trong cơ sở dữ liệu", ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật trạng thái hết hạn cho các lô nông sản có HanSuDung < ngày hiện tại
+        /// Chỉ cập nhật nếu:
+        /// - Hạn sử dụng đã quá
+        /// - Trạng thái hiện tại là 'san_sang' hoặc 'dang_van_chuyen'
+        /// - Không cập nhật nếu đã bán hết (da_ban và số lượng = 0)
+        /// </summary>
+        private void UpdateExpiredStatus(SqlConnection conn)
+        {
+            try
+            {
+                var wasOpen = conn.State == ConnectionState.Open;
+                if (!wasOpen) conn.Open();
+
+                using var cmd = new SqlCommand(@"
+                    UPDATE LoNongSan
+                    SET TrangThai = 'het_han'
+                    WHERE HanSuDung < CAST(GETDATE() AS DATE)
+                      AND TrangThai IN ('san_sang', 'dang_van_chuyen')
+                      AND SoLuongHienTai > 0", conn);
+
+                var updated = cmd.ExecuteNonQuery();
+                if (updated > 0)
+                {
+                    _logger.LogInformation("Auto-updated {Count} expired crop lots to 'het_han' status", updated);
+                }
+
+                if (!wasOpen) conn.Close();
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogWarning(ex, "Failed to auto-update expired status, continuing with query");
+                // Không throw exception để không ảnh hưởng đến query chính
             }
         }
 
