@@ -128,6 +128,82 @@ namespace NongDanService.Controllers
         }
 
         /// <summary>
+        /// Lấy sản phẩm theo nông dân
+        /// </summary>
+        /// <param name="maNongDan">Mã nông dân</param>
+        /// <returns>Danh sách sản phẩm của nông dân</returns>
+        [HttpGet("get-by-nong-dan/{maNongDan}")]
+        public IActionResult GetByNongDan(int maNongDan)
+        {
+            try
+            {
+                if (maNongDan <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã nông dân không hợp lệ"
+                    });
+                }
+
+                var data = _sanPhamService.GetByNongDan(maNongDan);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách sản phẩm thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// Lấy sản phẩm theo trang trại
+        /// </summary>
+        /// <param name="maTrangTrai">Mã trang trại</param>
+        /// <returns>Danh sách sản phẩm của trang trại</returns>
+        [HttpGet("get-by-trang-trai/{maTrangTrai}")]
+        public IActionResult GetByTrangTrai(int maTrangTrai)
+        {
+            try
+            {
+                if (maTrangTrai <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Mã trang trại không hợp lệ"
+                    });
+                }
+
+                var data = _sanPhamService.GetByTrangTrai(maTrangTrai);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy danh sách sản phẩm thành công",
+                    data = data,
+                    count = data.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Tạo sản phẩm mới
         /// </summary>
         /// <param name="dto">Thông tin sản phẩm</param>

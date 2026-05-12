@@ -16,5 +16,8 @@ namespace NongDanService.Models.DTOs
         public string? MoTa { get; set; }
 
         public string? HinhAnh { get; set; }
+
+        [Required(ErrorMessage = "Mã trang trại là bắt buộc")]
+        public int MaTrangTrai { get; set; }
     }
 }

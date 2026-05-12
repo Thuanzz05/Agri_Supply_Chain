@@ -18,6 +18,10 @@ namespace NongDanService.Services
 
         public List<SanPhamDTO> SearchByName(string tenSanPham) => _repo.SearchByName(tenSanPham);
 
+        public List<SanPhamDTO> GetByNongDan(int maNongDan) => _repo.GetByNongDan(maNongDan);
+
+        public List<SanPhamDTO> GetByTrangTrai(int maTrangTrai) => _repo.GetByTrangTrai(maTrangTrai);
+
         public int Create(SanPhamCreateDTO dto) => _repo.Create(dto);
 
         public bool Update(int id, SanPhamUpdateDTO dto) => _repo.Update(id, dto);

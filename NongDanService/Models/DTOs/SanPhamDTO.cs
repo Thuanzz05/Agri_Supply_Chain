@@ -7,5 +7,6 @@ namespace NongDanService.Models.DTOs
         public string DonViTinh { get; set; } = string.Empty;
         public string? MoTa { get; set; }
         public string? HinhAnh { get; set; }
+        public int MaTrangTrai { get; set; }
     }
 }
