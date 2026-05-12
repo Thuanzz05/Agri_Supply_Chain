@@ -310,6 +310,7 @@ namespace DaiLyService.Controllers
         /// Hoàn thành vận chuyển
         /// </summary>
         /// <param name="id">Mã vận chuyển</param>
+        /// <param name="maKhoDich">Mã kho đích (optional, = 0 nếu là đơn bán ra cho siêu thị)</param>
         /// <returns>Kết quả hoàn thành</returns>
         [HttpPut("hoan-thanh/{id}")]
         public IActionResult HoanThanh(int id, [FromQuery] int maKhoDich)
@@ -325,16 +326,9 @@ namespace DaiLyService.Controllers
                     });
                 }
 
-                if (maKhoDich <= 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Vui lòng chọn kho đích (maKhoDich)"
-                    });
-                }
-
-                var result = _vanChuyenService.UpdateTrangThai(id, "hoan_thanh", DateTime.Now, maKhoDich);
+                // Cho phép maKhoDich = 0 với đơn bán ra (backend sẽ tự động lấy kho siêu thị)
+                // Chỉ validate > 0 nếu không phải đơn bán ra
+                var result = _vanChuyenService.UpdateTrangThai(id, "hoan_thanh", DateTime.Now, maKhoDich > 0 ? maKhoDich : null);
                 if (result)
                 {
                     return Ok(new

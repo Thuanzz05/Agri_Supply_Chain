@@ -22,7 +22,7 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT vc.MaVanChuyen, vc.MaLo, vc.DiemDi, vc.DiemDen, 
+                    SELECT vc.MaVanChuyen, vc.MaLo, vc.MaDonHang, vc.DiemDi, vc.DiemDen, 
                            vc.NgayBatDau, vc.NgayKetThuc, vc.TrangThai,
                            sp.TenSanPham, sp.DonViTinh, ln.MaQR, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung
@@ -54,7 +54,7 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT vc.MaVanChuyen, vc.MaLo, vc.DiemDi, vc.DiemDen, 
+                    SELECT vc.MaVanChuyen, vc.MaLo, vc.MaDonHang, vc.DiemDi, vc.DiemDen, 
                            vc.NgayBatDau, vc.NgayKetThuc, vc.TrangThai,
                            sp.TenSanPham, sp.DonViTinh, ln.MaQR, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung
@@ -89,7 +89,7 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT vc.MaVanChuyen, vc.MaLo, vc.DiemDi, vc.DiemDen, 
+                    SELECT vc.MaVanChuyen, vc.MaLo, vc.MaDonHang, vc.DiemDi, vc.DiemDen, 
                            vc.NgayBatDau, vc.NgayKetThuc, vc.TrangThai,
                            sp.TenSanPham, sp.DonViTinh, ln.MaQR, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung
@@ -124,7 +124,7 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT DISTINCT vc.MaVanChuyen, vc.MaLo, vc.DiemDi, vc.DiemDen, 
+                    SELECT DISTINCT vc.MaVanChuyen, vc.MaLo, vc.MaDonHang, vc.DiemDi, vc.DiemDen, 
                            vc.NgayBatDau, vc.NgayKetThuc, vc.TrangThai,
                            sp.TenSanPham, sp.DonViTinh, ln.MaQR, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung
@@ -164,7 +164,7 @@ namespace DaiLyService.Data
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(@"
-                    SELECT vc.MaVanChuyen, vc.MaLo, vc.DiemDi, vc.DiemDen, 
+                    SELECT vc.MaVanChuyen, vc.MaLo, vc.MaDonHang, vc.DiemDi, vc.DiemDen, 
                            vc.NgayBatDau, vc.NgayKetThuc, vc.TrangThai,
                            sp.TenSanPham, sp.DonViTinh, ln.MaQR, ln.SoLuongHienTai,
                            ln.NgayThuHoach, ln.HanSuDung
@@ -276,28 +276,56 @@ namespace DaiLyService.Data
 
                     if (trangThai == "hoan_thanh")
                     {
-                        using var getTargetOrderCmd = new SqlCommand(@"
-                            SELECT TOP 1 dh.MaDonHang, dh.MaNguoiMua
-                            FROM DonHang dh
-                            INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
-                            WHERE dh.LoaiDon = 'nongdan_to_daily'
-                              AND dh.TrangThai = 'dang_van_chuyen'
-                              AND ct.MaLo = @MaLo
-                            ORDER BY dh.NgayDat DESC, dh.MaDonHang DESC", conn, transaction);
-                        getTargetOrderCmd.Parameters.AddWithValue("@MaLo", maLo);
-
+                        // Kiểm tra xem vận chuyển này thuộc loại đơn hàng nào
+                        string? loaiDon = null;
+                        int? maNguoiMua = null;
+                        string? loaiNguoiMua = null;
                         int? targetOrderId = null;
-                        int? targetMaDaiLy = null;
-                        using (var targetReader = getTargetOrderCmd.ExecuteReader())
+                        
+                        // Nếu có MaDonHang, lấy thông tin từ đó
+                        using (var getOrderInfoCmd = new SqlCommand(@"
+                            SELECT dh.MaDonHang, dh.LoaiDon, dh.MaNguoiMua, dh.LoaiNguoiMua
+                            FROM VanChuyen vc
+                            LEFT JOIN DonHang dh ON vc.MaDonHang = dh.MaDonHang
+                            WHERE vc.MaVanChuyen = @MaVanChuyen", conn, transaction))
                         {
-                            if (targetReader.Read())
+                            getOrderInfoCmd.Parameters.AddWithValue("@MaVanChuyen", maVanChuyen);
+                            using var orderReader = getOrderInfoCmd.ExecuteReader();
+                            if (orderReader.Read() && !orderReader.IsDBNull(0))
                             {
-                                targetOrderId = targetReader.GetInt32(0);
-                                targetMaDaiLy = targetReader.GetInt32(1);
+                                targetOrderId = orderReader.GetInt32(0);
+                                loaiDon = orderReader.GetString(1);
+                                maNguoiMua = orderReader.GetInt32(2);
+                                loaiNguoiMua = orderReader.GetString(3);
+                            }
+                        }
+                        
+                        // Nếu không có MaDonHang, tìm đơn hàng theo lô (logic cũ cho đơn nongdan_to_daily)
+                        if (!targetOrderId.HasValue)
+                        {
+                            using var getTargetOrderCmd = new SqlCommand(@"
+                                SELECT TOP 1 dh.MaDonHang, dh.LoaiDon, dh.MaNguoiMua, dh.LoaiNguoiMua
+                                FROM DonHang dh
+                                INNER JOIN ChiTietDonHang ct ON dh.MaDonHang = ct.MaDonHang
+                                WHERE dh.LoaiDon = 'nongdan_to_daily'
+                                  AND dh.TrangThai = 'dang_van_chuyen'
+                                  AND ct.MaLo = @MaLo
+                                ORDER BY dh.NgayDat DESC, dh.MaDonHang DESC", conn, transaction);
+                            getTargetOrderCmd.Parameters.AddWithValue("@MaLo", maLo);
+
+                            using (var targetReader = getTargetOrderCmd.ExecuteReader())
+                            {
+                                if (targetReader.Read())
+                                {
+                                    targetOrderId = targetReader.GetInt32(0);
+                                    loaiDon = targetReader.GetString(1);
+                                    maNguoiMua = targetReader.GetInt32(2);
+                                    loaiNguoiMua = targetReader.GetString(3);
+                                }
                             }
                         }
 
-                        if (targetOrderId.HasValue && targetMaDaiLy.HasValue)
+                        if (targetOrderId.HasValue && maNguoiMua.HasValue && loaiNguoiMua != null)
                         {
                             using var getDetailCmd = new SqlCommand(@"
                                 SELECT TOP 1 SoLuong
@@ -313,55 +341,140 @@ namespace DaiLyService.Data
                                 throw new Exception($"Không tìm thấy số lượng lô {maLo} trong đơn {targetOrderId.Value}");
                             }
 
-                            using var getLotQtyCmd = new SqlCommand("SELECT SoLuongHienTai FROM LoNongSan WHERE MaLo = @MaLo", conn, transaction);
-                            getLotQtyCmd.Parameters.AddWithValue("@MaLo", maLo);
-                            var currentQtyObj = getLotQtyCmd.ExecuteScalar();
-                            var currentQty = currentQtyObj == null ? 0 : Convert.ToDecimal(currentQtyObj);
-
-                            if (currentQty >= orderQty)
+                            // Xử lý theo loại đơn hàng
+                            if (loaiDon == "daily_to_sieuthi")
                             {
-                                using var updateLotCmd = new SqlCommand(@"
-                                    UPDATE LoNongSan
-                                    SET SoLuongHienTai = SoLuongHienTai - @SoLuong
-                                    WHERE MaLo = @MaLo", conn, transaction);
-                                updateLotCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                updateLotCmd.Parameters.AddWithValue("@SoLuong", orderQty);
-                                updateLotCmd.ExecuteNonQuery();
+                                // Đơn bán ra cho siêu thị: Giảm tồn kho đại lý, tăng tồn kho siêu thị
+                                using var getLotQtyCmd = new SqlCommand("SELECT SoLuongHienTai FROM LoNongSan WHERE MaLo = @MaLo", conn, transaction);
+                                getLotQtyCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                var currentQtyObj = getLotQtyCmd.ExecuteScalar();
+                                var currentQty = currentQtyObj == null ? 0 : Convert.ToDecimal(currentQtyObj);
 
-                                using var updateLotStatusCmd = new SqlCommand(@"
-                                    UPDATE LoNongSan
-                                    SET TrangThai = N'da_ban'
-                                    WHERE MaLo = @MaLo AND SoLuongHienTai = 0", conn, transaction);
-                                updateLotStatusCmd.Parameters.AddWithValue("@MaLo", maLo);
-                                updateLotStatusCmd.ExecuteNonQuery();
-                            }
-                            else
-                            {
-                                _logger.LogWarning("Skipped lot quantity deduction for transport {TransportId} because lot {LotId} current quantity {CurrentQty} is lower than order quantity {OrderQty}.", maVanChuyen, maLo, currentQty, orderQty);
-                            }
-
-                            if (!maKhoDich.HasValue || maKhoDich <= 0)
-                            {
-                                throw new Exception("Vui lòng chọn kho đích để nhập hàng (maKhoDich)");
-                            }
-
-                            using (var validateKhoCmd = new SqlCommand(@"
-                                SELECT COUNT(*) 
-                                FROM Kho 
-                                WHERE MaKho = @MaKho AND MaChuSoHuu = @MaDaiLy AND LoaiChuSoHuu = 'daily'", conn, transaction))
-                            {
-                                validateKhoCmd.Parameters.AddWithValue("@MaKho", maKhoDich.Value);
-                                validateKhoCmd.Parameters.AddWithValue("@MaDaiLy", targetMaDaiLy.Value);
-                                var ok = (int)validateKhoCmd.ExecuteScalar();
-                                if (ok == 0)
+                                if (currentQty >= orderQty)
                                 {
-                                    throw new Exception("Kho đích không hợp lệ hoặc không thuộc đại lý");
-                                }
-                            }
+                                    // Giảm số lượng lô
+                                    using var updateLotCmd = new SqlCommand(@"
+                                        UPDATE LoNongSan
+                                        SET SoLuongHienTai = SoLuongHienTai - @SoLuong
+                                        WHERE MaLo = @MaLo", conn, transaction);
+                                    updateLotCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                    updateLotCmd.Parameters.AddWithValue("@SoLuong", orderQty);
+                                    updateLotCmd.ExecuteNonQuery();
 
-                            var maKho = maKhoDich.Value;
-                            if (maKho > 0)
+                                    using var updateLotStatusCmd = new SqlCommand(@"
+                                        UPDATE LoNongSan
+                                        SET TrangThai = N'da_ban'
+                                        WHERE MaLo = @MaLo AND SoLuongHienTai = 0", conn, transaction);
+                                    updateLotStatusCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                    updateLotStatusCmd.ExecuteNonQuery();
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("Skipped lot quantity deduction for transport {TransportId} because lot {LotId} current quantity {CurrentQty} is lower than order quantity {OrderQty}.", maVanChuyen, maLo, currentQty, orderQty);
+                                }
+
+                                // Tự động lấy kho của siêu thị (siêu thị chỉ có 1 kho)
+                                int? khoSieuThi = null;
+                                using (var getKhoSieuThiCmd = new SqlCommand(@"
+                                    SELECT TOP 1 MaKho 
+                                    FROM Kho 
+                                    WHERE MaChuSoHuu = @MaSieuThi AND LoaiChuSoHuu = 'sieuthi'
+                                    ORDER BY MaKho", conn, transaction))
+                                {
+                                    getKhoSieuThiCmd.Parameters.AddWithValue("@MaSieuThi", maNguoiMua.Value);
+                                    var result = getKhoSieuThiCmd.ExecuteScalar();
+                                    if (result != null && result != DBNull.Value)
+                                    {
+                                        khoSieuThi = Convert.ToInt32(result);
+                                    }
+                                }
+
+                                if (!khoSieuThi.HasValue)
+                                {
+                                    throw new Exception($"Không tìm thấy kho của siêu thị {maNguoiMua.Value}");
+                                }
+
+                                // Nhập vào kho siêu thị
+                                using var checkInvCmd = new SqlCommand(@"
+                                    SELECT SoLuong FROM TonKho WHERE MaKho = @MaKho AND MaLo = @MaLo", conn, transaction);
+                                checkInvCmd.Parameters.AddWithValue("@MaKho", khoSieuThi.Value);
+                                checkInvCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                var existingQty = checkInvCmd.ExecuteScalar();
+
+                                if (existingQty != null)
+                                {
+                                    using var updateInvCmd = new SqlCommand(@"
+                                        UPDATE TonKho
+                                        SET SoLuong = SoLuong + @SoLuong, NgayCapNhat = GETDATE()
+                                        WHERE MaKho = @MaKho AND MaLo = @MaLo", conn, transaction);
+                                    updateInvCmd.Parameters.AddWithValue("@MaKho", khoSieuThi.Value);
+                                    updateInvCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                    updateInvCmd.Parameters.AddWithValue("@SoLuong", orderQty);
+                                    updateInvCmd.ExecuteNonQuery();
+                                }
+                                else
+                                {
+                                    using var insertInvCmd = new SqlCommand(@"
+                                        INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat)
+                                        VALUES (@MaKho, @MaLo, @SoLuong, GETDATE())", conn, transaction);
+                                    insertInvCmd.Parameters.AddWithValue("@MaKho", khoSieuThi.Value);
+                                    insertInvCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                    insertInvCmd.Parameters.AddWithValue("@SoLuong", orderQty);
+                                    insertInvCmd.ExecuteNonQuery();
+                                }
+                                
+                                _logger.LogInformation("Completed transport {TransportId} for order {OrderId}, moved lot {LotId} to supermarket warehouse {WarehouseId}", maVanChuyen, targetOrderId.Value, maLo, khoSieuThi.Value);
+                            }
+                            else // nongdan_to_daily
                             {
+                                // Logic cũ cho đơn mua vào từ nông dân
+                                using var getLotQtyCmd = new SqlCommand("SELECT SoLuongHienTai FROM LoNongSan WHERE MaLo = @MaLo", conn, transaction);
+                                getLotQtyCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                var currentQtyObj = getLotQtyCmd.ExecuteScalar();
+                                var currentQty = currentQtyObj == null ? 0 : Convert.ToDecimal(currentQtyObj);
+
+                                if (currentQty >= orderQty)
+                                {
+                                    using var updateLotCmd = new SqlCommand(@"
+                                        UPDATE LoNongSan
+                                        SET SoLuongHienTai = SoLuongHienTai - @SoLuong
+                                        WHERE MaLo = @MaLo", conn, transaction);
+                                    updateLotCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                    updateLotCmd.Parameters.AddWithValue("@SoLuong", orderQty);
+                                    updateLotCmd.ExecuteNonQuery();
+
+                                    using var updateLotStatusCmd = new SqlCommand(@"
+                                        UPDATE LoNongSan
+                                        SET TrangThai = N'da_ban'
+                                        WHERE MaLo = @MaLo AND SoLuongHienTai = 0", conn, transaction);
+                                    updateLotStatusCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                    updateLotStatusCmd.ExecuteNonQuery();
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("Skipped lot quantity deduction for transport {TransportId} because lot {LotId} current quantity {CurrentQty} is lower than order quantity {OrderQty}.", maVanChuyen, maLo, currentQty, orderQty);
+                                }
+
+                                if (!maKhoDich.HasValue || maKhoDich <= 0)
+                                {
+                                    throw new Exception("Vui lòng chọn kho đích để nhập hàng (maKhoDich)");
+                                }
+
+                                using (var validateKhoCmd = new SqlCommand(@"
+                                    SELECT COUNT(*) 
+                                    FROM Kho 
+                                    WHERE MaKho = @MaKho AND MaChuSoHuu = @MaDaiLy AND LoaiChuSoHuu = 'daily'", conn, transaction))
+                                {
+                                    validateKhoCmd.Parameters.AddWithValue("@MaKho", maKhoDich.Value);
+                                    validateKhoCmd.Parameters.AddWithValue("@MaDaiLy", maNguoiMua.Value);
+                                    var ok = (int)validateKhoCmd.ExecuteScalar();
+                                    if (ok == 0)
+                                    {
+                                        throw new Exception("Kho đích không hợp lệ hoặc không thuộc đại lý");
+                                    }
+                                }
+
+                                var maKho = maKhoDich.Value;
                                 using var checkInvCmd = new SqlCommand(@"
                                     SELECT SoLuong FROM TonKho WHERE MaKho = @MaKho AND MaLo = @MaLo", conn, transaction);
                                 checkInvCmd.Parameters.AddWithValue("@MaKho", maKho);
@@ -511,6 +624,7 @@ namespace DaiLyService.Data
             {
                 MaVanChuyen = reader.GetInt32("MaVanChuyen"),
                 MaLo = reader.GetInt32("MaLo"),
+                MaDonHang = reader.IsDBNull("MaDonHang") ? null : reader.GetInt32("MaDonHang"),
                 DiemDi = reader.GetString("DiemDi"),
                 DiemDen = reader.GetString("DiemDen"),
                 NgayBatDau = reader.GetDateTime("NgayBatDau"),

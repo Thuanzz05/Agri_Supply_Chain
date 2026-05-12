@@ -4,6 +4,7 @@ namespace DaiLyService.Models.DTOs
     {
         public int MaVanChuyen { get; set; }
         public int MaLo { get; set; }
+        public int? MaDonHang { get; set; } // Liên kết với đơn hàng
         public string DiemDi { get; set; } = string.Empty;
         public string DiemDen { get; set; } = string.Empty;
         public DateTime NgayBatDau { get; set; }

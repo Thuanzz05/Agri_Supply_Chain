@@ -303,7 +303,7 @@ namespace DaiLyService.Data
                 try
                 {
                     using var orderCmd = new SqlCommand(@"
-                        SELECT LoaiDon, TrangThai
+                        SELECT LoaiDon, TrangThai, MaNguoiBan, LoaiNguoiBan, MaNguoiMua, LoaiNguoiMua
                         FROM DonHang
                         WHERE MaDonHang = @MaDonHang
                           AND (LoaiNguoiBan = 'daily' OR LoaiNguoiMua = 'daily')", conn, transaction);
@@ -311,6 +311,11 @@ namespace DaiLyService.Data
 
                     string loaiDon;
                     string currentStatus;
+                    int maNguoiBan;
+                    string loaiNguoiBan;
+                    int maNguoiMua;
+                    string loaiNguoiMua;
+                    
                     using (var orderReader = orderCmd.ExecuteReader())
                     {
                         if (!orderReader.Read())
@@ -320,6 +325,10 @@ namespace DaiLyService.Data
                         }
                         loaiDon = orderReader.GetString(orderReader.GetOrdinal("LoaiDon"));
                         currentStatus = orderReader.GetString(orderReader.GetOrdinal("TrangThai"));
+                        maNguoiBan = orderReader.GetInt32(orderReader.GetOrdinal("MaNguoiBan"));
+                        loaiNguoiBan = orderReader.GetString(orderReader.GetOrdinal("LoaiNguoiBan"));
+                        maNguoiMua = orderReader.GetInt32(orderReader.GetOrdinal("MaNguoiMua"));
+                        loaiNguoiMua = orderReader.GetString(orderReader.GetOrdinal("LoaiNguoiMua"));
                     }
 
                     bool validTransition = false;
@@ -333,12 +342,89 @@ namespace DaiLyService.Data
                     else if (loaiDon == "daily_to_sieuthi")
                     {
                         validTransition =
-                            (currentStatus == "cho_xac_nhan" && (trangThai == "hoan_thanh" || trangThai == "da_huy"));
+                            (currentStatus == "cho_xac_nhan" && (trangThai == "dang_van_chuyen" || trangThai == "da_huy")) ||
+                            (currentStatus == "dang_van_chuyen" && trangThai == "hoan_thanh");
                     }
 
                     if (!validTransition)
                     {
                         throw new Exception($"Không thể chuyển trạng thái đơn {loaiDon} từ '{currentStatus}' sang '{trangThai}'");
+                    }
+
+                    // Nếu là đơn hàng daily_to_sieuthi và siêu thị xác nhận (chuyển sang dang_van_chuyen)
+                    // thì tự động tạo vận chuyển cho từng lô
+                    if (loaiDon == "daily_to_sieuthi" && currentStatus == "cho_xac_nhan" && trangThai == "dang_van_chuyen")
+                    {
+                        _logger.LogInformation("Creating transports for order {OrderId}", maDonHang);
+                        
+                        // Lấy thông tin đại lý và siêu thị
+                        string diemDi = "";
+                        string diemDen = "";
+                        
+                        // Lấy địa chỉ đại lý (người bán)
+                        using (var getDaiLyCmd = new SqlCommand(@"
+                            SELECT DiaChi FROM DaiLy WHERE MaDaiLy = @MaDaiLy", conn, transaction))
+                        {
+                            getDaiLyCmd.Parameters.AddWithValue("@MaDaiLy", maNguoiBan);
+                            var result = getDaiLyCmd.ExecuteScalar();
+                            diemDi = result != null && result != DBNull.Value ? result.ToString()! : $"Đại lý {maNguoiBan}";
+                            _logger.LogInformation("DiemDi: {DiemDi}", diemDi);
+                        }
+                        
+                        // Lấy địa chỉ siêu thị (người mua)
+                        using (var getSieuThiCmd = new SqlCommand(@"
+                            SELECT DiaChi FROM SieuThi WHERE MaSieuThi = @MaSieuThi", conn, transaction))
+                        {
+                            getSieuThiCmd.Parameters.AddWithValue("@MaSieuThi", maNguoiMua);
+                            var result = getSieuThiCmd.ExecuteScalar();
+                            diemDen = result != null && result != DBNull.Value ? result.ToString()! : $"Siêu thị {maNguoiMua}";
+                            _logger.LogInformation("DiemDen: {DiemDen}", diemDen);
+                        }
+                        
+                        // Lấy danh sách lô trong đơn hàng
+                        var chiTietList = new List<int>();
+                        using (var getChiTietCmd = new SqlCommand(@"
+                            SELECT MaLo FROM ChiTietDonHang WHERE MaDonHang = @MaDonHang", conn, transaction))
+                        {
+                            getChiTietCmd.Parameters.AddWithValue("@MaDonHang", maDonHang);
+                            using var reader = getChiTietCmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                chiTietList.Add(reader.GetInt32(0));
+                            }
+                        }
+                        
+                        _logger.LogInformation("Found {Count} lots in order {OrderId}", chiTietList.Count, maDonHang);
+                        
+                        if (chiTietList.Count == 0)
+                        {
+                            throw new Exception($"Không tìm thấy chi tiết đơn hàng cho đơn {maDonHang}");
+                        }
+                        
+                        // Tạo vận chuyển cho từng lô
+                        foreach (var maLo in chiTietList)
+                        {
+                            try
+                            {
+                                using var createVanChuyenCmd = new SqlCommand(@"
+                                    INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, TrangThai)
+                                    VALUES (@MaLo, @DiemDi, @DiemDen, @NgayBatDau, @TrangThai)", conn, transaction);
+                                
+                                createVanChuyenCmd.Parameters.AddWithValue("@MaLo", maLo);
+                                createVanChuyenCmd.Parameters.AddWithValue("@DiemDi", diemDi);
+                                createVanChuyenCmd.Parameters.AddWithValue("@DiemDen", diemDen);
+                                createVanChuyenCmd.Parameters.AddWithValue("@NgayBatDau", DateTime.Now);
+                                createVanChuyenCmd.Parameters.AddWithValue("@TrangThai", "dang_van_chuyen");
+                                
+                                createVanChuyenCmd.ExecuteNonQuery();
+                                _logger.LogInformation("Created transport for lot {LotId} in order {OrderId}", maLo, maDonHang);
+                            }
+                            catch (SqlException sqlEx)
+                            {
+                                _logger.LogError(sqlEx, "Failed to create transport for lot {LotId} in order {OrderId}", maLo, maDonHang);
+                                throw new Exception($"Lỗi tạo vận chuyển cho lô {maLo}: {sqlEx.Message}", sqlEx);
+                            }
+                        }
                     }
 
                     using var cmd = new SqlCommand(@"
