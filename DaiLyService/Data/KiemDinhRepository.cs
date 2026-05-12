@@ -178,6 +178,9 @@ namespace DaiLyService.Data
                         NgayThuHoach = reader.IsDBNull(reader.GetOrdinal("NgayThuHoach")) 
                             ? null 
                             : reader.GetDateTime(reader.GetOrdinal("NgayThuHoach")),
+                        HanSuDung = reader.IsDBNull(reader.GetOrdinal("HanSuDung")) 
+                            ? null 
+                            : reader.GetDateTime(reader.GetOrdinal("HanSuDung")),
                         TrangThaiKiemDinh = reader.GetString(reader.GetOrdinal("TrangThaiKiemDinh")),
                         KetQuaKiemDinh = reader.IsDBNull(reader.GetOrdinal("KetQuaKiemDinh")) 
                             ? null 
