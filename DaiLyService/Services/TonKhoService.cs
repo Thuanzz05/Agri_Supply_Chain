@@ -16,6 +16,8 @@ namespace DaiLyService.Services
 
         public List<TonKhoDTO> GetByKho(int maKho) => _repo.GetByKho(maKho);
 
+        public List<TonKhoDTO> GetByDaiLy(int maDaiLy) => _repo.GetByDaiLy(maDaiLy);
+
         public TonKhoDTO? GetByKhoAndLo(int maKho, int maLo) => _repo.GetByKhoAndLo(maKho, maLo);
 
         public bool Create(int maKho, int maLo, decimal soLuong) => _repo.Create(maKho, maLo, soLuong);

@@ -100,9 +100,7 @@ namespace DaiLyService.Controllers
                     });
                 }
 
-                var allData = _tonKhoService.GetAll();
-                // Lọc tồn kho của đại lý (tất cả kho của đại lý này)
-                var data = allData.Where(x => x.MaKho > 0).ToList();
+                var data = _tonKhoService.GetByDaiLy(maDaiLy);
                 
                 return Ok(new
                 {

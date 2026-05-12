@@ -81,6 +81,40 @@ namespace DaiLyService.Data
             return list;
         }
 
+        public List<TonKhoDTO> GetByDaiLy(int maDaiLy)
+        {
+            var list = new List<TonKhoDTO>();
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    SELECT tk.MaKho, tk.MaLo, tk.SoLuong, tk.NgayCapNhat,
+                           k.TenKho, sp.TenSanPham, sp.DonViTinh, ln.MaQR
+                    FROM TonKho tk
+                    LEFT JOIN Kho k ON tk.MaKho = k.MaKho
+                    LEFT JOIN LoNongSan ln ON tk.MaLo = ln.MaLo
+                    LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
+                    WHERE k.MaChuSoHuu = @MaDaiLy AND k.LoaiChuSoHuu = 'daily'
+                    ORDER BY tk.NgayCapNhat DESC", conn);
+                
+                cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
+
+                conn.Open();
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(MapToDTO(reader));
+                }
+                _logger.LogInformation("Retrieved {Count} inventory records for distributor {DistributorId}", list.Count, maDaiLy);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while getting inventory records for distributor {DistributorId}", maDaiLy);
+                throw new Exception("Lỗi truy vấn cơ sở dữ liệu", ex);
+            }
+            return list;
+        }
+
         public TonKhoDTO? GetByKhoAndLo(int maKho, int maLo)
         {
             try

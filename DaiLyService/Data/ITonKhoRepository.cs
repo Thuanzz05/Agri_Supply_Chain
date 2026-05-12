@@ -6,6 +6,7 @@ namespace DaiLyService.Data
     {
         List<TonKhoDTO> GetAll();
         List<TonKhoDTO> GetByKho(int maKho);
+        List<TonKhoDTO> GetByDaiLy(int maDaiLy);
         TonKhoDTO? GetByKhoAndLo(int maKho, int maLo);
         bool Create(int maKho, int maLo, decimal soLuong);
         bool UpdateSoLuong(int maKho, int maLo, decimal soLuongMoi);
