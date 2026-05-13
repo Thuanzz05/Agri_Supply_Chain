@@ -1,4 +1,4 @@
-﻿Create database CNWEB_Agri_Supply_Chain
+Create database CNWEB_Agri_Supply_Chain
 Go
 
 USE CNWEB_Agri_Supply_Chain;
@@ -168,488 +168,310 @@ CREATE TABLE KiemDinh (
 
 
 
--- 1. TÀI KHOẢN 
-INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan, TrangThai, NgayTao) VALUES
-('admin01', 'admin123', 'admin01@agrisupply.com', 'admin', N'hoat_dong', '2024-01-15'),
-('admin02', 'admin123', 'admin02@agrisupply.com', 'admin', N'hoat_dong', '2024-02-20'),
-('nongdan01', 'nongdan123', 'tranvannong@gmail.com', 'nongdan', N'hoat_dong', '2024-03-10'),
-('nongdan02', 'nongdan123', 'lethihoa@gmail.com', 'nongdan', N'hoat_dong', '2024-03-12'),
-('nongdan03', 'nongdan123', 'phamminhtam@gmail.com', 'nongdan', N'hoat_dong', '2024-04-05'),
-('nongdan04', 'nongdan123', 'nguyenvanbinh@gmail.com', 'nongdan', N'hoat_dong', '2024-04-18'),
-('nongdan05', 'nongdan123', 'vothimai@gmail.com', 'nongdan', N'hoat_dong', '2024-05-22'),
-('nongdan06', 'nongdan123', 'hoangvanduc@gmail.com', 'nongdan', N'hoat_dong', '2024-06-08'),
-('nongdan07', 'nongdan123', 'dangthilan@gmail.com', 'nongdan', N'hoat_dong', '2024-07-14'),
-('nongdan08', 'nongdan123', 'buivanhung@gmail.com', 'nongdan', N'hoat_dong', '2024-08-03'),
-('nongdan09', 'nongdan123', 'lythinga@gmail.com', 'nongdan', N'hoat_dong', '2024-09-11'),
-('nongdan10', 'nongdan123', 'phanvanson@gmail.com', 'nongdan', N'hoat_dong', '2024-10-25'),
-('nongdan11', 'nongdan123', 'truongthihang@gmail.com', 'nongdan', N'hoat_dong', '2024-11-07'),
-('nongdan12', 'nongdan123', 'dinhvantoan@gmail.com', 'nongdan', N'hoat_dong', '2024-12-19'),
-('nongdan13', 'nongdan123', 'maithixuan@gmail.com', 'nongdan', N'hoat_dong', '2025-01-08'),
-('nongdan14', 'nongdan123', 'duongvanphuc@gmail.com', 'nongdan', N'hoat_dong', '2025-02-14'),
-('nongdan15', 'nongdan123', 'caothithao@gmail.com', 'nongdan', N'hoat_dong', '2025-03-22'),
-('nongdan16', 'nongdan123', 'lamvankhoa@gmail.com', 'nongdan', N'hoat_dong', '2025-04-30'),
-('nongdan17', 'nongdan123', 'huynhthidiem@gmail.com', 'nongdan', N'hoat_dong', '2025-05-17'),
-('nongdan18', 'nongdan123', 'tovanlong@gmail.com', 'nongdan', N'hoat_dong', '2025-06-25'),
-('nongdan19', 'nongdan123', 'vuthikim@gmail.com', 'nongdan', N'hoat_dong', '2025-07-09'),
-('nongdan20', 'nongdan123', 'hovantai@gmail.com', 'nongdan', N'hoat_dong', '2025-08-13'),
-('daily01', 'daily123', 'daily.miennam@gmail.com', 'daily', N'hoat_dong', '2024-02-10'),
-('daily02', 'daily123', 'thucphamsach@gmail.com', 'daily', N'hoat_dong', '2024-03-15'),
-('daily03', 'daily123', 'raucuquatuoi@gmail.com', 'daily', N'hoat_dong', '2024-04-20'),
-('daily04', 'daily123', 'nongsanxanh@gmail.com', 'daily', N'hoat_dong', '2024-05-25'),
-('daily05', 'daily123', 'thucphamantoan@gmail.com', 'daily', N'hoat_dong', '2024-06-30'),
-('daily06', 'daily123', 'rausachorganic@gmail.com', 'daily', N'hoat_dong', '2024-08-05'),
-('daily07', 'daily123', 'nongsanviet@gmail.com', 'daily', N'hoat_dong', '2024-09-10'),
-('daily08', 'daily123', 'thucphamtuoingon@gmail.com', 'daily', N'hoat_dong', '2024-10-15'),
-('daily09', 'daily123', 'raucusach@gmail.com', 'daily', N'hoat_dong', '2024-11-20'),
-('daily10', 'daily123', 'nongsanhuuco@gmail.com', 'daily', N'hoat_dong', '2024-12-25'),
-('daily11', 'daily123', 'thucphamxanh@gmail.com', 'daily', N'hoat_dong', '2025-01-30'),
-('daily12', 'daily123', 'rauquatuoi@gmail.com', 'daily', N'hoat_dong', '2025-03-05'),
-('daily13', 'daily123', 'nongsansach@gmail.com', 'daily', N'hoat_dong', '2025-04-10'),
-('daily14', 'daily123', 'thucphamorganic@gmail.com', 'daily', N'hoat_dong', '2025-05-15'),
-('sieuthi01', 'sieuthi123', 'coopmart@gmail.com', 'sieuthi', N'hoat_dong', '2024-01-20'),
-('sieuthi02', 'sieuthi123', 'bigc@gmail.com', 'sieuthi', N'hoat_dong', '2024-02-25'),
-('sieuthi03', 'sieuthi123', 'lottemart@gmail.com', 'sieuthi', N'hoat_dong', '2024-04-01'),
-('sieuthi04', 'sieuthi123', 'aeonmall@gmail.com', 'sieuthi', N'hoat_dong', '2024-05-06'),
-('sieuthi05', 'sieuthi123', 'vinmart@gmail.com', 'sieuthi', N'hoat_dong', '2024-06-11'),
-('sieuthi06', 'sieuthi123', 'megamarket@gmail.com', 'sieuthi', N'hoat_dong', '2024-07-16'),
-('sieuthi07', 'sieuthi123', 'emart@gmail.com', 'sieuthi', N'hoat_dong', '2024-08-21'),
-('sieuthi08', 'sieuthi123', 'satra@gmail.com', 'sieuthi', N'hoat_dong', '2024-09-26'),
-('sieuthi09', 'sieuthi123', 'citimart@gmail.com', 'sieuthi', N'hoat_dong', '2024-11-01'),
-('sieuthi10', 'sieuthi123', 'topsmarket@gmail.com', 'sieuthi', N'hoat_dong', '2024-12-06'),
-('sieuthi11', 'sieuthi123', 'maximark@gmail.com', 'sieuthi', N'hoat_dong', '2025-01-11'),
-('sieuthi12', 'sieuthi123', 'fivimart@gmail.com', 'sieuthi', N'hoat_dong', '2025-02-16');
 
--- 2. ADMIN 
+-- 1. TÀI KHOẢN
+INSERT INTO TaiKhoan (TenDangNhap, MatKhau, Email, LoaiTaiKhoan, TrangThai, NgayTao) VALUES
+('admin01', 'admin123', 'admin01@agrisupply.vn', 'admin', N'hoat_dong', '2026-01-15'),
+('admin02', 'admin123', 'admin02@agrisupply.vn', 'admin', N'hoat_dong', '2026-02-20'),
+('nongdan01', 'nongdan123', 'nguyenvantuan@gmail.com', 'nongdan', N'hoat_dong', '2026-02-01'),
+('nongdan02', 'nongdan123', 'tranthiha@gmail.com', 'nongdan', N'hoat_dong', '2026-02-05'),
+('nongdan03', 'nongdan123', 'phungthanhdo@gmail.com', 'nongdan', N'hoat_dong', '2026-02-10'),
+('nongdan04', 'nongdan123', 'phamthid@gmail.com', 'nongdan', N'hoat_dong', '2026-02-15'),
+('nongdan05', 'nongdan123', 'hoangvane@gmail.com', 'nongdan', N'hoat_dong', '2026-02-20'),
+('nongdan06', 'nongdan123', 'vovanf@gmail.com', 'nongdan', N'hoat_dong', '2026-02-25'),
+('nongdan07', 'nongdan123', 'dangthig@gmail.com', 'nongdan', N'hoat_dong', '2026-03-01'),
+('nongdan08', 'nongdan123', 'buivanh@gmail.com', 'nongdan', N'hoat_dong', '2026-03-05'),
+('nongdan09', 'nongdan123', 'lythii@gmail.com', 'nongdan', N'hoat_dong', '2026-03-10'),
+('nongdan10', 'nongdan123', 'phanvank@gmail.com', 'nongdan', N'hoat_dong', '2026-03-15'),
+('daily01', 'daily123', 'daily.hanoi@gmail.com', 'daily', N'hoat_dong', '2026-02-25'),
+('daily02', 'daily123', 'daily.bacninh@gmail.com', 'daily', N'hoat_dong', '2026-03-01'),
+('daily03', 'daily123', 'daily.haiduong@gmail.com', 'daily', N'hoat_dong', '2026-03-05'),
+('daily04', 'daily123', 'daily.hungyen@gmail.com', 'daily', N'hoat_dong', '2026-03-10'),
+('daily05', 'daily123', 'daily.haiphong@gmail.com', 'daily', N'hoat_dong', '2026-03-15'),
+('daily06', 'daily123', 'daily.namdinh@gmail.com', 'daily', N'hoat_dong', '2026-03-20'),
+('sieuthi01', 'sieuthi123', 'vinmart.hanoi@gmail.com', 'sieuthi', N'hoat_dong', '2026-03-15'),
+('sieuthi02', 'sieuthi123', 'bigc.hanoi@gmail.com', 'sieuthi', N'hoat_dong', '2026-03-20'),
+('sieuthi03', 'sieuthi123', 'aeon.haiphong@gmail.com', 'sieuthi', N'hoat_dong', '2026-03-25'),
+('sieuthi04', 'sieuthi123', 'lotte.bacninh@gmail.com', 'sieuthi', N'hoat_dong', '2026-03-30'),
+('sieuthi05', 'sieuthi123', 'coopmart.haiduong@gmail.com', 'sieuthi', N'hoat_dong', '2026-04-05'),
+('sieuthi06', 'sieuthi123', 'mega.hungyen@gmail.com', 'sieuthi', N'hoat_dong', '2026-04-10');
+
+-- 2. ADMIN
 INSERT INTO Admin (MaTaiKhoan, HoTen) VALUES
 (1, N'Nguyễn Duy Thuấn'),
-(2, N'Nguyễn Thuấn Duy');
+(2, N'Nguyễn Duy Thuấnn');
 
--- 3. NÔNG DÂN 
+-- 3. NÔNG DÂN
 INSERT INTO NongDan (MaTaiKhoan, HoTen, SoDienThoai, DiaChi) VALUES
-(3, N'Trần Văn Nông', '0901234567', N'Ấp 3, Xã Tân Phú, Củ Chi'),
-(4, N'Lê Thị Hoa', '0912345678', N'Ấp 2, Xã Phước Vĩnh An, Củ Chi'),
-(5, N'Phạm Minh Tâm', '0923456789', N'Ấp 1, Xã Trung An, Củ Chi'),
-(6, N'Nguyễn Văn Bình', '0934567890', N'Ấp 4, Xã Phú Mỹ Hưng, Củ Chi'),
-(7, N'Võ Thị Mai', '0945678901', N'Ấp 2, Xã Tân Thông Hội, Củ Chi'),
-(8, N'Hoàng Văn Đức', '0956789012', N'Ấp 3, Xã Bình Mỹ, Củ Chi'),
-(9, N'Đặng Thị Lan', '0967890123', N'Ấp 1, Xã Thái Mỹ, Củ Chi'),
-(10, N'Bùi Văn Hùng', '0978901234', N'Ấp 5, Xã Phước Hiệp, Củ Chi'),
-(11, N'Lý Thị Nga', '0989012345', N'Ấp 2, Xã An Nhơn Tây, Củ Chi'),
-(12, N'Phan Văn Sơn', '0990123456', N'Ấp 4, Xã Nhuận Đức, Củ Chi'),
-(13, N'Trương Thị Hằng', '0901234568', N'Ấp 1, Xã Phạm Văn Cội, Củ Chi'),
-(14, N'Đinh Văn Toàn', '0912345679', N'Ấp 3, Xã Tân An Hội, Củ Chi'),
-(15, N'Mai Thị Xuân', '0923456780', N'Ấp 2, Xã Trung Lập Hạ, Củ Chi'),
-(16, N'Dương Văn Phúc', '0934567891', N'Ấp 5, Xã Trung Lập Thượng, Củ Chi'),
-(17, N'Cao Thị Thảo', '0945678902', N'Ấp 1, Xã Hòa Phú, Củ Chi'),
-(18, N'Lâm Văn Khoa', '0956789013', N'Ấp 4, Xã Tân Thạnh Đông, Củ Chi'),
-(19, N'Huỳnh Thị Diễm', '0967890124', N'Ấp 2, Xã Tân Thạnh Tây, Củ Chi'),
-(20, N'Tô Văn Long', '0978901235', N'Ấp 3, Xã Phước Thạnh, Củ Chi'),
-(21, N'Vũ Thị Kim', '0989012346', N'Ấp 1, Xã Phước Vĩnh Tây, Củ Chi'),
-(22, N'Hồ Văn Tài', '0990123457', N'Ấp 5, Xã Phước Vĩnh Đông, Củ Chi');
+(3, N'Nguyễn Văn Tuấn', '0912345678', N'Xã Đông Anh, Huyện Đông Anh, Hà Nội'),
+(4, N'Trần Thị Hà', '0923456789', N'Xã Gia Lâm, Huyện Gia Lâm, Hà Nội'),
+(5, N'Phùng Thanh Độ', '0934567890', N'Xã Thuận Thành, Huyện Thuận Thành, Bắc Ninh'),
+(6, N'Trương Tuấn Tú', '0945678901', N'Xã Chí Linh, Thành phố Chí Linh, Hải Dương'),
+(7, N'Hoàng Văn Em', '0956789012', N'Xã Khoái Châu, Huyện Khoái Châu, Hưng Yên'),
+(8, N'Võ Văn Phát', '0967890123', N'Xã Văn Giang, Huyện Văn Giang, Hưng Yên'),
+(9, N'Đặng Thị Giang', '0978901234', N'Xã Tiên Du, Huyện Tiên Du, Bắc Ninh'),
+(10, N'Bùi Văn Hải', '0989012345', N'Xã Thanh Hà, Huyện Thanh Hà, Hải Dương'),
+(11, N'Lý Thị Ích', '0990123456', N'Xã Sóc Sơn, Huyện Sóc Sơn, Hà Nội'),
+(12, N'Phan Văn Khoa', '0901234567', N'Xã Mê Linh, Huyện Mê Linh, Hà Nội');
 
 -- 4. ĐẠI LÝ
 INSERT INTO DaiLy (MaTaiKhoan, TenDaiLy, SoDienThoai, DiaChi) VALUES
-(23, N'Đại lý Nông sản Miền Nam', '0934567890', N'123 Lê Văn Việt, Q.9'),
-(24, N'Đại lý Thực phẩm Sạch', '0945678901', N'456 Nguyễn Duy Trinh, Q.2'),
-(25, N'Đại lý Rau Củ Quả Tươi', '0956789012', N'789 Võ Văn Ngân, Thủ Đức'),
-(26, N'Đại lý Nông sản Xanh', '0967890123', N'321 Phạm Văn Đồng, Gò Vấp'),
-(27, N'Đại lý Thực phẩm An Toàn', '0978901234', N'654 Quang Trung, Q.12'),
-(28, N'Đại lý Rau Sạch Organic', '0989012345', N'987 Lê Đức Thọ, Gò Vấp'),
-(29, N'Đại lý Nông sản Việt', '0990123456', N'147 Phan Văn Trị, Bình Thạnh'),
-(30, N'Đại lý Thực phẩm Tươi Ngon', '0901234569', N'258 Cách Mạng Tháng 8, Q.10'),
-(31, N'Đại lý Rau Củ Sạch', '0912345680', N'369 Lý Thường Kiệt, Q.11'),
-(32, N'Đại lý Nông sản Hữu Cơ', '0923456781', N'741 Nguyễn Thị Minh Khai, Q.3'),
-(33, N'Đại lý Thực phẩm Xanh', '0934567892', N'852 Điện Biên Phủ, Bình Thạnh'),
-(34, N'Đại lý Rau Quả Tươi', '0945678903', N'963 Hoàng Văn Thụ, Tân Bình'),
-(35, N'Đại lý Nông sản Sạch', '0956789014', N'159 Trường Chinh, Tân Bình'),
-(36, N'Đại lý Thực phẩm Organic', '0967890125', N'357 Cộng Hòa, Tân Bình');
+(13, N'Đại lý Nông sản Hà Nội', '0967890123', N'Số 25 Trần Đại Nghĩa, Hai Bà Trưng, Hà Nội'),
+(14, N'Đại lý Thực phẩm Bắc Ninh', '0978901234', N'Số 15 Lý Thái Tổ, TP Bắc Ninh, Bắc Ninh'),
+(15, N'Đại lý Rau sạch Hải Dương', '0989012345', N'Số 30 Nguyễn Lương Bằng, TP Hải Dương, Hải Dương'),
+(16, N'Đại lý Nông sản Hưng Yên', '0990123456', N'Số 45 Phạm Văn Đồng, TP Hưng Yên, Hưng Yên'),
+(17, N'Đại lý Thực phẩm Hải Phòng', '0901234568', N'Số 50 Lạch Tray, Ngô Quyền, Hải Phòng'),
+(18, N'Đại lý Rau củ Nam Định', '0912345679', N'Số 60 Trần Hưng Đạo, TP Nam Định, Nam Định');
 
--- 5. SIÊU THỊ 
+-- 5. SIÊU THỊ
 INSERT INTO SieuThi (MaTaiKhoan, TenSieuThi, SoDienThoai, DiaChi) VALUES
-(37, N'Siêu thị Co.opmart', '0956789012', N'789 Võ Văn Ngân, Thủ Đức'),
-(38, N'Siêu thị BigC', '0967890123', N'321 Phạm Văn Đồng, Gò Vấp'),
-(39, N'Siêu thị Lotte Mart', '0978901234', N'469 Nguyễn Hữu Thọ, Q.7'),
-(40, N'Siêu thị Aeon Mall', '0989012345', N'30 Bờ Bao Tân Thắng, Tân Phú'),
-(41, N'Siêu thị Vinmart', '0990123456', N'72 Lê Thánh Tôn, Q.1'),
-(42, N'Siêu thị Mega Market', '0901234570', N'1362 Kha Vạn Cân, Thủ Đức'),
-(43, N'Siêu thị Emart', '0912345681', N'26 Lý Tự Trọng, Q.1'),
-(44, N'Siêu thị Satra', '0923456782', N'268 Tô Hiến Thành, Q.10'),
-(45, N'Siêu thị Citimart', '0934567893', N'268 Lê Hồng Phong, Q.10'),
-(46, N'Siêu thị Tops Market', '0945678904', N'34 Lê Duẩn, Q.1'),
-(47, N'Siêu thị Maximark', '0956789015', N'520 Cách Mạng Tháng 8, Q.3'),
-(48, N'Siêu thị Fivimart', '0967890126', N'1 Nguyễn Văn Linh, Q.7');
+(19, N'VinMart Hà Nội', '0901234568', N'Tầng 1, Vincom Center, 191 Bà Triệu, Hai Bà Trưng, Hà Nội'),
+(20, N'BigC Hà Nội', '0902345679', N'Số 222 Trần Duy Hưng, Cầu Giấy, Hà Nội'),
+(21, N'Aeon Mall Hải Phòng', '0903456780', N'Số 10 Lê Hồng Phong, Ngô Quyền, Hải Phòng'),
+(22, N'Lotte Mart Bắc Ninh', '0904567891', N'Số 88 Lý Thái Tổ, TP Bắc Ninh, Bắc Ninh'),
+(23, N'Co.opmart Hải Dương', '0905678902', N'Số 100 Nguyễn Lương Bằng, TP Hải Dương, Hải Dương'),
+(24, N'Mega Market Hưng Yên', '0906789013', N'Số 120 Phạm Văn Đồng, TP Hưng Yên, Hưng Yên');
 
-
--- 6. SẢN PHẨM 
+-- 6. SẢN PHẨM
 INSERT INTO SanPham (TenSanPham, DonViTinh, MoTa) VALUES
-(N'Cà chua', N'kg', N'Cà chua tươi, màu đỏ, chín tự nhiên'),
+(N'Cà chua', N'kg', N'Cà chua tươi, màu đỏ tự nhiên'),
 (N'Rau muống', N'kg', N'Rau muống tươi, lá xanh'),
 (N'Cải thảo', N'kg', N'Cải thảo tươi, giòn ngọt'),
-(N'Dưa chuột', N'kg', N'Dưa chuột tươi, xanh giòn'),
-(N'Ớt', N'kg', N'Ớt tươi, cay nồng'),
-(N'Gạo ST25', N'kg', N'Gạo thơm ST25, hạt dài'),
+(N'Dưa chuột', N'kg', N'Dưa chuột xanh, giòn ngọt'),
 (N'Rau xà lách', N'kg', N'Xà lách tươi, lá xanh'),
-(N'Cà rốt', N'kg', N'Cà rốt tươi, màu cam'),
-(N'Khoai tây', N'kg', N'Khoai tây Đà Lạt'),
-(N'Hành tây', N'kg', N'Hành tây tươi'),
-(N'Tỏi', N'kg', N'Tỏi Lý Sơn'),
-(N'Gừng', N'kg', N'Gừng tươi'),
-(N'Ớt chuông', N'kg', N'Ớt chuông nhiều màu'),
-(N'Bí đao', N'kg', N'Bí đao tươi'),
-(N'Bí ngô', N'kg', N'Bí ngô Nhật'),
-(N'Mướp', N'kg', N'Mướp tươi'),
-(N'Đậu cove', N'kg', N'Đậu cove xanh'),
-(N'Đậu đũa', N'kg', N'Đậu đũa tươi'),
-(N'Bắp cải', N'kg', N'Bắp cải tươi'),
-(N'Súp lơ xanh', N'kg', N'Súp lơ xanh'),
-(N'Súp lơ trắng', N'kg', N'Súp lơ trắng'),
-(N'Cải bó xôi', N'kg', N'Cải bó xôi'),
 (N'Rau dền', N'kg', N'Rau dền đỏ/xanh'),
-(N'Rau ngót', N'kg', N'Rau ngót tươi'),
+(N'Rau ngót', N'kg', N'Rau ngót tươi, mát'),
 (N'Rau cần', N'kg', N'Rau cần thơm'),
+(N'Bắp cải', N'kg', N'Bắp cải tươi'),
+(N'Cải bó xôi', N'kg', N'Cải bó xôi'),
+(N'Cà rốt', N'kg', N'Cà rốt cam, giòn ngọt'),
+(N'Khoai tây', N'kg', N'Khoai tây Đà Lạt'),
+(N'Hành tây', N'kg', N'Hành tây tím'),
+(N'Bí đao', N'kg', N'Bí đao tươi'),
+(N'Bí ngô', N'kg', N'Bí ngô vàng'),
+(N'Tỏi', N'kg', N'Tỏi Lý Sơn'),
+(N'Gừng', N'kg', N'Gừng già'),
+(N'Ớt', N'kg', N'Ớt hiểm, cay'),
 (N'Hành lá', N'kg', N'Hành lá tươi'),
-(N'Ngò rí', N'kg', N'Ngò rí thơm'),
-(N'Húng quế', N'kg', N'Húng quế tươi'),
-(N'Rau thơm', N'kg', N'Rau thơm tổng hợp'),
-(N'Chanh', N'kg', N'Chanh tươi'),
-(N'Cam', N'kg', N'Cam Vinh/Cao Phong'),
-(N'Quýt', N'kg', N'Quýt ngọt'),
-(N'Bưởi', N'kg', N'Bưởi da xanh'),
-(N'Xoài', N'kg', N'Xoài cát Hòa Lộc'),
+(N'Húng quế', N'kg', N'Húng quế thơm'),
+(N'Cam', N'kg', N'Cam Vinh, ngọt'),
 (N'Chuối', N'kg', N'Chuối tiêu'),
-(N'Đu đủ', N'kg', N'Đu đủ chín vàng'),
-(N'Dưa hấu', N'kg', N'Dưa hấu không hạt'),
-(N'Dưa lưới', N'kg', N'Dưa lưới Nhật'),
-(N'Dâu tây', N'kg', N'Dâu tây Đà Lạt'),
-(N'Nho', N'kg', N'Nho xanh/đỏ'),
+(N'Bưởi', N'kg', N'Bưởi da xanh'),
 (N'Táo', N'kg', N'Táo Fuji'),
-(N'Lê', N'kg', N'Lê Hàn Quốc'),
-(N'Thanh long', N'kg', N'Thanh long ruột đỏ'),
-(N'Măng cụt', N'kg', N'Măng cụt tươi'),
-(N'Chom chom', N'kg', N'Chom chom'),
-(N'Vải', N'kg', N'Vải thiều'),
-(N'Nhãn', N'kg', N'Nhãn lồng Hưng Yên'),
-(N'Mận', N'kg', N'Mận Mộc Châu'),
-(N'Dứa', N'kg', N'Dứa Cayenne'),
-(N'Thơm', N'kg', N'Thơm Queen');
+(N'Thanh long', N'kg', N'Thanh long ruột đỏ');
 
-
--- 7. TRANG TRẠI 
+-- 7. TRANG TRẠI
 INSERT INTO TrangTrai (MaNongDan, TenTrangTrai, DiaChi, SoChungNhan) VALUES
-(1, N'Trang trại Xanh', N'Ấp 3, Xã Tân Phú', 'VG001234'),
-(1, N'Trang trại Organic 1', N'Ấp 5, Xã Tân Phú', 'ORG001235'),
-(2, N'Trang trại Hoa Sen', N'Ấp 2, Xã Phước Vĩnh An', 'VG001236'),
-(3, N'Trang trại Minh Tâm', N'Ấp 1, Xã Trung An', 'VG001237'),
-(4, N'Trang trại Bình An', N'Ấp 4, Xã Phú Mỹ Hưng', 'VG001238'),
-(5, N'Trang trại Mai Xanh', N'Ấp 2, Xã Tân Thông Hội', 'VG001239'),
-(6, N'Trang trại Đức Phát', N'Ấp 3, Xã Bình Mỹ', 'VG001240'),
-(7, N'Trang trại Lan Anh', N'Ấp 1, Xã Thái Mỹ', 'VG001241'),
-(8, N'Trang trại Hùng Vương', N'Ấp 5, Xã Phước Hiệp', 'VG001242'),
-(9, N'Trang trại Nga Xanh', N'Ấp 2, Xã An Nhơn Tây', 'VG001243'),
-(10, N'Trang trại Sơn Thủy', N'Ấp 4, Xã Nhuận Đức', 'VG001244'),
-(11, N'Trang trại Hằng Nga', N'Ấp 1, Xã Phạm Văn Cội', 'VG001245'),
-(12, N'Trang trại Toàn Phát', N'Ấp 3, Xã Tân An Hội', 'VG001246'),
-(13, N'Trang trại Xuân Mai', N'Ấp 2, Xã Trung Lập Hạ', 'VG001247'),
-(14, N'Trang trại Phúc Lộc', N'Ấp 5, Xã Trung Lập Thượng', 'VG001248'),
-(15, N'Trang trại Thảo Nguyên', N'Ấp 1, Xã Hòa Phú', 'VG001249'),
-(16, N'Trang trại Khoa Học', N'Ấp 4, Xã Tân Thạnh Đông', 'VG001250'),
-(17, N'Trang trại Diễm Phúc', N'Ấp 2, Xã Tân Thạnh Tây', 'VG001251'),
-(18, N'Trang trại Long Thành', N'Ấp 3, Xã Phước Thạnh', 'VG001252'),
-(19, N'Trang trại Kim Cương', N'Ấp 1, Xã Phước Vĩnh Tây', 'VG001253'),
-(20, N'Trang trại Tài Lộc', N'Ấp 5, Xã Phước Vĩnh Đông', 'VG001254'),
-(1, N'Trang trại Hữu Cơ 2', N'Ấp 6, Xã Tân Phú', 'ORG001255'),
-(2, N'Trang trại Sạch', N'Ấp 3, Xã Phước Vĩnh An', 'VG001256'),
-(3, N'Trang trại An Toàn', N'Ấp 2, Xã Trung An', 'VG001257'),
-(4, N'Trang trại Xanh Sạch', N'Ấp 5, Xã Phú Mỹ Hưng', 'VG001258'),
-(5, N'Trang trại Tươi Ngon', N'Ấp 3, Xã Tân Thông Hội', 'VG001259'),
-(6, N'Trang trại Chất Lượng', N'Ấp 4, Xã Bình Mỹ', 'VG001260'),
-(7, N'Trang trại Uy Tín', N'Ấp 2, Xã Thái Mỹ', 'VG001261'),
-(8, N'Trang trại Phát Đạt', N'Ấp 6, Xã Phước Hiệp', 'VG001262'),
-(9, N'Trang trại Thịnh Vượng', N'Ấp 3, Xã An Nhơn Tây', 'VG001263'),
-(10, N'Trang trại Hòa Bình', N'Ấp 5, Xã Nhuận Đức', 'VG001264'),
-(11, N'Trang trại Tân Tiến', N'Ấp 2, Xã Phạm Văn Cội', 'VG001265'),
-(12, N'Trang trại Hiện Đại', N'Ấp 4, Xã Tân An Hội', 'VG001266'),
-(13, N'Trang trại Công Nghệ', N'Ấp 3, Xã Trung Lập Hạ', 'VG001267'),
-(14, N'Trang trại Thông Minh', N'Ấp 6, Xã Trung Lập Thượng', 'VG001268'),
-(15, N'Trang trại Bền Vững', N'Ấp 2, Xã Hòa Phú', 'VG001269'),
-(16, N'Trang trại Sinh Thái', N'Ấp 5, Xã Tân Thạnh Đông', 'VG001270'),
-(17, N'Trang trại Môi Trường', N'Ấp 3, Xã Tân Thạnh Tây', 'VG001271'),
-(18, N'Trang trại Xanh Đẹp', N'Ấp 4, Xã Phước Thạnh', 'VG001272'),
-(19, N'Trang trại An Lành', N'Ấp 2, Xã Phước Vĩnh Tây', 'VG001273');
+(1, N'Trang trại Đông Anh', N'Xã Đông Anh, Huyện Đông Anh, Hà Nội', 'VG001234'),
+(1, N'Vườn rau An Nhiên', N'Xã Xuân Nộn, Huyện Đông Anh, Hà Nội', 'ORG001235'),
+(2, N'Trang trại Gia Lâm', N'Xã Gia Lâm, Huyện Gia Lâm, Hà Nội', 'VG001236'),
+(3, N'Trang trại Bắc Ninh', N'Xã Thuận Thành, Huyện Thuận Thành, Bắc Ninh', 'VG001237'),
+(3, N'Vườn trái cây Cường', N'Xã Võ Cường, TP Bắc Ninh, Bắc Ninh', 'VG001238'),
+(4, N'Trang trại Hải Dương', N'Xã Chí Linh, Thành phố Chí Linh, Hải Dương', 'VG001239'),
+(5, N'Trang trại Hưng Yên', N'Xã Khoái Châu, Huyện Khoái Châu, Hưng Yên', 'VG001240'),
+(6, N'Trang trại Văn Giang', N'Xã Văn Giang, Huyện Văn Giang, Hưng Yên', 'VG001241'),
+(7, N'Trang trại Tiên Du', N'Xã Tiên Du, Huyện Tiên Du, Bắc Ninh', 'VG001242'),
+(8, N'Trang trại Thanh Hà', N'Xã Thanh Hà, Huyện Thanh Hà, Hải Dương', 'VG001243'),
+(9, N'Trang trại Sóc Sơn', N'Xã Sóc Sơn, Huyện Sóc Sơn, Hà Nội', 'VG001244'),
+(10, N'Trang trại Mê Linh', N'Xã Mê Linh, Huyện Mê Linh, Hà Nội', 'VG001245');
 
-
--- 8. LÔ NÔNG SẢN 
+-- 8. LÔ NÔNG SẢN (Thu hoạch 11/05/2026)
 INSERT INTO LoNongSan (MaTrangTrai, MaSanPham, SoLuongBanDau, SoLuongHienTai, NgayThuHoach, HanSuDung, MaQR, TrangThai) VALUES
-(1, 1, 500, 450, '2024-03-15', '2024-03-29', 'QR001', N'san_sang'),
-(1, 2, 200, 180, '2024-04-20', '2024-04-27', 'QR002', N'san_sang'),
-(2, 3, 300, 280, '2024-05-10', '2024-05-24', 'QR003', N'san_sang'),
-(2, 4, 150, 120, '2024-06-05', '2024-06-19', 'QR004', N'san_sang'),
-(3, 5, 100, 80, '2024-07-12', '2024-08-12', 'QR005', N'san_sang'),
-(4, 6, 1000, 800, '2024-08-20', '2025-02-20', 'QR006', N'san_sang'),
-(5, 7, 250, 200, '2024-09-08', '2024-09-15', 'QR007', N'san_sang'),
-(6, 8, 400, 350, '2024-10-14', '2024-11-14', 'QR008', N'san_sang'),
-(7, 9, 600, 500, '2024-11-22', '2024-12-22', 'QR009', N'san_sang'),
-(8, 10, 300, 250, '2024-12-18', '2025-01-18', 'QR010', N'san_sang'),
-(9, 11, 200, 180, '2025-01-10', '2025-02-10', 'QR011', N'san_sang'),
-(10, 12, 150, 130, '2025-02-14', '2025-03-14', 'QR012', N'san_sang'),
-(11, 13, 180, 150, '2025-03-20', '2025-04-03', 'QR013', N'san_sang'),
-(12, 14, 500, 450, '2025-04-25', '2025-05-25', 'QR014', N'san_sang'),
-(13, 15, 400, 350, '2025-05-30', '2025-06-30', 'QR015', N'san_sang'),
-(14, 16, 250, 200, '2025-06-18', '2025-06-25', 'QR016', N'san_sang'),
-(15, 17, 200, 180, '2025-07-22', '2025-07-29', 'QR017', N'san_sang'),
-(16, 18, 220, 200, '2025-08-15', '2025-08-22', 'QR018', N'san_sang'),
-(17, 19, 350, 300, '2025-09-10', '2025-09-24', 'QR019', N'san_sang'),
-(18, 20, 180, 150, '2025-10-05', '2025-10-12', 'QR020', N'san_sang'),
-(19, 21, 200, 180, '2025-11-12', '2025-11-19', 'QR021', N'san_sang'),
-(20, 22, 150, 130, '2025-12-08', '2025-12-15', 'QR022', N'san_sang'),
-(1, 23, 180, 160, '2026-01-14', '2026-01-21', 'QR023', N'san_sang'),
-(2, 24, 160, 140, '2026-02-18', '2026-02-25', 'QR024', N'san_sang'),
-(3, 25, 140, 120, '2026-03-10', '2026-03-17', 'QR025', N'san_sang'),
-(4, 26, 120, 100, '2024-04-15', '2024-04-22', 'QR026', N'san_sang'),
-(5, 27, 100, 80, '2024-05-20', '2024-05-27', 'QR027', N'san_sang'),
-(6, 28, 90, 70, '2024-06-25', '2024-07-02', 'QR028', N'san_sang'),
-(7, 29, 110, 90, '2024-07-30', '2024-08-06', 'QR029', N'san_sang'),
-(8, 30, 300, 250, '2024-08-12', '2024-09-12', 'QR030', N'san_sang'),
-(9, 31, 400, 350, '2024-09-18', '2024-10-18', 'QR031', N'san_sang'),
-(10, 32, 350, 300, '2024-10-22', '2024-11-22', 'QR032', N'san_sang'),
-(11, 33, 500, 450, '2024-11-28', '2024-12-28', 'QR033', N'san_sang'),
-(12, 34, 300, 250, '2024-12-15', '2024-12-29', 'QR034', N'san_sang'),
-(13, 35, 250, 200, '2025-01-20', '2025-01-27', 'QR035', N'san_sang'),
-(14, 36, 200, 180, '2025-02-25', '2025-03-04', 'QR036', N'san_sang'),
-(15, 37, 600, 500, '2025-03-18', '2025-04-01', 'QR037', N'san_sang'),
-(16, 38, 180, 150, '2025-04-22', '2025-04-29', 'QR038', N'san_sang'),
-(17, 39, 100, 80, '2025-05-15', '2025-05-22', 'QR039', N'san_sang'),
-(18, 40, 150, 120, '2025-06-20', '2025-07-04', 'QR040', N'san_sang'),
-(19, 41, 200, 180, '2025-07-25', '2025-08-25', 'QR041', N'san_sang'),
-(20, 42, 180, 160, '2025-08-30', '2025-09-30', 'QR042', N'san_sang'),
-(1, 43, 250, 200, '2025-09-12', '2025-09-26', 'QR043', N'san_sang'),
-(2, 44, 120, 100, '2025-10-18', '2025-10-25', 'QR044', N'san_sang'),
-(3, 45, 140, 120, '2025-11-22', '2025-11-29', 'QR045', N'san_sang'),
-(4, 46, 160, 140, '2025-12-15', '2025-12-22', 'QR046', N'san_sang'),
-(5, 47, 180, 160, '2026-01-20', '2026-01-27', 'QR047', N'san_sang'),
-(6, 48, 130, 110, '2026-02-10', '2026-02-24', 'QR048', N'san_sang'),
-(7, 49, 300, 250, '2026-03-15', '2026-04-15', 'QR049', N'san_sang'),
-(8, 50, 280, 230, '2024-03-20', '2024-04-20', 'QR050', N'san_sang');
+(1, 1, 500, 500, '2026-05-11', '2026-05-20', 'QR001', N'san_sang'),
+(1, 2, 300, 300, '2026-05-11', '2026-05-20', 'QR002', N'san_sang'),
+(1, 3, 400, 400, '2026-05-11', '2026-05-22', 'QR003', N'san_sang'),
+(1, 4, 250, 250, '2026-05-11', '2026-05-21', 'QR004', N'san_sang'),
+(2, 5, 200, 200, '2026-05-11', '2026-05-20', 'QR005', N'san_sang'),
+(2, 6, 180, 180, '2026-05-11', '2026-05-20', 'QR006', N'san_sang'),
+(2, 7, 160, 160, '2026-05-11', '2026-05-20', 'QR007', N'san_sang'),
+(2, 8, 150, 150, '2026-05-11', '2026-05-21', 'QR008', N'san_sang'),
+(3, 9, 300, 300, '2026-05-11', '2026-05-22', 'QR009', N'san_sang'),
+(3, 10, 280, 280, '2026-05-11', '2026-05-20', 'QR010', N'san_sang'),
+(3, 2, 250, 250, '2026-05-11', '2026-05-20', 'QR011', N'san_sang'),
+(4, 11, 400, 400, '2026-05-11', '2026-05-23', 'QR012', N'san_sang'),
+(4, 12, 500, 500, '2026-05-11', '2026-05-25', 'QR013', N'san_sang'),
+(4, 13, 350, 350, '2026-05-11', '2026-05-25', 'QR014', N'san_sang'),
+(4, 14, 300, 300, '2026-05-11', '2026-05-24', 'QR015', N'san_sang'),
+(5, 21, 600, 600, '2026-05-11', '2026-05-25', 'QR016', N'san_sang'),
+(5, 22, 300, 300, '2026-05-11', '2026-05-22', 'QR017', N'san_sang'),
+(5, 23, 400, 400, '2026-05-11', '2026-05-23', 'QR018', N'san_sang'),
+(6, 16, 280, 280, '2026-05-11', '2026-05-25', 'QR019', N'san_sang'),
+(6, 17, 200, 200, '2026-05-11', '2026-05-25', 'QR020', N'san_sang'),
+(6, 18, 150, 150, '2026-05-11', '2026-05-23', 'QR021', N'san_sang'),
+(6, 19, 120, 120, '2026-05-11', '2026-05-22', 'QR022', N'san_sang'),
+(7, 1, 350, 350, '2026-05-11', '2026-05-20', 'QR023', N'san_sang'),
+(7, 11, 300, 300, '2026-05-11', '2026-05-23', 'QR024', N'san_sang'),
+(7, 15, 250, 250, '2026-05-11', '2026-05-25', 'QR025', N'san_sang'),
+(8, 3, 280, 280, '2026-05-11', '2026-05-22', 'QR026', N'san_sang'),
+(8, 5, 200, 200, '2026-05-11', '2026-05-20', 'QR027', N'san_sang'),
+(8, 9, 220, 220, '2026-05-11', '2026-05-22', 'QR028', N'san_sang'),
+(9, 12, 400, 400, '2026-05-11', '2026-05-25', 'QR029', N'san_sang'),
+(9, 14, 350, 350, '2026-05-11', '2026-05-24', 'QR030', N'san_sang'),
+(9, 15, 300, 300, '2026-05-11', '2026-05-25', 'QR031', N'san_sang'),
+(10, 21, 500, 500, '2026-05-11', '2026-05-25', 'QR032', N'san_sang'),
+(10, 24, 200, 200, '2026-05-11', '2026-05-24', 'QR033', N'san_sang'),
+(10, 25, 250, 250, '2026-05-11', '2026-05-22', 'QR034', N'san_sang');
 
-
--- 9. KHO 
+-- 9. KHO
 INSERT INTO Kho (TenKho, LoaiKho, MaChuSoHuu, LoaiChuSoHuu, DiaChi) VALUES
-(N'Kho Đại lý Miền Nam', 'daily', 1, 'daily', N'123 Lê Văn Việt, Q.9'),
-(N'Kho Thực phẩm Sạch', 'daily', 2, 'daily', N'456 Nguyễn Duy Trinh, Q.2'),
-(N'Kho Rau Củ Quả Tươi', 'daily', 3, 'daily', N'789 Võ Văn Ngân, Thủ Đức'),
-(N'Kho Nông sản Xanh', 'daily', 4, 'daily', N'321 Phạm Văn Đồng, Gò Vấp'),
-(N'Kho Thực phẩm An Toàn', 'daily', 5, 'daily', N'654 Quang Trung, Q.12'),
-(N'Kho Rau Sạch Organic', 'daily', 6, 'daily', N'987 Lê Đức Thọ, Gò Vấp'),
-(N'Kho Nông sản Việt', 'daily', 7, 'daily', N'147 Phan Văn Trị, Bình Thạnh'),
-(N'Kho Thực phẩm Tươi Ngon', 'daily', 8, 'daily', N'258 Cách Mạng Tháng 8, Q.10'),
-(N'Kho Co.opmart', 'sieuthi', 1, 'sieuthi', N'789 Võ Văn Ngân, Thủ Đức'),
-(N'Kho BigC', 'sieuthi', 2, 'sieuthi', N'321 Phạm Văn Đồng, Gò Vấp'),
-(N'Kho Lotte Mart', 'sieuthi', 3, 'sieuthi', N'469 Nguyễn Hữu Thọ, Q.7'),
-(N'Kho Aeon Mall', 'sieuthi', 4, 'sieuthi', N'30 Bờ Bao Tân Thắng, Tân Phú'),
-(N'Kho Vinmart', 'sieuthi', 5, 'sieuthi', N'72 Lê Thánh Tôn, Q.1'),
-(N'Kho Mega Market', 'sieuthi', 6, 'sieuthi', N'1362 Kha Vạn Cân, Thủ Đức'),
-(N'Kho Trung Gian 1', 'trung_gian', 1, 'daily', N'100 Xa Lộ Hà Nội, Q.9'),
-(N'Kho Trung Gian 2', 'trung_gian', 2, 'daily', N'200 Quốc Lộ 1A, Q.12'),
-(N'Kho Trung Gian 3', 'trung_gian', 3, 'daily', N'300 Võ Văn Kiệt, Q.5'),
-(N'Kho Lạnh 1', 'daily', 1, 'daily', N'111 Lê Văn Việt, Q.9'),
-(N'Kho Lạnh 2', 'sieuthi', 1, 'sieuthi', N'222 Võ Văn Ngân, Thủ Đức'),
-(N'Kho Lạnh 3', 'sieuthi', 2, 'sieuthi', N'333 Phạm Văn Đồng, Gò Vấp');
+(N'Kho Đại lý Hà Nội', 'daily', 1, 'daily', N'Số 25 Trần Đại Nghĩa, Hai Bà Trưng, Hà Nội'),
+(N'Kho Đại lý Bắc Ninh', 'daily', 2, 'daily', N'Số 15 Lý Thái Tổ, TP Bắc Ninh, Bắc Ninh'),
+(N'Kho Đại lý Hải Dương', 'daily', 3, 'daily', N'Số 30 Nguyễn Lương Bằng, TP Hải Dương, Hải Dương'),
+(N'Kho Đại lý Hưng Yên', 'daily', 4, 'daily', N'Số 45 Phạm Văn Đồng, TP Hưng Yên, Hưng Yên'),
+(N'Kho Đại lý Hải Phòng', 'daily', 5, 'daily', N'Số 50 Lạch Tray, Ngô Quyền, Hải Phòng'),
+(N'Kho Đại lý Nam Định', 'daily', 6, 'daily', N'Số 60 Trần Hưng Đạo, TP Nam Định, Nam Định'),
+(N'Kho VinMart Hà Nội', 'sieuthi', 1, 'sieuthi', N'Tầng B1, Vincom Center, 191 Bà Triệu, Hà Nội'),
+(N'Kho BigC Hà Nội', 'sieuthi', 2, 'sieuthi', N'Tầng B2, BigC, 222 Trần Duy Hưng, Hà Nội'),
+(N'Kho Aeon Hải Phòng', 'sieuthi', 3, 'sieuthi', N'Tầng B1, Aeon Mall, 10 Lê Hồng Phong, Hải Phòng'),
+(N'Kho Lotte Bắc Ninh', 'sieuthi', 4, 'sieuthi', N'Tầng B1, Lotte Mart, 88 Lý Thái Tổ, Bắc Ninh'),
+(N'Kho Co.opmart Hải Dương', 'sieuthi', 5, 'sieuthi', N'Tầng B1, Co.opmart, 100 Nguyễn Lương Bằng, Hải Dương'),
+(N'Kho Mega Hưng Yên', 'sieuthi', 6, 'sieuthi', N'Tầng B1, Mega Market, 120 Phạm Văn Đồng, Hưng Yên');
 
 -- 10. TỒN KHO
 INSERT INTO TonKho (MaKho, MaLo, SoLuong, NgayCapNhat) VALUES
-(1, 1, 100, '2024-03-16'),
-(1, 2, 50, '2024-04-21'),
-(2, 3, 80, '2024-05-11'),
-(2, 4, 30, '2024-06-06'),
-(3, 5, 20, '2024-07-13'),
-(4, 6, 200, '2024-08-21'),
-(5, 7, 50, '2024-09-09'),
-(6, 8, 50, '2024-10-15'),
-(7, 9, 100, '2024-11-23'),
-(8, 10, 50, '2024-12-19'),
-(9, 1, 150, '2024-03-17'),
-(9, 5, 20, '2024-07-14'),
-(10, 6, 200, '2024-08-22'),
-(10, 11, 20, '2025-01-11'),
-(11, 12, 20, '2025-02-15'),
-(11, 13, 30, '2025-03-21'),
-(12, 14, 50, '2025-04-26'),
-(12, 15, 50, '2025-05-31'),
-(13, 16, 50, '2025-06-19'),
-(13, 17, 20, '2025-07-23'),
-(14, 18, 20, '2025-08-16'),
-(14, 19, 50, '2025-09-11'),
-(15, 20, 30, '2025-10-06'),
-(16, 21, 20, '2025-11-13'),
-(17, 22, 20, '2025-12-09'),
-(18, 30, 50, '2024-08-13'),
-(18, 31, 50, '2024-09-19'),
-(19, 37, 100, '2025-03-19'),
-(19, 38, 30, '2025-04-23'),
-(20, 40, 30, '2025-06-21');
+(1, 1, 200, '2026-05-11'),
+(1, 2, 150, '2026-05-11'),
+(1, 3, 180, '2026-05-11'),
+(1, 5, 100, '2026-05-11'),
+(2, 12, 250, '2026-05-11'),
+(2, 13, 200, '2026-05-11'),
+(2, 14, 150, '2026-05-11'),
+(2, 16, 300, '2026-05-11'),
+(3, 19, 140, '2026-05-11'),
+(3, 20, 100, '2026-05-11'),
+(3, 21, 80, '2026-05-11'),
+(4, 23, 180, '2026-05-11'),
+(4, 24, 150, '2026-05-11'),
+(4, 25, 120, '2026-05-11'),
+(7, 1, 100, '2026-05-12'),
+(7, 2, 80, '2026-05-12'),
+(7, 5, 50, '2026-05-12'),
+(8, 3, 90, '2026-05-12'),
+(8, 12, 120, '2026-05-12'),
+(9, 16, 150, '2026-05-12'),
+(9, 19, 70, '2026-05-12'),
+(10, 13, 100, '2026-05-12'),
+(10, 14, 80, '2026-05-12');
 
+-- 11. VẬN CHUYỂN (với MaDonHang)
+-- Vận chuyển từ Nông dân đến Đại lý (liên kết với đơn hàng 1-6)
+INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, NgayKetThuc, TrangThai, MaDonHang) VALUES
+-- Đơn hàng 1: Nông dân 1 -> Đại lý 1 (Lô 1,2,3,4)
+(1, N'Trang trại Đông Anh', N'Kho Đại lý Hà Nội', '2026-05-11 06:00', '2026-05-11 08:30', N'hoan_thanh', 1),
+(2, N'Trang trại Đông Anh', N'Kho Đại lý Hà Nội', '2026-05-11 06:00', '2026-05-11 08:30', N'hoan_thanh', 1),
+(3, N'Trang trại Đông Anh', N'Kho Đại lý Hà Nội', '2026-05-11 06:00', '2026-05-11 08:30', N'hoan_thanh', 1),
+(4, N'Trang trại Đông Anh', N'Kho Đại lý Hà Nội', '2026-05-11 06:00', '2026-05-11 08:30', N'hoan_thanh', 1),
+-- Đơn hàng 2: Nông dân 2 -> Đại lý 1 (Lô 5,6,7)
+(5, N'Vườn rau An Nhiên', N'Kho Đại lý Hà Nội', '2026-05-11 06:30', '2026-05-11 09:00', N'hoan_thanh', 2),
+(6, N'Vườn rau An Nhiên', N'Kho Đại lý Hà Nội', '2026-05-11 06:30', '2026-05-11 09:00', N'hoan_thanh', 2),
+(7, N'Vườn rau An Nhiên', N'Kho Đại lý Hà Nội', '2026-05-11 06:30', '2026-05-11 09:00', N'hoan_thanh', 2),
+-- Đơn hàng 3: Nông dân 3 -> Đại lý 2 (Lô 12,13,14,15)
+(12, N'Trang trại Bắc Ninh', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 3),
+(13, N'Trang trại Bắc Ninh', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 3),
+(14, N'Trang trại Bắc Ninh', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 3),
+(15, N'Trang trại Bắc Ninh', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 3),
+-- Đơn hàng 4: Nông dân 5 -> Đại lý 2 (Lô 16,17,18)
+(16, N'Vườn trái cây Cường', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:30', '2026-05-11 10:00', N'hoan_thanh', 4),
+(17, N'Vườn trái cây Cường', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:30', '2026-05-11 10:00', N'hoan_thanh', 4),
+(18, N'Vườn trái cây Cường', N'Kho Đại lý Bắc Ninh', '2026-05-11 07:30', '2026-05-11 10:00', N'hoan_thanh', 4),
+-- Đơn hàng 5: Nông dân 4 -> Đại lý 3 (Lô 19,20,21)
+(19, N'Trang trại Hải Dương', N'Kho Đại lý Hải Dương', '2026-05-11 06:30', '2026-05-11 09:00', N'hoan_thanh', 5),
+(20, N'Trang trại Hải Dương', N'Kho Đại lý Hải Dương', '2026-05-11 06:30', '2026-05-11 09:00', N'hoan_thanh', 5),
+(21, N'Trang trại Hải Dương', N'Kho Đại lý Hải Dương', '2026-05-11 06:30', '2026-05-11 09:00', N'hoan_thanh', 5),
+-- Đơn hàng 6: Nông dân 7 -> Đại lý 4 (Lô 23,24,25)
+(23, N'Trang trại Hưng Yên', N'Kho Đại lý Hưng Yên', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 6),
+(24, N'Trang trại Hưng Yên', N'Kho Đại lý Hưng Yên', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 6),
+(25, N'Trang trại Hưng Yên', N'Kho Đại lý Hưng Yên', '2026-05-11 07:00', '2026-05-11 09:30', N'hoan_thanh', 6),
 
--- 11. VẬN CHUYỂN
-INSERT INTO VanChuyen (MaLo, DiemDi, DiemDen, NgayBatDau, NgayKetThuc, TrangThai) VALUES
-(1, N'Trang trại Xanh', N'Kho Đại lý Miền Nam', '2024-03-15 08:00', '2024-03-15 10:30', N'hoan_thanh'),
-(2, N'Trang trại Xanh', N'Kho Đại lý Miền Nam', '2024-04-20 07:30', '2024-04-20 10:00', N'hoan_thanh'),
-(3, N'Trang trại Hoa Sen', N'Kho Thực phẩm Sạch', '2024-05-10 08:00', '2024-05-10 11:00', N'hoan_thanh'),
-(4, N'Trang trại Hoa Sen', N'Kho Thực phẩm Sạch', '2024-06-05 09:00', '2024-06-05 11:30', N'hoan_thanh'),
-(5, N'Trang trại Minh Tâm', N'Kho Rau Củ Quả Tươi', '2024-07-12 07:00', '2024-07-12 09:30', N'hoan_thanh'),
-(6, N'Trang trại Bình An', N'Kho Nông sản Xanh', '2024-08-20 08:30', '2024-08-20 11:00', N'hoan_thanh'),
-(7, N'Trang trại Mai Xanh', N'Kho Thực phẩm An Toàn', '2024-09-08 07:30', '2024-09-08 10:00', N'hoan_thanh'),
-(8, N'Trang trại Đức Phát', N'Kho Rau Sạch Organic', '2024-10-14 08:00', '2024-10-14 10:30', N'hoan_thanh'),
-(9, N'Trang trại Lan Anh', N'Kho Nông sản Việt', '2024-11-22 09:00', '2024-11-22 11:30', N'hoan_thanh'),
-(10, N'Trang trại Hùng Vương', N'Kho Thực phẩm Tươi Ngon', '2024-12-18 07:00', '2024-12-18 09:30', N'hoan_thanh'),
-(11, N'Trang trại Nga Xanh', N'Kho Co.opmart', '2025-01-10 08:00', '2025-01-10 10:00', N'hoan_thanh'),
-(12, N'Trang trại Sơn Thủy', N'Kho BigC', '2025-02-14 08:30', '2025-02-14 10:30', N'hoan_thanh'),
-(13, N'Trang trại Hằng Nga', N'Kho Lotte Mart', '2025-03-20 07:30', '2025-03-20 09:30', N'hoan_thanh'),
-(14, N'Trang trại Toàn Phát', N'Kho Aeon Mall', '2025-04-25 08:00', '2025-04-25 10:00', N'hoan_thanh'),
-(15, N'Trang trại Xuân Mai', N'Kho Vinmart', '2025-05-30 09:00', '2025-05-30 11:00', N'hoan_thanh'),
-(16, N'Trang trại Phúc Lộc', N'Kho Mega Market', '2025-06-18 07:00', '2025-06-18 09:00', N'hoan_thanh'),
-(17, N'Trang trại Thảo Nguyên', N'Kho Trung Gian 1', '2025-07-22 08:00', NULL, N'dang_van_chuyen'),
-(18, N'Trang trại Khoa Học', N'Kho Trung Gian 2', '2025-08-15 08:30', NULL, N'dang_van_chuyen'),
-(19, N'Trang trại Diễm Phúc', N'Kho Trung Gian 3', '2025-09-10 07:30', NULL, N'dang_van_chuyen'),
-(20, N'Trang trại Long Thành', N'Kho Lạnh 1', '2025-10-05 08:00', NULL, N'dang_van_chuyen'),
-(30, N'Trang trại Lan Anh', N'Kho Lạnh 1', '2024-08-12 09:00', '2024-08-12 11:00', N'hoan_thanh'),
-(31, N'Trang trại Hùng Vương', N'Kho Lạnh 1', '2024-09-18 08:00', '2024-09-18 10:00', N'hoan_thanh'),
-(37, N'Trang trại Thảo Nguyên', N'Kho Lạnh 2', '2025-03-18 07:30', '2025-03-18 09:30', N'hoan_thanh'),
-(38, N'Trang trại Khoa Học', N'Kho Lạnh 2', '2025-04-22 08:00', '2025-04-22 10:00', N'hoan_thanh'),
-(40, N'Trang trại Long Thành', N'Kho Lạnh 3', '2025-06-20 09:00', '2025-06-20 11:00', N'hoan_thanh');
+-- Vận chuyển từ Đại lý đến Siêu thị (liên kết với đơn hàng 7-10)
+-- Đơn hàng 7: Đại lý 1 -> Siêu thị 1 (Lô 1,2,5)
+(1, N'Kho Đại lý Hà Nội', N'Kho VinMart Hà Nội', '2026-05-12 08:00', '2026-05-12 10:00', N'hoan_thanh', 7),
+(2, N'Kho Đại lý Hà Nội', N'Kho VinMart Hà Nội', '2026-05-12 08:00', '2026-05-12 10:00', N'hoan_thanh', 7),
+(5, N'Kho Đại lý Hà Nội', N'Kho VinMart Hà Nội', '2026-05-12 08:00', '2026-05-12 10:00', N'hoan_thanh', 7),
+-- Đơn hàng 8: Đại lý 1 -> Siêu thị 2 (Lô 3,12)
+(3, N'Kho Đại lý Hà Nội', N'Kho BigC Hà Nội', '2026-05-12 08:30', '2026-05-12 10:30', N'hoan_thanh', 8),
+(12, N'Kho Đại lý Bắc Ninh', N'Kho BigC Hà Nội', '2026-05-12 09:00', '2026-05-12 11:30', N'hoan_thanh', 8),
+-- Đơn hàng 9: Đại lý 2 -> Siêu thị 3 (Lô 16,19)
+(16, N'Kho Đại lý Bắc Ninh', N'Kho Aeon Hải Phòng', '2026-05-12 08:00', '2026-05-12 11:00', N'hoan_thanh', 9),
+(19, N'Kho Đại lý Hải Dương', N'Kho Aeon Hải Phòng', '2026-05-12 08:30', '2026-05-12 10:30', N'hoan_thanh', 9),
+-- Đơn hàng 10: Đại lý 2 -> Siêu thị 4 (Lô 13,14)
+(13, N'Kho Đại lý Bắc Ninh', N'Kho Lotte Bắc Ninh', '2026-05-12 09:00', '2026-05-12 10:30', N'hoan_thanh', 10),
+(14, N'Kho Đại lý Bắc Ninh', N'Kho Lotte Bắc Ninh', '2026-05-12 09:00', '2026-05-12 10:30', N'hoan_thanh', 10);
 
-
--- 12. ĐƠN HÀNG 
+-- 12. ĐƠN HÀNG
 INSERT INTO DonHang (LoaiDon, MaNguoiBan, LoaiNguoiBan, MaNguoiMua, LoaiNguoiMua, NgayDat, TrangThai, TongGiaTri) VALUES
-('nongdan_to_daily', 1, 'nongdan', 1, 'daily', '2024-03-15 07:00', N'hoan_thanh', 2500000),
-('nongdan_to_daily', 1, 'nongdan', 1, 'daily', '2024-04-20 07:00', N'hoan_thanh', 1500000),
-('nongdan_to_daily', 2, 'nongdan', 2, 'daily', '2024-05-10 07:30', N'hoan_thanh', 2400000),
-('nongdan_to_daily', 2, 'nongdan', 2, 'daily', '2024-06-05 08:00', N'hoan_thanh', 900000),
-('nongdan_to_daily', 3, 'nongdan', 3, 'daily', '2024-07-12 06:30', N'hoan_thanh', 960000),
-('nongdan_to_daily', 4, 'nongdan', 4, 'daily', '2024-08-20 07:00', N'hoan_thanh', 16000000),
-('nongdan_to_daily', 5, 'nongdan', 5, 'daily', '2024-09-08 06:30', N'hoan_thanh', 1250000),
-('nongdan_to_daily', 6, 'nongdan', 6, 'daily', '2024-10-14 07:00', N'hoan_thanh', 1750000),
-('nongdan_to_daily', 7, 'nongdan', 7, 'daily', '2024-11-22 07:30', N'hoan_thanh', 3000000),
-('nongdan_to_daily', 8, 'nongdan', 8, 'daily', '2024-12-18 06:30', N'hoan_thanh', 1500000),
-('nongdan_to_daily', 9, 'nongdan', 1, 'daily', '2025-01-10 07:00', N'hoan_thanh', 1800000),
-('nongdan_to_daily', 10, 'nongdan', 2, 'daily', '2025-02-14 07:30', N'hoan_thanh', 1300000),
-('nongdan_to_daily', 11, 'nongdan', 3, 'daily', '2025-03-20 06:30', N'hoan_thanh', 1620000),
-('nongdan_to_daily', 12, 'nongdan', 4, 'daily', '2025-04-25 07:00', N'hoan_thanh', 2250000),
-('nongdan_to_daily', 13, 'nongdan', 5, 'daily', '2025-05-30 07:30', N'hoan_thanh', 2000000),
-('nongdan_to_daily', 14, 'nongdan', 6, 'daily', '2025-06-18 06:30', N'hoan_thanh', 1250000),
-('nongdan_to_daily', 15, 'nongdan', 7, 'daily', '2025-07-22 07:00', N'cho_xac_nhan', 1800000),
-('nongdan_to_daily', 16, 'nongdan', 8, 'daily', '2025-08-15 07:30', N'cho_xac_nhan', 1980000),
-('nongdan_to_daily', 17, 'nongdan', 1, 'daily', '2025-09-10 06:30', N'cho_xac_nhan', 1750000),
-('nongdan_to_daily', 18, 'nongdan', 2, 'daily', '2025-10-05 07:00', N'cho_xac_nhan', 1620000),
-('daily_to_sieuthi', 1, 'daily', 1, 'sieuthi', '2024-03-16 09:00', N'hoan_thanh', 3750000),
-('daily_to_sieuthi', 1, 'daily', 1, 'sieuthi', '2024-07-13 09:30', N'hoan_thanh', 960000),
-('daily_to_sieuthi', 2, 'daily', 2, 'sieuthi', '2024-05-11 10:00', N'hoan_thanh', 3200000),
-('daily_to_sieuthi', 2, 'daily', 2, 'sieuthi', '2024-06-06 09:30', N'hoan_thanh', 1080000),
-('daily_to_sieuthi', 3, 'daily', 3, 'sieuthi', '2025-01-11 10:00', N'hoan_thanh', 2400000),
-('daily_to_sieuthi', 4, 'daily', 4, 'sieuthi', '2024-08-21 09:00', N'hoan_thanh', 20000000),
-('daily_to_sieuthi', 4, 'daily', 4, 'sieuthi', '2025-02-15 10:30', N'hoan_thanh', 1600000),
-('daily_to_sieuthi', 5, 'daily', 5, 'sieuthi', '2025-03-21 09:00', N'hoan_thanh', 2160000),
-('daily_to_sieuthi', 5, 'daily', 5, 'sieuthi', '2025-04-26 10:00', N'hoan_thanh', 2750000),
-('daily_to_sieuthi', 6, 'daily', 6, 'sieuthi', '2025-05-31 09:30', N'hoan_thanh', 2500000),
-('daily_to_sieuthi', 6, 'daily', 6, 'sieuthi', '2025-06-19 10:00', N'hoan_thanh', 1750000),
-('daily_to_sieuthi', 7, 'daily', 1, 'sieuthi', '2025-07-23 09:00', N'cho_xac_nhan', 1800000),
-('daily_to_sieuthi', 8, 'daily', 2, 'sieuthi', '2025-08-16 10:00', N'cho_xac_nhan', 1980000),
-('daily_to_sieuthi', 1, 'daily', 3, 'sieuthi', '2025-09-11 09:30', N'cho_xac_nhan', 2250000),
-('daily_to_sieuthi', 2, 'daily', 4, 'sieuthi', '2025-10-06 10:00', N'cho_xac_nhan', 2160000),
-('daily_to_sieuthi', 1, 'daily', 2, 'sieuthi', '2024-08-13 09:00', N'hoan_thanh', 3750000),
-('daily_to_sieuthi', 1, 'daily', 2, 'sieuthi', '2024-09-19 10:00', N'hoan_thanh', 4000000),
-('daily_to_sieuthi', 2, 'daily', 2, 'sieuthi', '2025-03-19 09:30', N'hoan_thanh', 7500000),
-('daily_to_sieuthi', 2, 'daily', 2, 'sieuthi', '2025-04-23 10:00', N'hoan_thanh', 2700000),
-('daily_to_sieuthi', 3, 'daily', 3, 'sieuthi', '2025-06-21 09:00', N'hoan_thanh', 2400000);
+('nongdan_to_daily', 1, 'nongdan', 1, 'daily', '2026-05-10 14:00', N'hoan_thanh', 26500000),
+('nongdan_to_daily', 2, 'nongdan', 1, 'daily', '2026-05-10 14:30', N'hoan_thanh', 8000000),
+('nongdan_to_daily', 3, 'nongdan', 2, 'daily', '2026-05-10 15:00', N'hoan_thanh', 42000000),
+('nongdan_to_daily', 5, 'nongdan', 2, 'daily', '2026-05-10 15:30', N'hoan_thanh', 21000000),
+('nongdan_to_daily', 4, 'nongdan', 3, 'daily', '2026-05-10 16:00', N'hoan_thanh', 18900000),
+('nongdan_to_daily', 7, 'nongdan', 4, 'daily', '2026-05-10 16:30', N'hoan_thanh', 23500000),
+('daily_to_sieuthi', 1, 'daily', 1, 'sieuthi', '2026-05-11 10:00', N'hoan_thanh', 16500000),
+('daily_to_sieuthi', 1, 'daily', 2, 'sieuthi', '2026-05-11 10:30', N'hoan_thanh', 10800000),
+('daily_to_sieuthi', 2, 'daily', 3, 'sieuthi', '2026-05-11 11:00', N'hoan_thanh', 28500000),
+('daily_to_sieuthi', 2, 'daily', 4, 'sieuthi', '2026-05-11 11:30', N'hoan_thanh', 18000000),
+('nongdan_to_daily', 6, 'nongdan', 5, 'daily', '2026-05-12 09:00', N'cho_xac_nhan', 15000000),
+('nongdan_to_daily', 8, 'nongdan', 6, 'daily', '2026-05-12 09:30', N'cho_xac_nhan', 12500000),
+('daily_to_sieuthi', 3, 'daily', 5, 'sieuthi', '2026-05-12 14:00', N'cho_xac_nhan', 9500000),
+('daily_to_sieuthi', 4, 'daily', 6, 'sieuthi', '2026-05-12 14:30', N'cho_xac_nhan', 11000000);
 
-
--- 13. CHI TIẾT ĐƠN HÀNG 
+-- 13. CHI TIẾT ĐƠN HÀNG
 INSERT INTO ChiTietDonHang (MaDonHang, MaLo, SoLuong, DonGia, ThanhTien) VALUES
-(1, 1, 50, 25000, 1250000),
-(1, 2, 50, 25000, 1250000),
-(2, 2, 50, 30000, 1500000),
-(3, 3, 80, 30000, 2400000),
-(4, 4, 30, 30000, 900000),
-(5, 5, 20, 48000, 960000),
-(6, 6, 800, 20000, 16000000),
-(7, 7, 50, 25000, 1250000),
-(8, 8, 50, 35000, 1750000),
-(9, 9, 100, 30000, 3000000),
-(10, 10, 50, 30000, 1500000),
-(11, 11, 20, 90000, 1800000),
-(12, 12, 20, 65000, 1300000),
-(13, 13, 30, 54000, 1620000),
-(14, 14, 50, 45000, 2250000),
-(15, 15, 50, 40000, 2000000),
-(16, 16, 50, 25000, 1250000),
-(17, 17, 20, 90000, 1800000),
-(18, 18, 20, 99000, 1980000),
-(19, 19, 50, 35000, 1750000),
-(20, 20, 30, 54000, 1620000),
-(21, 1, 100, 30000, 3000000),
-(21, 2, 30, 25000, 750000),
-(22, 5, 20, 48000, 960000),
-(23, 3, 80, 40000, 3200000),
-(24, 4, 30, 36000, 1080000),
-(25, 11, 20, 120000, 2400000),
-(26, 6, 800, 25000, 20000000),
-(27, 12, 20, 80000, 1600000),
-(28, 13, 30, 72000, 2160000),
-(29, 14, 50, 55000, 2750000),
-(30, 15, 50, 50000, 2500000),
-(31, 16, 50, 35000, 1750000),
-(32, 17, 20, 90000, 1800000),
-(33, 18, 20, 99000, 1980000),
-(34, 19, 50, 45000, 2250000),
-(35, 20, 30, 72000, 2160000),
-(36, 30, 50, 75000, 3750000),
-(37, 31, 50, 80000, 4000000),
-(38, 37, 100, 75000, 7500000),
-(39, 38, 30, 90000, 2700000),
-(40, 40, 30, 80000, 2400000),
-(21, 5, 20, 48000, 960000),
-(23, 4, 30, 36000, 1080000),
-(26, 11, 20, 120000, 2400000),
-(28, 12, 20, 80000, 1600000),
-(29, 13, 30, 72000, 2160000),
-(30, 14, 50, 55000, 2750000),
-(31, 15, 50, 50000, 2500000),
-(34, 20, 30, 72000, 2160000),
-(38, 38, 30, 90000, 2700000);
+(1, 1, 200, 50000, 10000000),
+(1, 2, 150, 30000, 4500000),
+(1, 3, 180, 40000, 7200000),
+(1, 4, 100, 35000, 3500000),
+(2, 5, 100, 45000, 4500000),
+(2, 6, 80, 25000, 2000000),
+(2, 7, 60, 22000, 1320000),
+(3, 12, 250, 60000, 15000000),
+(3, 13, 200, 70000, 14000000),
+(3, 14, 150, 55000, 8250000),
+(3, 15, 80, 58000, 4640000),
+(4, 16, 300, 35000, 10500000),
+(4, 17, 150, 40000, 6000000),
+(4, 18, 100, 45000, 4500000),
+(5, 19, 140, 80000, 11200000),
+(5, 20, 100, 45000, 4500000),
+(5, 21, 80, 40000, 3200000),
+(6, 23, 180, 50000, 9000000),
+(6, 24, 150, 60000, 9000000),
+(6, 25, 120, 45000, 5400000),
+(7, 1, 100, 65000, 6500000),
+(7, 2, 80, 45000, 3600000),
+(7, 5, 50, 60000, 3000000),
+(8, 3, 90, 55000, 4950000),
+(8, 12, 120, 75000, 9000000),
+(9, 16, 150, 50000, 7500000),
+(9, 19, 70, 95000, 6650000),
+(10, 13, 100, 85000, 8500000),
+(10, 14, 80, 70000, 5600000);
 
--- 14. KIỂM ĐỊNH 
+-- 14. KIỂM ĐỊNH
 INSERT INTO KiemDinh (MaLo, NguoiKiemDinh, NgayKiemDinh, KetQua, BienBanKiemTra, ChuKySo) VALUES
-(1, N'Trung tâm Kiểm định TP.HCM', '2024-03-15 06:00', 'dat', N'Sản phẩm đạt tiêu chuẩn VietGAP', 'SIGN001'),
-(2, N'Trung tâm Kiểm định TP.HCM', '2024-04-20 06:00', 'dat', N'Sản phẩm đạt tiêu chuẩn an toàn', 'SIGN002'),
-(3, N'Viện Kiểm nghiệm ATVS', '2024-05-10 06:00', 'dat', N'Sản phẩm organic đạt chuẩn', 'SIGN003'),
-(4, N'Trung tâm Kiểm định TP.HCM', '2024-06-05 06:00', 'dat', N'Không phát hiện dư lượng thuốc BVTV', 'SIGN004'),
-(5, N'Viện Kiểm nghiệm ATVS', '2024-07-12 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN005'),
-(6, N'Trung tâm Kiểm định TP.HCM', '2024-08-20 06:00', 'dat', N'Gạo đạt tiêu chuẩn chất lượng', 'SIGN006'),
-(7, N'Viện Kiểm nghiệm ATVS', '2024-09-08 06:00', 'dat', N'Rau sạch đạt chuẩn', 'SIGN007'),
-(8, N'Trung tâm Kiểm định TP.HCM', '2024-10-14 06:00', 'dat', N'Không có kim loại nặng', 'SIGN008'),
-(9, N'Viện Kiểm nghiệm ATVS', '2024-11-22 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN009'),
-(10, N'Trung tâm Kiểm định TP.HCM', '2024-12-18 06:00', 'dat', N'Sản phẩm an toàn', 'SIGN010'),
-(11, N'Viện Kiểm nghiệm ATVS', '2025-01-10 06:00', 'dat', N'Đạt chuẩn organic', 'SIGN011'),
-(12, N'Trung tâm Kiểm định TP.HCM', '2025-02-14 06:00', 'dat', N'Không dư lượng thuốc BVTV', 'SIGN012'),
-(13, N'Viện Kiểm nghiệm ATVS', '2025-03-20 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN013'),
-(14, N'Trung tâm Kiểm định TP.HCM', '2025-04-25 06:00', 'dat', N'Sản phẩm đạt chuẩn', 'SIGN014'),
-(15, N'Viện Kiểm nghiệm ATVS', '2025-05-30 06:00', 'dat', N'Đạt tiêu chuẩn an toàn', 'SIGN015'),
-(16, N'Trung tâm Kiểm định TP.HCM', '2025-06-18 06:00', 'dat', N'Rau sạch đạt chuẩn', 'SIGN016'),
-(17, N'Viện Kiểm nghiệm ATVS', '2025-07-22 06:00', 'khong_dat', N'Phát hiện dư lượng thuốc BVTV vượt ngưỡng', 'SIGN017'),
-(18, N'Trung tâm Kiểm định TP.HCM', '2025-08-15 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN018'),
-(19, N'Viện Kiểm nghiệm ATVS', '2025-09-10 06:00', 'dat', N'Sản phẩm an toàn', 'SIGN019'),
-(20, N'Trung tâm Kiểm định TP.HCM', '2025-10-05 06:00', 'dat', N'Đạt chuẩn chất lượng', 'SIGN020'),
-(30, N'Viện Kiểm nghiệm ATVS', '2024-08-12 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN030'),
-(31, N'Trung tâm Kiểm định TP.HCM', '2024-09-18 06:00', 'dat', N'Sản phẩm an toàn', 'SIGN031'),
-(37, N'Viện Kiểm nghiệm ATVS', '2025-03-18 06:00', 'dat', N'Đạt chuẩn organic', 'SIGN037'),
-(38, N'Trung tâm Kiểm định TP.HCM', '2025-04-22 06:00', 'dat', N'Không dư lượng thuốc BVTV', 'SIGN038'),
-(40, N'Viện Kiểm nghiệm ATVS', '2025-06-20 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN040'),
-(25, N'Trung tâm Kiểm định TP.HCM', '2026-03-10 06:00', 'dat', N'Sản phẩm đạt chuẩn', 'SIGN025'),
-(26, N'Viện Kiểm nghiệm ATVS', '2024-04-15 06:00', 'dat', N'Đạt tiêu chuẩn an toàn', 'SIGN026'),
-(27, N'Trung tâm Kiểm định TP.HCM', '2024-05-20 06:00', 'dat', N'Rau thơm đạt chuẩn', 'SIGN027'),
-(28, N'Viện Kiểm nghiệm ATVS', '2024-06-25 06:00', 'khong_dat', N'Phát hiện vi sinh vật vượt ngưỡng', 'SIGN028'),
-(29, N'Trung tâm Kiểm định TP.HCM', '2024-07-30 06:00', 'dat', N'Đạt tiêu chuẩn VietGAP', 'SIGN029');
+(1, N'Nguyễn Văn Kiểm', '2026-05-11 05:00', 'dat', N'Cà chua đạt tiêu chuẩn VietGAP, không dư lượng thuốc BVTV', 'SIGN001'),
+(2, N'Nguyễn Văn Kiểm', '2026-05-11 05:00', 'dat', N'Rau muống đạt tiêu chuẩn VietGAP, tươi xanh', 'SIGN002'),
+(3, N'Nguyễn Văn Kiểm', '2026-05-11 05:00', 'dat', N'Cải thảo đạt tiêu chuẩn VietGAP, không sâu bệnh', 'SIGN003'),
+(4, N'Nguyễn Văn Kiểm', '2026-05-11 05:00', 'dat', N'Dưa chuột đạt tiêu chuẩn VietGAP, giòn ngọt', 'SIGN004'),
+(5, N'Trần Thị Định', '2026-05-11 05:15', 'dat', N'Xà lách hữu cơ đạt tiêu chuẩn Organic, không hóa chất', 'SIGN005'),
+(6, N'Trần Thị Định', '2026-05-11 05:15', 'dat', N'Rau dền đạt tiêu chuẩn VietGAP', 'SIGN006'),
+(7, N'Trần Thị Định', '2026-05-11 05:15', 'dat', N'Rau ngót đạt tiêu chuẩn VietGAP', 'SIGN007'),
+(8, N'Trần Thị Định', '2026-05-11 05:15', 'dat', N'Rau cần đạt tiêu chuẩn VietGAP, thơm tự nhiên', 'SIGN008'),
+(12, N'Lê Văn Nghiệm', '2026-05-11 05:30', 'dat', N'Khoai tây Đà Lạt đạt tiêu chuẩn VietGAP, củ to đều', 'SIGN009'),
+(13, N'Lê Văn Nghiệm', '2026-05-11 05:30', 'dat', N'Hành tây đạt tiêu chuẩn VietGAP', 'SIGN010'),
+(14, N'Lê Văn Nghiệm', '2026-05-11 05:30', 'dat', N'Bí đao đạt tiêu chuẩn VietGAP, tươi ngon', 'SIGN011'),
+(16, N'Phạm Thị Thẩm', '2026-05-11 05:45', 'dat', N'Cam Vinh đạt tiêu chuẩn VietGAP, ngọt tự nhiên', 'SIGN012'),
+(17, N'Phạm Thị Thẩm', '2026-05-11 05:45', 'dat', N'Chuối tiêu đạt tiêu chuẩn VietGAP, chín vàng', 'SIGN013'),
+(18, N'Phạm Thị Thẩm', '2026-05-11 05:45', 'dat', N'Bưởi da xanh đạt tiêu chuẩn VietGAP', 'SIGN014'),
+(19, N'Hoàng Văn Tra', '2026-05-11 06:00', 'dat', N'Tỏi Lý Sơn đạt tiêu chuẩn VietGAP, cay thơm', 'SIGN015'),
+(20, N'Hoàng Văn Tra', '2026-05-11 06:00', 'dat', N'Gừng già đạt tiêu chuẩn VietGAP, cay nồng', 'SIGN016'),
+(21, N'Hoàng Văn Tra', '2026-05-11 06:00', 'dat', N'Ớt hiểm đạt tiêu chuẩn VietGAP, cay đậm', 'SIGN017'),
+(23, N'Võ Thị Xét', '2026-05-11 06:15', 'dat', N'Cà chua đạt tiêu chuẩn VietGAP', 'SIGN018'),
+(24, N'Võ Thị Xét', '2026-05-11 06:15', 'dat', N'Cà rốt đạt tiêu chuẩn VietGAP, giòn ngọt', 'SIGN019'),
+(25, N'Võ Thị Xét', '2026-05-11 06:15', 'dat', N'Bí ngô đạt tiêu chuẩn VietGAP, ngọt tự nhiên', 'SIGN020');
 
 GO
+
 
 
 DELETE FROM KiemDinh;
@@ -706,6 +528,9 @@ DELETE FROM TaiKhoan;
 DBCC CHECKIDENT ('TaiKhoan', RESEED, 0);
 PRINT N'Đã xóa dữ liệu bảng TaiKhoan';
 
+DELETE FROM PhieuChuyenKho;
+DBCC CHECKIDENT ('PhieuChuyenKho', RESEED, 0);
+
 
 
 SELECT * FROM TaiKhoan;
@@ -722,7 +547,7 @@ SELECT * FROM VanChuyen;
 SELECT * FROM DonHang;
 SELECT * FROM ChiTietDonHang;
 SELECT * FROM KiemDinh;
-
+SELECT * FROM PhieuChuyenKho;
 
 
 
@@ -854,33 +679,45 @@ GO
 
 -- Dữ liệu mẫu cho chat
 INSERT INTO CuocTroChuyen (MaNguoi1, LoaiNguoi1, MaNguoi2, LoaiNguoi2, TinNhanCuoi, NgayCapNhat) VALUES
-(1, 'nongdan', 1, 'daily', N'Vâng, tôi sẽ giao hàng vào sáng mai', SYSDATETIME()),
-(1, 'daily', 1, 'sieuthi', N'Đơn hàng đã được xác nhận', SYSDATETIME()),
-(2, 'nongdan', 2, 'daily', N'Cảm ơn bạn đã đặt hàng', SYSDATETIME());
+(1, 'nongdan', 1, 'daily', N'Vâng, tôi sẽ giao hàng vào sáng mai', '2026-05-12 10:00'),
+(1, 'daily', 1, 'sieuthi', N'Đơn hàng đã được xác nhận', '2026-05-12 11:00'),
+(2, 'nongdan', 2, 'daily', N'Cảm ơn bạn đã đặt hàng', '2026-05-12 12:00'),
+(3, 'nongdan', 3, 'daily', N'Hàng đã sẵn sàng giao', '2026-05-12 13:00'),
+(4, 'nongdan', 2, 'daily', N'Cam Vinh chất lượng cao', '2026-05-12 14:00');
 
 INSERT INTO TinNhan (MaCuocTroChuyen, MaNguoiGui, LoaiNguoiGui, NoiDung, DaDoc, NgayGui) VALUES
 -- Cuộc trò chuyện 1: Nông dân 1 - Đại lý 1
-(1, 1, 'daily', N'Chào bạn, tôi muốn đặt 100kg cà chua', 1, DATEADD(HOUR, -2, SYSDATETIME())),
-(1, 1, 'nongdan', N'Chào bạn, hiện tại tôi có sẵn hàng. Giá 25.000đ/kg', 1, DATEADD(HOUR, -1, SYSDATETIME())),
-(1, 1, 'daily', N'Được, khi nào có thể giao hàng?', 1, DATEADD(MINUTE, -30, SYSDATETIME())),
-(1, 1, 'nongdan', N'Vâng, tôi sẽ giao hàng vào sáng mai', 0, DATEADD(MINUTE, -5, SYSDATETIME())),
+(1, 1, 'daily', N'Chào bạn, tôi muốn đặt 100kg cà chua', 1, '2026-05-12 08:00'),
+(1, 1, 'nongdan', N'Chào bạn, hiện tại tôi có sẵn hàng. Giá 50.000đ/kg', 1, '2026-05-12 08:30'),
+(1, 1, 'daily', N'Được, khi nào có thể giao hàng?', 1, '2026-05-12 09:00'),
+(1, 1, 'nongdan', N'Vâng, tôi sẽ giao hàng vào sáng mai', 0, '2026-05-12 10:00'),
 
 -- Cuộc trò chuyện 2: Đại lý 1 - Siêu thị 1
-(2, 1, 'sieuthi', N'Tôi cần đặt 200kg rau muống', 1, DATEADD(HOUR, -3, SYSDATETIME())),
-(2, 1, 'daily', N'Dạ, hiện tại shop có sẵn. Giá 30.000đ/kg', 1, DATEADD(HOUR, -2, SYSDATETIME())),
-(2, 1, 'sieuthi', N'OK, tôi đặt luôn nhé', 1, DATEADD(HOUR, -1, SYSDATETIME())),
-(2, 1, 'daily', N'Đơn hàng đã được xác nhận', 0, DATEADD(MINUTE, -10, SYSDATETIME())),
+(2, 1, 'sieuthi', N'Tôi cần đặt 200kg rau muống', 1, '2026-05-12 09:00'),
+(2, 1, 'daily', N'Dạ, hiện tại shop có sẵn. Giá 45.000đ/kg', 1, '2026-05-12 09:30'),
+(2, 1, 'sieuthi', N'OK, tôi đặt luôn nhé', 1, '2026-05-12 10:30'),
+(2, 1, 'daily', N'Đơn hàng đã được xác nhận', 0, '2026-05-12 11:00'),
 
 -- Cuộc trò chuyện 3: Nông dân 2 - Đại lý 2
-(3, 2, 'daily', N'Bạn có bí xanh không?', 1, DATEADD(HOUR, -1, SYSDATETIME())),
-(3, 2, 'nongdan', N'Có bạn, tôi có 50kg', 1, DATEADD(MINUTE, -30, SYSDATETIME())),
-(3, 2, 'daily', N'Cảm ơn bạn đã đặt hàng', 0, DATEADD(MINUTE, -2, SYSDATETIME()));
+(3, 2, 'daily', N'Bạn có rau xà lách không?', 1, '2026-05-12 11:00'),
+(3, 2, 'nongdan', N'Có bạn, tôi có 100kg rau xà lách tươi', 1, '2026-05-12 11:30'),
+(3, 2, 'daily', N'Cảm ơn bạn đã đặt hàng', 0, '2026-05-12 12:00'),
+
+-- Cuộc trò chuyện 4: Nông dân 3 - Đại lý 3
+(4, 3, 'daily', N'Khoai tây Đà Lạt còn hàng không?', 1, '2026-05-12 12:00'),
+(4, 3, 'nongdan', N'Còn nhiều bạn, giá 70.000đ/kg', 1, '2026-05-12 12:30'),
+(4, 3, 'daily', N'Hàng đã sẵn sàng giao', 0, '2026-05-12 13:00'),
+
+-- Cuộc trò chuyện 5: Nông dân 4 - Đại lý 2
+(5, 4, 'daily', N'Cam Vinh có sẵn không bạn?', 1, '2026-05-12 13:00'),
+(5, 4, 'nongdan', N'Có bạn, cam rất ngọt và tươi', 1, '2026-05-12 13:30'),
+(5, 4, 'daily', N'Cam Vinh chất lượng cao', 0, '2026-05-12 14:00');
 
 PRINT 'Đã thêm dữ liệu mẫu cho chức năng chat!';
 GO
 
-
-
+SELECT * FROM CuocTroChuyen;
+SELECT * FROM TinNhan;
 
 
 
@@ -961,3 +798,64 @@ LEFT JOIN SanPham sp ON ln.MaSanPham = sp.MaSanPham
 WHERE HanSuDung < CAST(GETDATE() AS DATE)
 ORDER BY HanSuDung DESC;
 GO
+
+
+
+
+
+
+-- Thêm cột MaDonHang (nullable vì các bản ghi cũ không có)
+ALTER TABLE VanChuyen
+ADD MaDonHang INT NULL;
+
+-- Thêm foreign key constraint
+ALTER TABLE VanChuyen
+ADD CONSTRAINT FK_VanChuyen_DonHang 
+FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang);
+
+-- Thêm index để tăng tốc query theo MaDonHang
+CREATE INDEX IX_VanChuyen_MaDonHang ON VanChuyen(MaDonHang);
+
+PRINT 'Migration completed: Added MaDonHang column to VanChuyen table';
+
+
+
+
+
+
+
+
+
+-- 1: Thêm cột MaTrangTrai 
+ALTER TABLE SanPham
+ADD MaTrangTrai INT NULL;
+
+-- 2: Cập nhật MaTrangTrai cho các sản phẩm hiện có dựa trên lô nông sản
+-- Lấy MaTrangTrai từ LoNongSan (lô nông sản đầu tiên của sản phẩm đó)
+UPDATE sp
+SET sp.MaTrangTrai = (
+    SELECT TOP 1 ln.MaTrangTrai
+    FROM LoNongSan ln
+    WHERE ln.MaSanPham = sp.MaSanPham
+    ORDER BY ln.NgayTao DESC
+)
+FROM SanPham sp
+WHERE EXISTS (
+    SELECT 1 FROM LoNongSan ln WHERE ln.MaSanPham = sp.MaSanPham
+);
+
+--  3: Xóa các sản phẩm không có trang trại (nếu có)
+DELETE FROM SanPham WHERE MaTrangTrai IS NULL;
+
+--  4: Đặt cột MaTrangTrai thành NOT NULL
+ALTER TABLE SanPham
+ALTER COLUMN MaTrangTrai INT NOT NULL;
+
+-- 5: Thêm foreign key constraint
+ALTER TABLE SanPham
+ADD CONSTRAINT FK_SanPham_TrangTrai 
+FOREIGN KEY (MaTrangTrai) REFERENCES TrangTrai(MaTrangTrai);
+
+--  6: Thêm index để tăng tốc query
+CREATE INDEX IX_SanPham_MaTrangTrai ON SanPham(MaTrangTrai);
+
