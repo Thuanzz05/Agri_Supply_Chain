@@ -395,10 +395,43 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                
+                // Kiểm tra dữ liệu liên quan
+                using var checkCmd = new SqlCommand(@"
+                    SELECT 
+                        (SELECT COUNT(*) FROM ChiTietDonHang WHERE MaLo = @MaLo) as SoDonHang,
+                        (SELECT COUNT(*) FROM VanChuyen WHERE MaLo = @MaLo) as SoVanChuyen,
+                        (SELECT COUNT(*) FROM KiemDinh WHERE MaLo = @MaLo) as SoKiemDinh", conn);
+                checkCmd.Parameters.AddWithValue("@MaLo", id);
+                
+                conn.Open();
+                using var reader = checkCmd.ExecuteReader();
+                
+                if (reader.Read())
+                {
+                    var soDonHang = reader.GetInt32(0);
+                    var soVanChuyen = reader.GetInt32(1);
+                    var soKiemDinh = reader.GetInt32(2);
+                    
+                    if (soDonHang > 0 || soVanChuyen > 0 || soKiemDinh > 0)
+                    {
+                        var details = new List<string>();
+                        if (soDonHang > 0) details.Add($"{soDonHang} đơn hàng");
+                        if (soVanChuyen > 0) details.Add($"{soVanChuyen} vận chuyển");
+                        if (soKiemDinh > 0) details.Add($"{soKiemDinh} kiểm định");
+                        
+                        var message = $"Không thể xóa lô nông sản này vì đang có {string.Join(", ", details)} liên quan. Vui lòng xóa các dữ liệu liên quan trước.";
+                        _logger.LogWarning("Cannot delete crop lot {LotId}: {Orders} orders, {Transports} transports, {Inspections} inspections", 
+                            id, soDonHang, soVanChuyen, soKiemDinh);
+                        throw new Exception(message);
+                    }
+                }
+                reader.Close();
+                
+                // Nếu không có dữ liệu liên quan, thực hiện xóa
                 using var cmd = new SqlCommand("DELETE FROM LoNongSan WHERE MaLo = @MaLo", conn);
                 cmd.Parameters.AddWithValue("@MaLo", id);
 
-                conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
                 
                 if (rowsAffected > 0)
@@ -415,7 +448,7 @@ namespace NongDanService.Data
                 _logger.LogError(ex, "SQL error occurred while deleting crop lot with ID {LotId}", id);
                 if (ex.Number == 547)
                     throw new Exception("Không thể xóa lô nông sản này vì đang có dữ liệu liên quan", ex);
-                throw new Exception("Lỗi xóa lô nông sản trong cơ sở dữ liệu", ex);
+                throw new Exception("Lỗi xóa lô nông sản trong cơ sở dữ liệu: " + ex.Message, ex);
             }
         }
 

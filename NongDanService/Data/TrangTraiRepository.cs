@@ -172,10 +172,39 @@ namespace NongDanService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                
+                // Kiểm tra dữ liệu liên quan
+                using var checkCmd = new SqlCommand(@"
+                    SELECT 
+                        (SELECT COUNT(*) FROM SanPham WHERE MaTrangTrai = @MaTrangTrai) as SoSanPham,
+                        (SELECT COUNT(*) FROM LoNongSan WHERE MaTrangTrai = @MaTrangTrai) as SoLoNongSan", conn);
+                checkCmd.Parameters.Add("@MaTrangTrai", SqlDbType.Int).Value = id;
+                
+                conn.Open();
+                using var reader = checkCmd.ExecuteReader();
+                
+                if (reader.Read())
+                {
+                    var soSanPham = reader.GetInt32(0);
+                    var soLoNongSan = reader.GetInt32(1);
+                    
+                    if (soSanPham > 0 || soLoNongSan > 0)
+                    {
+                        var details = new List<string>();
+                        if (soSanPham > 0) details.Add($"{soSanPham} sản phẩm");
+                        if (soLoNongSan > 0) details.Add($"{soLoNongSan} lô nông sản");
+                        
+                        var message = $"Không thể xóa trang trại này vì đang có {string.Join(", ", details)} liên quan. Vui lòng xóa các dữ liệu liên quan trước.";
+                        _logger.LogWarning("Cannot delete farm {FarmId}: {Products} products, {Batches} batches", id, soSanPham, soLoNongSan);
+                        throw new Exception(message);
+                    }
+                }
+                reader.Close();
+                
+                // Nếu không có dữ liệu liên quan, thực hiện xóa
                 using var cmd = new SqlCommand("DELETE FROM TrangTrai WHERE MaTrangTrai = @MaTrangTrai", conn);
                 cmd.Parameters.Add("@MaTrangTrai", SqlDbType.Int).Value = id;
 
-                conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
                 
                 if (rowsAffected > 0)
@@ -192,7 +221,7 @@ namespace NongDanService.Data
                 _logger.LogError(ex, "SQL error occurred while deleting farm with ID {FarmId}", id);
                 if (ex.Number == 547)
                     throw new Exception("Không thể xóa trang trại này vì đang có dữ liệu liên quan", ex);
-                throw new Exception("Lỗi xóa trang trại trong cơ sở dữ liệu", ex);
+                throw new Exception("Lỗi xóa trang trại trong cơ sở dữ liệu: " + ex.Message, ex);
             }
         }
 
