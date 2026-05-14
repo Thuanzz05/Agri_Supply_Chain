@@ -164,11 +164,11 @@ namespace NongDanService.Data
                     OUTPUT INSERTED.MaSanPham 
                     VALUES (@TenSanPham, @DonViTinh, @MoTa, @HinhAnh, @MaTrangTrai)", conn);
 
-                cmd.Parameters.AddWithValue("@TenSanPham", dto.TenSanPham);
-                cmd.Parameters.AddWithValue("@DonViTinh", dto.DonViTinh);
-                cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@HinhAnh", (object?)dto.HinhAnh ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@MaTrangTrai", dto.MaTrangTrai);
+                cmd.Parameters.Add("@TenSanPham", SqlDbType.NVarChar, 100).Value = dto.TenSanPham;
+                cmd.Parameters.Add("@DonViTinh", SqlDbType.NVarChar, 20).Value = dto.DonViTinh;
+                cmd.Parameters.Add("@MoTa", SqlDbType.NVarChar, 255).Value = (object?)dto.MoTa ?? DBNull.Value;
+                cmd.Parameters.Add("@HinhAnh", SqlDbType.NVarChar, -1).Value = (object?)dto.HinhAnh ?? DBNull.Value; // -1 = MAX
+                cmd.Parameters.Add("@MaTrangTrai", SqlDbType.Int).Value = dto.MaTrangTrai;
 
                 conn.Open();
                 var maSanPham = (int)cmd.ExecuteScalar();
@@ -197,11 +197,11 @@ namespace NongDanService.Data
                     SET TenSanPham = @TenSanPham, DonViTinh = @DonViTinh, MoTa = @MoTa, HinhAnh = @HinhAnh 
                     WHERE MaSanPham = @MaSanPham", conn);
 
-                cmd.Parameters.AddWithValue("@MaSanPham", id);
-                cmd.Parameters.AddWithValue("@TenSanPham", dto.TenSanPham);
-                cmd.Parameters.AddWithValue("@DonViTinh", dto.DonViTinh);
-                cmd.Parameters.AddWithValue("@MoTa", (object?)dto.MoTa ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@HinhAnh", (object?)dto.HinhAnh ?? DBNull.Value);
+                cmd.Parameters.Add("@MaSanPham", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TenSanPham", SqlDbType.NVarChar, 100).Value = dto.TenSanPham;
+                cmd.Parameters.Add("@DonViTinh", SqlDbType.NVarChar, 20).Value = dto.DonViTinh;
+                cmd.Parameters.Add("@MoTa", SqlDbType.NVarChar, 255).Value = (object?)dto.MoTa ?? DBNull.Value;
+                cmd.Parameters.Add("@HinhAnh", SqlDbType.NVarChar, -1).Value = (object?)dto.HinhAnh ?? DBNull.Value; // -1 = MAX
 
                 conn.Open();
                 var rowsAffected = cmd.ExecuteNonQuery();
@@ -218,7 +218,7 @@ namespace NongDanService.Data
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "SQL error occurred while updating product with ID {ProductId}", id);
-                throw new Exception("Lỗi cập nhật sản phẩm trong cơ sở dữ liệu", ex);
+                throw new Exception("Lỗi cập nhật sản phẩm trong cơ sở dữ liệu: " + ex.Message, ex);
             }
         }
 

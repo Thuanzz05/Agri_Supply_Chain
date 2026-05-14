@@ -4,7 +4,12 @@ using SieuThiService.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Chấp nhận cả camelCase và PascalCase từ frontend
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // Register SieuThi dependencies
 builder.Services.AddScoped<ISieuThiRepository, SieuThiRepository>();

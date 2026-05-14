@@ -85,7 +85,7 @@ CREATE TABLE TrangTrai (
     TenTrangTrai NVARCHAR(100) NOT NULL,
     DiaChi NVARCHAR(255),
     SoChungNhan NVARCHAR(50),
-    HinhAnh NVARCHAR(500) NULL,
+    HinhAnh NVARCHAR(MAX) NULL, 
     FOREIGN KEY (MaNongDan) REFERENCES NongDan(MaNongDan)
 );
 
@@ -95,7 +95,7 @@ CREATE TABLE SanPham (
     TenSanPham NVARCHAR(100) NOT NULL,
     DonViTinh NVARCHAR(20) NOT NULL,
     MoTa NVARCHAR(255),
-    HinhAnh NVARCHAR(500) NULL,
+    HinhAnh NVARCHAR(MAX) NULL, 
     MaTrangTrai INT NOT NULL,
     FOREIGN KEY (MaTrangTrai) REFERENCES TrangTrai(MaTrangTrai)
 );

@@ -4,7 +4,12 @@ using NongDanService.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Chấp nhận cả camelCase và PascalCase từ frontend
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
