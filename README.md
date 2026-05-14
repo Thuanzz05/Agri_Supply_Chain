@@ -1,4 +1,4 @@
-Frontend: https://github.com/Thuanzz05/Agri_Supply_Chain_UI
+Frontend: https://github.com/Thuanzz05/UI_Agri_Supply_Chain
 
 # Hệ thống Quản lý Nông sản & Chuỗi cung ứng (Agri Supply Chain)
 
