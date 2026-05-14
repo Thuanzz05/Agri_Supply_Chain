@@ -109,11 +109,13 @@ namespace SieuThiService.Data
             try
             {
                 using var conn = new SqlConnection(_connectionString);
+                // Chỉ lấy phiếu vận chuyển mới nhất (lần vận chuyển cuối cùng)
+                // để tránh hiển thị tất cả các lần vận chuyển song song của cùng 1 lô
                 using var cmd = new SqlCommand(@"
-                    SELECT MaVanChuyen, DiemDi, DiemDen, NgayBatDau, NgayKetThuc, TrangThai
+                    SELECT TOP 1 MaVanChuyen, DiemDi, DiemDen, NgayBatDau, NgayKetThuc, TrangThai
                     FROM VanChuyen
                     WHERE MaLo = @MaLo
-                    ORDER BY NgayBatDau ASC", conn);
+                    ORDER BY NgayBatDau DESC", conn);
 
                 cmd.Parameters.AddWithValue("@MaLo", maLo);
 
