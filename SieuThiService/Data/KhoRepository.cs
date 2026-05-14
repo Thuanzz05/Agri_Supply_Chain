@@ -119,5 +119,112 @@ namespace SieuThiService.Data
                 TenChuSoHuu = reader.IsDBNull("TenChuSoHuu") ? null : reader.GetString("TenChuSoHuu")
             };
         }
+
+        public int Create(KhoCreateDTO dto)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    INSERT INTO Kho (TenKho, LoaiKho, MaChuSoHuu, LoaiChuSoHuu, DiaChi)
+                    OUTPUT INSERTED.MaKho
+                    VALUES (@TenKho, @LoaiKho, @MaChuSoHuu, @LoaiChuSoHuu, @DiaChi)", conn);
+
+                cmd.Parameters.Add("@TenKho", SqlDbType.NVarChar, 100).Value = dto.TenKho;
+                cmd.Parameters.Add("@LoaiKho", SqlDbType.NVarChar, 20).Value = dto.LoaiKho;
+                cmd.Parameters.Add("@MaChuSoHuu", SqlDbType.Int).Value = dto.MaChuSoHuu;
+                cmd.Parameters.Add("@LoaiChuSoHuu", SqlDbType.NVarChar, 20).Value = dto.LoaiChuSoHuu;
+                cmd.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
+
+                conn.Open();
+                var maKho = (int)cmd.ExecuteScalar();
+                
+                _logger.LogInformation("Created new warehouse with ID {WarehouseId}", maKho);
+                return maKho;
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while creating warehouse");
+                throw new Exception("Lỗi tạo kho trong cơ sở dữ liệu: " + ex.Message, ex);
+            }
+        }
+
+        public bool Update(int id, KhoUpdateDTO dto)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(@"
+                    UPDATE Kho
+                    SET TenKho = @TenKho, LoaiKho = @LoaiKho, DiaChi = @DiaChi
+                    WHERE MaKho = @MaKho", conn);
+
+                cmd.Parameters.Add("@MaKho", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@TenKho", SqlDbType.NVarChar, 100).Value = dto.TenKho;
+                cmd.Parameters.Add("@LoaiKho", SqlDbType.NVarChar, 20).Value = dto.LoaiKho;
+                cmd.Parameters.Add("@DiaChi", SqlDbType.NVarChar, 255).Value = (object?)dto.DiaChi ?? DBNull.Value;
+
+                conn.Open();
+                var rowsAffected = cmd.ExecuteNonQuery();
+                
+                if (rowsAffected > 0)
+                {
+                    _logger.LogInformation("Updated warehouse with ID {WarehouseId}", id);
+                    return true;
+                }
+                
+                _logger.LogWarning("No warehouse found with ID {WarehouseId} to update", id);
+                return false;
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while updating warehouse with ID {WarehouseId}", id);
+                throw new Exception("Lỗi cập nhật kho trong cơ sở dữ liệu: " + ex.Message, ex);
+            }
+        }
+
+        public bool Delete(int id)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                
+                // Kiểm tra xem kho có tồn kho không
+                using var checkCmd = new SqlCommand(@"
+                    SELECT COUNT(*) FROM TonKho WHERE MaKho = @MaKho", conn);
+                checkCmd.Parameters.Add("@MaKho", SqlDbType.Int).Value = id;
+                
+                conn.Open();
+                var count = (int)checkCmd.ExecuteScalar();
+                
+                if (count > 0)
+                {
+                    _logger.LogWarning("Cannot delete warehouse {WarehouseId} because it has {Count} inventory records", id, count);
+                    throw new Exception($"Không thể xóa kho này vì đang có {count} bản ghi tồn kho. Vui lòng xóa tồn kho trước.");
+                }
+                
+                // Nếu không có tồn kho, thực hiện xóa
+                using var cmd = new SqlCommand("DELETE FROM Kho WHERE MaKho = @MaKho", conn);
+                cmd.Parameters.Add("@MaKho", SqlDbType.Int).Value = id;
+
+                var rowsAffected = cmd.ExecuteNonQuery();
+                
+                if (rowsAffected > 0)
+                {
+                    _logger.LogInformation("Deleted warehouse with ID {WarehouseId}", id);
+                    return true;
+                }
+                
+                _logger.LogWarning("No warehouse found with ID {WarehouseId} to delete", id);
+                return false;
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "SQL error occurred while deleting warehouse with ID {WarehouseId}", id);
+                if (ex.Number == 547)
+                    throw new Exception("Không thể xóa kho này vì đang có dữ liệu liên quan", ex);
+                throw new Exception("Lỗi xóa kho trong cơ sở dữ liệu: " + ex.Message, ex);
+            }
+        }
     }
 }

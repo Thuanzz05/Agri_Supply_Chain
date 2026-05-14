@@ -35,6 +35,10 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 
+// Register ChuyenKho dependencies
+builder.Services.AddScoped<IChuyenKhoRepository, ChuyenKhoRepository>();
+builder.Services.AddScoped<IChuyenKhoService, ChuyenKhoService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
