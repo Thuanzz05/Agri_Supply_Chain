@@ -72,7 +72,6 @@ namespace DaiLyService.Data
                         AND dh.LoaiNguoiMua = 'daily'
                         AND dh.LoaiNguoiBan = 'nongdan'
                         AND ln.SoLuongHienTai > 0
-                        AND dh.TrangThai IN ('cho_kiem_dinh', 'dang_van_chuyen', 'tra_hang')
                     ORDER BY SortOrder, ln.NgayThuHoach DESC", conn);
 
                 cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
@@ -576,8 +575,7 @@ namespace DaiLyService.Data
                     WHERE dh.MaNguoiMua = @MaDaiLy
                         AND dh.LoaiNguoiMua = 'daily'
                         AND dh.LoaiNguoiBan = 'nongdan'
-                        AND ln.SoLuongHienTai > 0
-                        AND dh.TrangThai IN ('cho_kiem_dinh', 'dang_van_chuyen', 'tra_hang')", conn);
+                        AND ln.SoLuongHienTai > 0", conn);
 
                 cmd.Parameters.AddWithValue("@MaDaiLy", maDaiLy);
                 conn.Open();
