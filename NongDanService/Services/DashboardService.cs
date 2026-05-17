@@ -7,6 +7,7 @@ namespace NongDanService.Services
         object GetDashboardStats(int maNongDan);
         List<object> GetRecentOrders(int maNongDan, int limit = 5);
         object GetOrderStats(int maNongDan);
+        List<object> GetProductSales(int maNongDan);
     }
 
     public class DashboardService : IDashboardService
@@ -37,6 +38,11 @@ namespace NongDanService.Services
         public object GetOrderStats(int maNongDan)
         {
             return _repository.GetOrderStats(maNongDan);
+        }
+
+        public List<object> GetProductSales(int maNongDan)
+        {
+            return _repository.GetProductSales(maNongDan);
         }
     }
 }

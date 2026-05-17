@@ -91,5 +91,31 @@ namespace NongDanService.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Lấy thống kê sản phẩm bán chạy của nông dân
+        /// </summary>
+        [HttpGet("product-sales/{maNongDan}")]
+        public IActionResult GetProductSales(int maNongDan)
+        {
+            try
+            {
+                var sales = _service.GetProductSales(maNongDan);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Lấy thống kê sản phẩm bán chạy thành công",
+                    data = sales
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi server: " + ex.Message
+                });
+            }
+        }
     }
 }
